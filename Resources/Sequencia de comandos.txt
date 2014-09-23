@@ -1,0 +1,39 @@
+Editor/UI:
+	JsonDb banco = getInstanciaBanco();
+	try {
+		SqlResult result = banco.executeSql(conteudoEditor);
+		
+		if (result.hasResults()) {
+			output.setRows(result.rowSet());
+		}
+		
+		output.setAffectedRowsCount(result.getAffectedRowsCount());
+	} catch (SqlParseException e1) {
+		onSqlError("Erro no(s) comando(s) SQL: " + e1.getMessage());
+	} catch (SqlException e2) {
+		onSqlError("Erro na execução do(s) comando(s): " + e2.getMessage());
+	}
+	
+	
+Core:
+>JsonDb
+
+	public SqlResult executeSql(String plainSql) throws SqlParseException, SqlException {
+		List<SqlCommand> commands = SqlParser.parseCommands(plainSql);
+		Iterator<SqlCommand> cmdsIt = commands.iterator();
+		// TODO: ver se em uma série de comandos SQL a quantidade de registros afetados é:
+		// 1. a soma de todos os comandos;
+		// 2. o tamanho do *conjunto* de registros afetados; ou
+		// 3. a quantidade de registros afetados pelo último comando
+		while (cmdsIt.hasNext()) {
+			SqlCommand cmd = cmdsIt.next();
+			boolean isLastCmd = !cmdsIt.hasNext();
+			SqlResult cmdResult = execute(cmd, isLastCmd);
+			if (isLastCmd) {
+				lastResult = cmdResult;
+			}
+		}
+	
+		return result;
+	}
+	
