@@ -71,8 +71,8 @@ id: _? {letra} (_? | {letra} | {digito})*
 	:[\r\s\n\t]
 #NonTerminals
 <ACAO>
-<CRIA>
-<CRIA2>
+<CRIAR>
+<CRIAR2>
 <ATRIBUTOS>
 <ATRIBUTO>
 <RATRIBUTOS>
@@ -100,7 +100,8 @@ id: _? {letra} (_? | {letra} | {digito})*
 <CAMPOS>
 <RCAMPOS>
 <CAMPO>
-<CAMPO2>
+<ID>
+<QUALIFICADOR>
 <TABELAS>
 <RTABELAS>
 <TABELA>
@@ -115,27 +116,27 @@ id: _? {letra} (_? | {letra} | {digito})*
 <DESCREVER>
 <SETAR_BANCO>
 #Grammar
-<ACAO> ::= <CRIA> | <INCLUIR> | <SELECIONAR> | <ELIMINAR> | <DESCREVER> | <SETAR_BANCO>;
-<CRIA> ::= CREATE <CRIA2> ";";
-<CRIA2> ::= DATABASE id_ref #51 | TABLE id_ref #38 "(" <ATRIBUTOS> ")" #58 | INDEX <TABELA> "(" <CAMPO> ")" #66 ;
+<ACAO> ::= <CRIAR> | <INCLUIR> | <SELECIONAR> | <ELIMINAR> | <DESCREVER> | <SETAR_BANCO>;
+<CRIAR> ::= CREATE <CRIAR2> ";";
+<CRIAR2> ::= DATABASE <ID> #999 | TABLE <TABELA> "(" <ATRIBUTOS> ")" #58 | INDEX <TABELA> "(" <CAMPO> ")" #66 ;
 <ATRIBUTOS> ::= <ATRIBUTO> <RATRIBUTOS>;
-<ATRIBUTO> ::= id #33 <TIPO> #53 <RESTRICOES>;
+<ATRIBUTO> ::= <ID> <TIPO> #53 <RESTRICOES>;
 <RATRIBUTOS> ::= "," <RATRIBUTOS2> | î;
 <RATRIBUTOS2> ::= <ATRIBUTOS> | <RESTRICAO_FINAL> ;
-<TIPO> ::= NUMBER "(" numero <DECIMAL> ")" | VARCHAR "(" numero ")" | DATE | CHAR "(" numero ")";
+<TIPO> ::= NUMBER #999 "(" numero <DECIMAL> #999 ")" | VARCHAR #999 "(" numero #999 ")" | DATE #999 | CHAR #999 "(" numero #999 ")";
 <RESTRICOES> ::= CONSTRAINT <RESTRICAO1> | <RESTRICAO2> | î;
 <RESTRICAO1> ::= id #15 <TIPO_RESTRICAO1> #55;
-<TIPO_RESTRICAO1> ::= NULL | NOT NULL | PRIMARY KEY | REFERENCES id #38 "(" <LISTAIDS> ")";
+<TIPO_RESTRICAO1> ::= NULL | NOT NULL | PRIMARY KEY | REFERENCES <TABELA> "(" <LISTAIDS> ")";
 <RESTRICAO2> ::= <TIPO_RESTRICAO2> #55;
-<TIPO_RESTRICAO2> ::= NULL | NOT NULL | PRIMARY KEY | REFERENCES id #38 "(" id #13 ")";
+<TIPO_RESTRICAO2> ::= NULL | NOT NULL | PRIMARY KEY | REFERENCES <TABELA> "(" <ID> ")";
 <RESTRICAO_FINAL> ::= CONSTRAINT <RESTRICAO3> <RRESTRICAO_FINAL>;
 <RRESTRICAO_FINAL> ::= "," <RESTRICAO_FINAL> | î;
 <RESTRICAO3> ::= id #15 <TIPO_RESTRICAO3> #55;
-<TIPO_RESTRICAO3> ::= PRIMARY KEY "(" <LISTAIDS> ")" | FOREIGN KEY "(" <LISTAIDS> ")" REFERENCES id #38 "(" <LISTAIDS> ")";
+<TIPO_RESTRICAO3> ::= PRIMARY KEY "(" <LISTAIDS> ")" | FOREIGN KEY "(" <LISTAIDS> ")" REFERENCES <TABELA> "(" <LISTAIDS> ")";
 <DECIMAL> ::= "," numero | î;
-<LISTAIDS> ::= id #13 <RLISTAIDS>;
+<LISTAIDS> ::= <ID> <RLISTAIDS>;
 <RLISTAIDS> ::= "," <LISTAIDS> | î;
-<INCLUIR> ::= INSERT INTO id #18 <COLUNAS> VALUES "(" <LISTAVALORES> ")" ";" #98;
+<INCLUIR> ::= INSERT INTO <TABELA> <COLUNAS> VALUES "(" <LISTAVALORES> ")" ";" #98;
 <COLUNAS> ::= "(" <LISTAIDS> ")" | î;
 <LISTAVALORES> ::= <VALOR> #43 <RLISTAVALORES>;
 <VALOR> ::= numero | literal | data | "null";
@@ -144,10 +145,11 @@ id: _? {letra} (_? | {letra} | {digito})*
 <CAMPOSNOVO> ::= <CAMPOS> | "*";
 <CAMPOS> ::= <CAMPO> <RCAMPOS>;
 <RCAMPOS> ::= "," <CAMPOS> | î;
-<CAMPO> ::= id <CAMPO2> #13;
-<CAMPO2> ::= "." id | î;
 <TABELAS> ::= <TABELA> <RTABELAS>;
 <RTABELAS> ::= "," <TABELAS> | î;
+<ID> ::= id #13;
+<CAMPO> ::= <QUALIFICADOR> <ID>;
+<QUALIFICADOR> ::= <TABELA> "." | î;
 <TABELA> ::= id #18;
 <CLAUSULA_WHERE> ::= WHERE <CONDICOES> | î;
 <CONDICOES> ::= <CONDICAO> <RCONDICAO>;
@@ -156,6 +158,6 @@ id: _? {letra} (_? | {letra} | {digito})*
 <OPERADOR_REL> ::= "=" | ">" | "<" | ">=" | "<=" | "<>";
 <OPERADOR_LOG> ::= AND | OR;
 <ELIMINAR> ::= DROP <ELIMINAR2> ";";
-<ELIMINAR2> ::= TABLE id #61 | INDEX <TABELA> "(" <CAMPO> ")" #67;
-<DESCREVER> ::= DESCRIBE id ";" #63;
-<SETAR_BANCO> ::= SET DATABASE id ";" #65;
+<ELIMINAR2> ::= TABLE <TABELA> | INDEX <TABELA> "(" <CAMPO> ")" #67;
+<DESCREVER> ::= DESCRIBE <TABELA> ";" #63;
+<SETAR_BANCO> ::= SET DATABASE <ID> ";" #65;
