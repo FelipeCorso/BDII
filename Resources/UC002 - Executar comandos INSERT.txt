@@ -1,0 +1,57 @@
+Caso de uso - Executar comandos INSERT
+Ator: Usuário
+Objetivo: Inserir registros em tabelas do banco
+Pré-condições: Base criada e definida com as tabelas envolvidas nos comandos; código SQL de somente um ou mais comandos INSERT
+Pós-condições: Registros inseridos nas devidas tabelas, conforme comandos SQL
+
+Cenário principal:
+01. Usuário submete código SQL para a instância do JsonDb
+02. JsonDb submete código para o SqlParser
+03. SqlParser faz o reconhecimento preliminar das sentenças SQL (texto até encontrar ";") e, para cada um, cria um objeto de RawStatement
+04. SqlParser cria e retorna uma fila das sentenças SQL (sem o reconhecimento dos tokens)
+05. JsonDb remove a primeira sentença da fila
+06. JsonDb solicita interpretação da sentença SQL para o SqlParser
+07. SqlParser reconhece a sentença, cria o objeto de InsertStatement correspondente e retorna para o JsonDb
+08. JsonDb verifica no metadados da base se a tabela indicada após a palavra chave "INTO" existe
+09. JsonDb obtém o metadados da tabela através do Store
+10. JsonDb valida os tipos de dados das colunas e valores informados
+11. JsonDb verifica violação de chave primária
+12. JsonDb submete inserção para o Store
+13. Store grava o registro na tabela de dados
+14. Store grava na tabela de índices o offset e quantidade de bytes do registro gravado
+15. JsonDb cria e armazena na sessão um objeto de resultado do comando, contendo o comando executado, tempo decorrido desde o passo 05 e tempo absoluto do SO
+16. Caso existam mais comandos na fila, pula para o passo 05
+17. JsonDb retorna a lista de objetos de resultados dos comandos para o usuário
+
+Cenário alternativo:
+No passo 10, caso os nomes das colunas não tenham sido indicados:
+10.01. JsonDb assume que os nomes das colunas foram informados na mesma ordem em que foram definidas na criação da tabela
+10.02. Volta ao cenário principal
+
+Cenário de exceção:
+No passo 07, caso o SqlParser encontre algum erro léxico ou sintático:
+07.01. SqlParser lança exceção com uma mensagem de diagnóstico do erro
+07.02. JsonDb cria e armazena o objeto de resultado com a exceção, indicando o comando que causou a exceção
+07.03. Pula para o passo 17
+
+Cenário de exceção:
+No passo 08, caso a tabela não exista no metadados:
+08.01. Store lança exceção de tabela não encontrada
+08.02. JsonDb cria e armazena o objeto de resultado com uma nova exceção, indicando o comando que apresentou problema e uma mensagem de diagnóstico
+08.03. Pula para o passo 17
+
+Cenário de exceção:
+No passo 10, caso um campo não exista, seja de tipo incompatível com o valor fornecido ou seja NOT NULL e não tenha sido informado:
+10.01. JsonDb cria e armazena objeto de resultado com exceção com uma mensagem de diagnóstico
+10.02. Pula para o passo 17
+
+Cenário de exceção:
+No passo 11, caso o valor da chave primária já exista no índice:
+11.01. JsonDb cria e armazena o objeto de resultado com exceção indicando o nome da coluna e o valor duplicado
+11.02. Pula para o passo 17
+
+Cenário de exceção:
+Nos passos 13 e 14, caso ocorra falha de IO:
+x.01. Store repassa exceção do Sistema Operacional, indicando o arquivo sendo modificado ao ocorrer o erro
+x.02. JsonDb cria e armazena o objeto de resultado de comando com a exceção, alertando inconsistência física dos dados
+x.03. Pula para o passo 17

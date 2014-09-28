@@ -1,0 +1,47 @@
+Caso de uso - Executar comandos SQL
+Ator: Usuário
+Objetivo: Efetuar alterações na base ou seus dados, de forma genérica
+Pré-condições: Base criada e definida para execução dos comandos
+Pós-condições: Base alterada de acordo com as instruções SQL, resultados das ações exibidos na interface
+
+Cenário principal:
+01. Usuário digita comandos SQL
+02. Usuário submete comandos para execução
+03. Interface submete código do usuário para a instância do JsonDb
+04. JsonDb submete código para o SqlParser
+05. SqlParser faz o reconhecimento preliminar das sentenças SQL (texto até encontrar ";") e, para cada um, cria um objeto de RawStatement
+06. SqlParser cria e retorna uma fila das sentenças SQL (sem o reconhecimento dos tokens)
+07. JsonDb remove a primeira sentença da fila
+08. JsonDb solicita interpretação da sentença SQL para o SqlParser
+09. SqlParser reconhece a sentença, cria o objeto de IStatement correspondente e retorna para o JsonDb
+10. JsonDb verifica no metadados da base se a tabela envolvida no comando existe
+11. JsonDb efetua as validações do comando
+12. JsonDb submete alterações para o Store
+13. Store executa e retorna o resultado das alterações
+14. JsonDb cria e armazena na sessão um objeto de resultados com o comando executado, tempo decorrido desde o passo 07 e tempo absoluto do SO
+15. Se houver mais um comando, pula para o passo 07
+16. JsonDb retorna os objetos de resultados para a UI
+17. Interface define a melhor forma de exibir os resultados
+
+Cenário de exceção:
+No passo 08, caso seja identificado algum erro léxico ou sintático:
+08.01. SqlParser lança exceção indicando a linha do erro e uma mensagem de diagnóstico
+08.02. Interface captura o erro e apresenta a mensagem de diagnóstico para o usuário
+08.03. O caso de uso é encerrado
+
+Cenário de exceção:
+No passo 10, caso a tabela não exista no metadados:
+10.01. JsonDb cria e armazena o objeto de resultado com uma exceção indicando o comando que apresentou problema e uma mensagem de diagnóstico
+10.02. Pula para o passo 16
+
+Cenário de exceção:
+No passo 11, caso algum problema seja identificado:
+11.01. JsonDb cria e armazena o objeto de resultado com uma exceção indicando o comando que apresentou problema e uma mensagem de diagnóstico
+11.02. Pula para o passo 16
+
+Cenário de exceção:
+No passo 13, caso ocorra algum erro de IO:
+13.01. Store repassa exceção do Sistema Operacional, indicando o arquivo sendo modificado ao ocorrer o erro
+13.02. JsonDb cria e armazena o objeto de resultado de comando com a exceção, alertando inconsistência física dos dados
+13.03. Pula para o passo 16
+
