@@ -1,0 +1,112 @@
+#Options
+GenerateScanner = true
+GenerateParser = true
+Language = Java
+ScannerName = Lexico
+ParserName = Sintatico
+SemanticName = Semantico
+ScannerCaseSensitive = false
+ScannerTable = Compact
+Input = String
+Parser = LL
+#RegularDefinitions
+letra: [a-zA-Z]
+digito: [0-9]
+nao_zero: [1-9]
+inteiro: {digito}+
+id: _? {letra} (_ | {letra} | {digito})*
+
+#Tokens
+id: {id} | ' {id} '
+numero: {inteiro}
+literal: \" ([^\\ \" \n] | \\ (\\ | \"))* \"
+data: {digito} {digito} / {digito} {digito} / {digito} {digito} {digito} {digito}
+
+#NonTerminals
+<ACAO>
+<CRIA>
+<CRIA2>
+<ATRIBUTOS>
+<ATRIBUTO>
+<RATRIBUTOS>
+<RATRIBUTOS2>
+<TIPO>
+<RESTRICOES>
+<RESTRICAO1>
+<TIPO_RESTRICAO1>
+<RESTRICAO2>
+<TIPO_RESTRICAO2>
+<RESTRICAO_FINAL>
+<RRESTRICAO_FINAL>
+<RESTRICAO3>
+<TIPO_RESTRICAO3>
+<DECIMAL>
+<LISTAIDS>
+<RLISTAIDS>
+<INCLUIR>
+<COLUNAS>
+<LISTAVALORES>
+<VALOR>
+<RLISTAVALORES>
+<SELECIONAR>
+<CAMPOS>
+<RCAMPOS>
+<CAMPO>
+<CAMPO2>
+<TABELAS>
+<RTABELAS>
+<TABELA>
+<CLAUSULA_WHERE>
+<CONDICOES>
+<CONDICAO>
+<RCONDICAO>
+<OPERADOR_REL>
+<OPERADOR_LOG>
+<ELIMINAR>
+<DESCREVER>
+<SETAR_BANCO>
+
+#Grammar
+<ACAO> ::= <CRIA> | <INCLUIR> | <SELECIONAR> | <ELIMINAR> | <DESCREVER> | <SETAR_BANCO> ";";
+<CRIA> ::= CREATE <CRIA2>;
+<CRIA2> ::= DATABASE id #51 | TABLE id #38 "(" <ATRIBUTOS> ")" #58;
+<ATRIBUTOS> ::= <ATRIBUTO> <RATRIBUTOS>;
+<ATRIBUTO> ::= id #33 <TIPO> #53 <RESTRICOES>;
+<RATRIBUTOS> ::= "," <RATRIBUTOS2> | î;
+<RATRIBUTOS2> ::= <ATRIBUTOS> | <RESTRICAO_FINAL>;
+<TIPO> ::= NUMBER "(" numero <DECIMAL> ")" | VARCHAR "(" numero ")" | DATE | CHAR "(" numero ")";
+<RESTRICOES> ::= CONSTRAINT <RESTRICAO1> | <RESTRICAO2> | î;
+<RESTRICAO1> ::= id #15 <TIPO_RESTRICAO1> #55;
+<TIPO_RESTRICAO1> ::= NULL | NOT NULL | PRIMARY KEY | REFERENCES id #38 "("<LISTAIDS>")";
+<RESTRICAO2> ::= <TIPO_RESTRICAO2> #55;
+<TIPO_RESTRICAO2> ::= NULL | NOT NULL | PRIMARY KEY | REFERENCES id #38 "(" id #13 ")"; 
+<RESTRICAO_FINAL> ::= CONSTRAINT <RESTRICAO3> <RRESTRICAO_FINAL>;
+<RRESTRICAO_FINAL> ::= "," <RESTRICAO_FINAL> | î;
+<RESTRICAO3> ::= id #15 <TIPO_RESTRICAO3> #55;
+<TIPO_RESTRICAO3> ::= PRIMARY KEY "(" <LISTAIDS> ")" | FOREIGN KEY "(" <LISTAIDS> ")" REFERENCES id #38 "(" <LISTAIDS> ")";
+<DECIMAL> ::= "," numero | î;
+<LISTAIDS> ::= id #13 <RLISTAIDS> | id #13;
+<RLISTAIDS> ::= "," <LISTAIDS> | î;
+<INCLUIR> ::= INSERT INTO id #18 <COLUNAS> VALUES "(" <LISTAVALORES> ")";
+<COLUNAS> ::= "(" <LISTAIDS> ")" | î;
+<LISTAVALORES> ::= <VALOR> #43 <RLISTAVALORES>;
+<VALOR> ::= numero | literal | data | null;
+<RLISTAVALORES> ::= "," <LISTAVALORES> | î;
+<SELECIONAR> ::= SELECT <CAMPOS> FROM <TABELAS> <CLAUSULA_WHERE>;
+<CAMPOS> ::= <CAMPO> <RCAMPOS> | "*";
+<RCAMPOS> ::= "," <CAMPOS> | î;
+<CAMPO> ::= id <CAMPO2> #13;
+<CAMPO2> ::= "." id | î;
+<TABELAS> ::= <TABELA> <RTABELAS>;
+<RTABELAS> ::= "," <TABELAS> | î;
+<TABELA> ::= id #18;
+<CLAUSULA_WHERE> ::= WHERE <CONDICOES> | î;
+<CONDICOES> ::= <CONDICAO> <RCONDICAO>;
+<CONDICAO> ::= <CAMPO> <OPERADOR_REL> <VALOR> #43;
+<RCONDICAO> ::= <OPERADOR_LOG> <CONDICOES> | î;
+<OPERADOR_REL> ::= "=" | ">" | "<" | ">=" | "<=" | "<>";
+<OPERADOR_LOG> ::= AND | OR;
+<ELIMINAR> ::= DROP TABLE id #61;
+<DESCREVER> ::= DESCRIBE id #63;
+<SETAR_BANCO> ::= SET DATABASE id #65;
+
