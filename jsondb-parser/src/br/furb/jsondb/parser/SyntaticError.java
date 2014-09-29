@@ -1,4 +1,4 @@
-package br.furb.jsondb.parser;
+﻿package br.furb.jsondb.parser;
 
 public class SyntaticError extends AnalysisError
 {

@@ -1,9 +1,9 @@
-package br.furb.jsondb.parser;
+ï»¿package br.furb.jsondb.parser;
 
 public class Semantico implements Constants
 {
     public void executeAction(int action, Token token)	throws SemanticError
     {
-        System.out.println("Ação #"+action+", Token: "+token);
+        System.out.println("AÃ§Ã£o #"+action+", Token: "+token);
     }	
 }

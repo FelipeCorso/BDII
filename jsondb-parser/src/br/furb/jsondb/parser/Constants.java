@@ -1,4 +1,4 @@
-package br.furb.jsondb.parser;
+﻿package br.furb.jsondb.parser;
 
 public interface Constants extends ScannerConstants, ParserConstants
 {

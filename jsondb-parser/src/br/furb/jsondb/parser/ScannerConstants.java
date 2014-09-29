@@ -1,4 +1,4 @@
-package br.furb.jsondb.parser;
+﻿package br.furb.jsondb.parser;
 
 public interface ScannerConstants
 {
@@ -709,7 +709,7 @@ public interface ScannerConstants
 
     String[] SCANNER_ERROR =
     {
-        "Caractere n�o esperado",
+        "Caractere não esperado",
         "",
         "Erro identificando literal",
         "Erro identificando id",
