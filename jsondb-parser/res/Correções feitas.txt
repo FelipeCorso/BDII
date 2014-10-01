@@ -1,0 +1,1 @@
+01. Criada a ação <sentenca> para que todos os comandos esperem o ";" no final. Na forma original, somente a ação <DESCRIBE> esperava.
