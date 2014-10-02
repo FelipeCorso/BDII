@@ -1,1 +1,12 @@
-01. Criada a ação <sentenca> para que todos os comandos esperem o ";" no final. Na forma original, somente a ação <DESCRIBE> esperava.
+01. Criada a ação <sentenca> para que todos os comandos esperem o ";" no final. Na forma original, somente a ação <DESCRIBE> esperava
+02. Adicionado suporte para "CRAETE INDEX <tabela>(<campo>)", específico para nosso trabalho
+03. "Enxuta" a recursão para a criação dos atributos da tabela e restrições finais (cada um passa a ter seu próprio não-terminal recursivo)
+04. Adicionadas ações semânticas para reconhecer:
+	Tipos de atributos e parâmetros (precisão)
+	Tipos de restrições e parâmetros (campos referenciados)
+05. Criadas ações que permitam ao compilador saber quando a declaração de uma lista começa e encerra
+06. Criadas ações para reconhecer os valores no não-terminal <listavalores>
+07. Alterado para que o não-terminal <campos> reconheça somente ou uma lista de campos ou "*" (anteriormente era possível obter "select campoa, campob, * from...")
+08. 
+
+Lembrando que as ações semânticas sempre retornam apenas o último token reconhecido.

@@ -17,8 +17,8 @@ Acoes semanticas
 15		Nome de restricao usada no CREATE
 16		Finaliza reconhecimento de lista de IDs
 17		Nome de campo/atributo usado no CREATE
-18		Encerra reconhecimento de lista de campos (SELECT Å´camposÅª)
-19		Encerra reconhecimento de lista de tabelas (SELECT campos from Å´tabelasÅª)
+18		Encerra reconhecimento de lista de campos (SELECT ÔøΩÔøΩcamposÔøΩÔøΩ)
+19		Encerra reconhecimento de lista de tabelas (SELECT campos from ÔøΩÔøΩtabelasÔøΩÔøΩ)
 --		-----
 20		Restricao NULL
 21		Restricao NOT NULL
@@ -26,6 +26,7 @@ Acoes semanticas
 23		Restricao [FOREIGN KEY] REFERENCES
 24		Restricao FOREIGN KEY
 
+--		-----
 30		Reconhece operador relacional
 31		Reconhece operador logico
 32		Reconhece numero
@@ -35,11 +36,15 @@ Acoes semanticas
 38		Inicia reconhecimento de valores no INSERT
 39		Encerra reconhecimento de valores no INSERT
 
+--		-----
+
 51		Nome de base de dados
 
 53		Encerra reconhecimento do tipo
 
 55		Encerra reconhecimento da restricao
+
+--		-----
 
 61		Nome de tabela e ser removida (DROP)
 

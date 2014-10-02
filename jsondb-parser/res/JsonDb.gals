@@ -74,7 +74,7 @@ INDEX = id: "INDEX"
 <criar>
 <criar_estrutura>
 <lista_atributos>
-<lista_atributos_1>
+<lista_atributos_rec>
 <atributo>
 <tipo>
 <decimal>
@@ -115,8 +115,8 @@ INDEX = id: "INDEX"
 <acao> ::= <criar> | <incluir> | <selecionar> | <eliminar> | <descrever> | <setar_banco>;
 <criar> ::= CREATE <criar_estrutura>;
 <criar_estrutura> ::= DATABASE id #51 | TABLE id #13 "(" <lista_atributos> <lista_restricoes_finais_opt> ")" | INDEX #66 <index>;
-<lista_atributos> ::= <atributo> <lista_atributos_1>;
-<lista_atributos_1> ::= "," <atributo> <lista_atributos_1> | �;
+<lista_atributos> ::= <atributo> <lista_atributos_rec>;
+<lista_atributos_rec> ::= "," <atributo> <lista_atributos_rec> | �;
 <atributo> ::= id #17 <tipo> #53 <restricao>;
 <tipo> ::= NUMBER #01 "(" numero #09 <decimal> ")" | VARCHAR #02 "(" numero #09 ")" | DATE #03 | CHAR #04 "(" numero #09 ")";
 <decimal> ::= "," numero #08 | �;
