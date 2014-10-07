@@ -10,4 +10,15 @@ public class SyntaticError extends AnalysisError {
 	public SyntaticError(String msg) {
 		super(msg);
 	}
+
+	public SyntaticError(int lastState, int position, Token token) {
+		super(geraMensagem(lastState, token), position);
+	}
+
+	public static String geraMensagem(int lastState, Token token) {
+		if (token.isFimProg()) {
+			return "Erro na linha %d - encontrado fim de programa, " + ParserConstants.PARSER_ERROR[lastState];
+		}
+		return "Erro na linha %d - encontrado " + token.getClassificacao() + ", " + ParserConstants.PARSER_ERROR[lastState];
+	}
 }
