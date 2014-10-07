@@ -1,28 +1,26 @@
-﻿package br.furb.jsondb.parser;
+package br.furb.jsondb.parser;
 
-public class AnalysisError extends Exception
-{
-    private int position;
+@SuppressWarnings("serial")
+public class AnalysisError extends Exception {
 
-    public AnalysisError(String msg, int position)
-    {
-        super(msg);
-        this.position = position;
-    }
+	private int position;
 
-    public AnalysisError(String msg)
-    {
-        super(msg);
-        this.position = -1;
-    }
+	public AnalysisError(String msg, int position) {
+		super(msg);
+		this.position = position;
+	}
 
-    public int getPosition()
-    {
-        return position;
-    }
+	public AnalysisError(String msg) {
+		super(msg);
+		this.position = -1;
+	}
 
-    public String toString()
-    {
-        return super.toString() + ", @ "+position;
-    }
+	public int getPosition() {
+		return position;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + ", @ " + position;
+	}
 }
