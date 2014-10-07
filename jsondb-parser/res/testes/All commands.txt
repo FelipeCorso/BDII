@@ -1,0 +1,36 @@
+CREATE DATABASE 'database';
+
+CREATE TABLE 'tabela' (
+	col_1 NUMBER(010, 10) PRIMARY KEY,
+	col_2 NUMBER(0020),
+	col_3 VARCHAR (001) CONSTRAINT ccol_3_nn NOT NULL,
+	col_4 DATE constraint 'constraint' NULL,
+	col_5 CHAR (010) references 'table'(col_pk),
+	CONSTRAINT c1 FOREIGN KEY (col_1, 'col_2') REFERENCES 'table2'(col1, col2),
+	constraint c2 PRIMARY KEY (cola, colb)
+);
+
+CREATE INDEX 'tabela'('campo');
+CREATE INDEX tabela(campo);
+
+SELECT * FROM 'tabela1', tabela2, 'tabela3';
+SELECT campoA, 'campoB', 'tabela1'.'campoa', tabela1.'campob' FROM tabela1, tabela2;
+SELECT * FROM tabela 
+	WHERE campoA = 1 
+		OR campoB = "texto" 
+		AND campoA <> 2.12 
+		OR campoA > "texto2" 
+		OR campoA < 3 
+		OR tabela.'campoA' <= 7 
+		OR 'tabela'.campoA >= 6;
+
+DROP TABLE tabela;
+DROP TABLE 'tabela';
+
+DROP INDEX 'tabela'(campo);
+DROP INDEX tabela('campo');
+
+DESCRIBE tabela;
+
+SET DATABASE nome_base;
+SET DATABASE 'nome_base';
