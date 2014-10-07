@@ -18,12 +18,17 @@ inteiro: {digito}+
 id: _? {letra} (_ | {letra} | {digito})*
 
 #Tokens
+// 2014.10@FURB.BR
+// Felipe Loose Corso
+// Janaína Carraro Mendonça Lima
+// William Leander Seefeld
+
 id: {id} | ' {id} '
-numero: {inteiro}
+numero: {inteiro} (\.{inteiro})?
 literal: \" ([^\\ \" \n] | \\ (\\ | \"))* \"
 data: {digito} {digito} / {digito} {digito} / {digito} {digito} {digito} {digito}
 
-// Sï¿½mbolos especiais
+// Símbolos especiais
 ";"
 "("
 ")"
@@ -65,7 +70,7 @@ DESCRIBE = id: "DESCRIBE"
 SET = id: "SET"
 INDEX = id: "INDEX"
 
-// Sï¿½mbolos ignorados
+// Símbolos ignorados
 :[\r\s\n\t]
 
 #NonTerminals
@@ -75,15 +80,15 @@ INDEX = id: "INDEX"
 <criar_estrutura>
 <lista_atributos>
 <lista_atributos_rec>
+<lista_atributos_rec_dec>
 <atributo>
 <tipo>
 <decimal>
 <restricao>
 <nome_restricao_opt>
 <restricao_constraint>
-<lista_restricoes_finais_opt>
-<lista_restricoes_finais>
 <lista_restricoes_finais_rec>
+<lista_restricoes_finais>
 <tipo_restricao_final>
 <lista_ids>
 <lista_ids_rec>
@@ -114,35 +119,35 @@ INDEX = id: "INDEX"
 <sentenca> ::= <acao> ";" #99;
 <acao> ::= <criar> | <incluir> | <selecionar> | <eliminar> | <descrever> | <setar_banco>;
 <criar> ::= CREATE <criar_estrutura>;
-<criar_estrutura> ::= DATABASE id #51 | TABLE id #13 "(" <lista_atributos> <lista_restricoes_finais_opt> ")" | INDEX #66 <index>;
+<criar_estrutura> ::= DATABASE id #51 | TABLE id #13 "(" <lista_atributos> ")" | INDEX #66 <index>;
 <lista_atributos> ::= <atributo> <lista_atributos_rec>;
-<lista_atributos_rec> ::= "," <atributo> <lista_atributos_rec> | ï¿½;
+<lista_atributos_rec> ::= "," <lista_atributos_rec_dec> | î;
+<lista_atributos_rec_dec> ::= <atributo> <lista_atributos_rec> | <lista_restricoes_finais>;
 <atributo> ::= id #17 <tipo> #53 <restricao>;
 <tipo> ::= NUMBER #01 "(" numero #09 <decimal> ")" | VARCHAR #02 "(" numero #09 ")" | DATE #03 | CHAR #04 "(" numero #09 ")";
-<decimal> ::= "," numero #08 | ï¿½;
-<restricao> ::= <nome_restricao_opt> <restricao_constraint> #55 | ï¿½;
-<nome_restricao_opt> ::= CONSTRAINT id #15 | ï¿½;
+<decimal> ::= "," numero #08 | î;
+<restricao> ::= <nome_restricao_opt> <restricao_constraint> #55 | î;
+<nome_restricao_opt> ::= CONSTRAINT id #15 | î;
 <restricao_constraint> 	::= NULL #20 | NOT NULL #21 | PRIMARY KEY #22 | REFERENCES #23 id #13 "(" id #12 ")";
-<lista_restricoes_finais_opt> ::= <lista_restricoes_finais> | ï¿½;
+<lista_restricoes_finais_rec> ::= "," <lista_restricoes_finais> | î;
 <lista_restricoes_finais> ::= CONSTRAINT id #15 <tipo_restricao_final> #55 <lista_restricoes_finais_rec>;
-<lista_restricoes_finais_rec> ::= "," <lista_restricoes_finais> | ï¿½;
 <tipo_restricao_final> ::= PRIMARY KEY #22 "(" <lista_ids> #16 ")" | FOREIGN KEY #24 "(" <lista_ids> #16 ")" REFERENCES id #13 "(" <lista_ids> #16 ")";
 <lista_ids> ::= id #12 <lista_ids_rec>;
-<lista_ids_rec> ::= "," <lista_ids> | ï¿½;
+<lista_ids_rec> ::= "," <lista_ids> | î;
 <incluir> ::= INSERT INTO id #13 <colunas> VALUES "(" #38 <lista_valores> #39 ")";
-<colunas> ::= "(" #10 <lista_ids> #11 ")" | ï¿½;
+<colunas> ::= "(" #10 <lista_ids> #11 ")" | î;
 <lista_valores> ::= <valor> <lista_valores_rec>;
 <valor> ::= numero #32 | literal #33 | data #34 | NULL #20;
-<lista_valores_rec> ::= "," <lista_valores> | ï¿½;
+<lista_valores_rec> ::= "," <lista_valores> | î;
 <selecionar> ::= SELECT <campos> #18 FROM <lista_ids> #19 <clausula_where>;
 <campos> ::= <lista_campos> | "*";
 <lista_campos> ::= <campo> <lista_campos_rec>;
-<lista_campos_rec> ::= "," <lista_campos> | ï¿½;
+<lista_campos_rec> ::= "," <lista_campos> | î;
 <campo> ::= id #12 <tabela_opt>;
-<tabela_opt> ::= "." id #14 | ï¿½;
-<clausula_where> ::= WHERE <lista_condicoes> | ï¿½;
+<tabela_opt> ::= "." id #14 | î;
+<clausula_where> ::= WHERE <lista_condicoes> | î;
 <lista_condicoes> ::= <condicao> <lista_condicoes_rec>;
-<lista_condicoes_rec> ::= <op_logico> #31 <lista_condicoes> | ï¿½;
+<lista_condicoes_rec> ::= <op_logico> #31 <lista_condicoes> | î;
 <condicao> ::= <campo> <op_relacional> #30 <valor>;
 <op_relacional> ::= "=" | ">" | "<" | ">=" | "<=" | "<>";
 <op_logico> ::= AND | OR;
