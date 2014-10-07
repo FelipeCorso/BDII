@@ -20,15 +20,16 @@ id: _? {letra} (_ | {letra} | {digito})*
 #Tokens
 // 2014.10@FURB.BR
 // Felipe Loose Corso
-// Janaína Carraro Mendonça Lima
+// Janaï¿½na Carraro Mendonï¿½a Lima
 // William Leander Seefeld
 
+rawId: {id}
 id: {id} | ' {id} '
 numero: {inteiro} (\.{inteiro})?
 literal: \" ([^\\ \" \n] | \\ (\\ | \"))* \"
 data: {digito} {digito} / {digito} {digito} / {digito} {digito} {digito} {digito}
 
-// Símbolos especiais
+// Sï¿½mbolos especiais
 ";"
 "("
 ")"
@@ -43,34 +44,34 @@ data: {digito} {digito} / {digito} {digito} / {digito} {digito} {digito} {digito
 "<>"
 
 // Palavras reservadas
-CREATE = id: "CREATE"
-DATABASE = id: "DATABASE"
-TABLE = id: "TABLE"
-NUMBER = id: "NUMBER"
-VARCHAR = id: "VARCHAR"
-DATE = id: "DATE"
-CHAR = id: "CHAR"
-CONSTRAINT = id: "CONSTRAINT"
-NULL = id: "NULL"
-NOT = id: "NOT"
-PRIMARY = id: "PRIMARY"
-KEY = id: "KEY"
-REFERENCES = id: "REFERENCES"
-FOREIGN = id: "FOREIGN"
-INSERT = id: "INSERT"
-INTO = id: "INTO"
-VALUES = id: "VALUES"
-SELECT = id: "SELECT"
-FROM = id: "FROM"
-WHERE = id: "WHERE"
-AND = id: "AND"
-OR = id: "OR"
-DROP = id: "DROP"
-DESCRIBE = id: "DESCRIBE"
-SET = id: "SET"
-INDEX = id: "INDEX"
+CREATE = rawId: "CREATE"
+DATABASE = rawId: "DATABASE"
+TABLE = rawId: "TABLE"
+NUMBER = rawId: "NUMBER"
+VARCHAR = rawId: "VARCHAR"
+DATE = rawId: "DATE"
+CHAR = rawId: "CHAR"
+CONSTRAINT = rawId: "CONSTRAINT"
+NULL = rawId: "NULL"
+NOT = rawId: "NOT"
+PRIMARY = rawId: "PRIMARY"
+KEY = rawId: "KEY"
+REFERENCES = rawId: "REFERENCES"
+FOREIGN = rawId: "FOREIGN"
+INSERT = rawId: "INSERT"
+INTO = rawId: "INTO"
+VALUES = rawId: "VALUES"
+SELECT = rawId: "SELECT"
+FROM = rawId: "FROM"
+WHERE = rawId: "WHERE"
+AND = rawId: "AND"
+OR = rawId: "OR"
+DROP = rawId: "DROP"
+DESCRIBE = rawId: "DESCRIBE"
+SET = rawId: "SET"
+INDEX = rawId: "INDEX"
 
-// Símbolos ignorados
+// Sï¿½mbolos ignorados
 :[\r\s\n\t]
 
 #NonTerminals
@@ -121,33 +122,33 @@ INDEX = id: "INDEX"
 <criar> ::= CREATE <criar_estrutura>;
 <criar_estrutura> ::= DATABASE id #51 | TABLE id #13 "(" <lista_atributos> ")" | INDEX #66 <index>;
 <lista_atributos> ::= <atributo> <lista_atributos_rec>;
-<lista_atributos_rec> ::= "," <lista_atributos_rec_dec> | î;
+<lista_atributos_rec> ::= "," <lista_atributos_rec_dec> | ï¿½;
 <lista_atributos_rec_dec> ::= <atributo> <lista_atributos_rec> | <lista_restricoes_finais>;
 <atributo> ::= id #17 <tipo> #53 <restricao>;
 <tipo> ::= NUMBER #01 "(" numero #09 <decimal> ")" | VARCHAR #02 "(" numero #09 ")" | DATE #03 | CHAR #04 "(" numero #09 ")";
-<decimal> ::= "," numero #08 | î;
-<restricao> ::= <nome_restricao_opt> <restricao_constraint> #55 | î;
-<nome_restricao_opt> ::= CONSTRAINT id #15 | î;
+<decimal> ::= "," numero #08 | ï¿½;
+<restricao> ::= <nome_restricao_opt> <restricao_constraint> #55 | ï¿½;
+<nome_restricao_opt> ::= CONSTRAINT id #15 | ï¿½;
 <restricao_constraint> 	::= NULL #20 | NOT NULL #21 | PRIMARY KEY #22 | REFERENCES #23 id #13 "(" id #12 ")";
-<lista_restricoes_finais_rec> ::= "," <lista_restricoes_finais> | î;
+<lista_restricoes_finais_rec> ::= "," <lista_restricoes_finais> | ï¿½;
 <lista_restricoes_finais> ::= CONSTRAINT id #15 <tipo_restricao_final> #55 <lista_restricoes_finais_rec>;
 <tipo_restricao_final> ::= PRIMARY KEY #22 "(" <lista_ids> #16 ")" | FOREIGN KEY #24 "(" <lista_ids> #16 ")" REFERENCES id #13 "(" <lista_ids> #16 ")";
 <lista_ids> ::= id #12 <lista_ids_rec>;
-<lista_ids_rec> ::= "," <lista_ids> | î;
+<lista_ids_rec> ::= "," <lista_ids> | ï¿½;
 <incluir> ::= INSERT INTO id #13 <colunas> VALUES "(" #38 <lista_valores> #39 ")";
-<colunas> ::= "(" #10 <lista_ids> #11 ")" | î;
+<colunas> ::= "(" #10 <lista_ids> #11 ")" | ï¿½;
 <lista_valores> ::= <valor> <lista_valores_rec>;
 <valor> ::= numero #32 | literal #33 | data #34 | NULL #20;
-<lista_valores_rec> ::= "," <lista_valores> | î;
+<lista_valores_rec> ::= "," <lista_valores> | ï¿½;
 <selecionar> ::= SELECT <campos> #18 FROM <lista_ids> #19 <clausula_where>;
 <campos> ::= <lista_campos> | "*";
 <lista_campos> ::= <campo> <lista_campos_rec>;
-<lista_campos_rec> ::= "," <lista_campos> | î;
+<lista_campos_rec> ::= "," <lista_campos> | ï¿½;
 <campo> ::= id #12 <tabela_opt>;
-<tabela_opt> ::= "." id #14 | î;
-<clausula_where> ::= WHERE <lista_condicoes> | î;
+<tabela_opt> ::= "." id #14 | ï¿½;
+<clausula_where> ::= WHERE <lista_condicoes> | ï¿½;
 <lista_condicoes> ::= <condicao> <lista_condicoes_rec>;
-<lista_condicoes_rec> ::= <op_logico> #31 <lista_condicoes> | î;
+<lista_condicoes_rec> ::= <op_logico> #31 <lista_condicoes> | ï¿½;
 <condicao> ::= <campo> <op_relacional> #30 <valor>;
 <op_relacional> ::= "=" | ">" | "<" | ">=" | "<=" | "<>";
 <op_logico> ::= AND | OR;
