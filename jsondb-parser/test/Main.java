@@ -6,12 +6,12 @@ import br.furb.jsondb.parser.core.Sintatico;
 
 public class Main {
 
-	private static final String DELIMITER = "##FIM##";
+	private static final String DELIMITER = ";";
 
 	public static void main(String[] args) throws Exception {
 		try (Scanner sc = new Scanner(System.in)) {
 			sc.useDelimiter(DELIMITER);
-			String program = sc.next();
+			String program = sc.next() + DELIMITER;
 			Sintatico sintatico = new Sintatico();
 			Lexico lexico = new Lexico(program);
 			Semantico semantico = new Semantico();
