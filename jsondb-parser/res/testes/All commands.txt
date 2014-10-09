@@ -22,7 +22,8 @@ SELECT * FROM tabela
 		OR campoA > "texto2" 
 		OR campoA < 3 
 		OR tabela.'campoA' <= 7 
-		OR 'tabela'.campoA >= 6;
+		OR 'tabela'.campoA >= 6
+		AND 'campoData' = 25/10/2014;
 
 DROP TABLE tabela;
 DROP TABLE 'tabela';
