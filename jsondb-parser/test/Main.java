@@ -6,9 +6,11 @@ import br.furb.jsondb.parser.core.Sintatico;
 
 public class Main {
 
+	private static final String DELIMITER = "##FIM##";
+
 	public static void main(String[] args) throws Exception {
 		try (Scanner sc = new Scanner(System.in)) {
-			// sc.useDelimiter(PROGRAM_DELIMITER_REGEXP);
+			sc.useDelimiter(DELIMITER);
 			String program = sc.next();
 			Sintatico sintatico = new Sintatico();
 			Lexico lexico = new Lexico(program);
