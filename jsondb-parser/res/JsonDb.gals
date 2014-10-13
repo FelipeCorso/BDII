@@ -5,7 +5,7 @@ Language = Java
 ScannerName = Lexico
 ParserName = Sintatico
 SemanticName = Semantico
-Package = br.furb.jsondb.parser
+Package = br.furb.jsondb.parser.core
 ScannerCaseSensitive = false
 ScannerTable = Compact
 Input = String
@@ -152,7 +152,7 @@ INDEX = id: "INDEX"
 <op_relacional> ::= "=" | ">" | "<" | ">=" | "<=" | "<>";
 <op_logico> ::= AND | OR;
 <eliminar> ::= DROP <eliminar_estrutura>;
-<eliminar_estrutura> ::= TABLE id #61 | INDEX #67 <index>;
+<eliminar_estrutura> ::= TABLE id #61 | INDEX <index> #67;
 <descrever> ::= DESCRIBE id #63;
 <setar_banco> ::= SET DATABASE id #65;
 <index> ::= id #13 "(" id #12 ")";

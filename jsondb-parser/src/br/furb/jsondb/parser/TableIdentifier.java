@@ -1,6 +1,6 @@
 package br.furb.jsondb.parser;
 
-public class TableIdentifier {
+public class TableIdentifier implements IStructure {
 
 	private String tableName;
 
@@ -8,7 +8,8 @@ public class TableIdentifier {
 		this.tableName = tableName;
 	}
 
-	public final String getTableName() {
+	@Override
+	public final String getIdentifier() {
 		return tableName;
 	}
 

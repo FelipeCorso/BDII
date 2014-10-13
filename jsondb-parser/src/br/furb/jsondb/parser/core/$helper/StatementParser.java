@@ -1,7 +1,11 @@
 package br.furb.jsondb.parser.core.$helper;
 
+import br.furb.jsondb.parser.DropStatement;
 import br.furb.jsondb.parser.IStatement;
+import br.furb.jsondb.parser.IStructure;
+import br.furb.jsondb.parser.Index;
 import br.furb.jsondb.parser.SetDatabaseStatement;
+import br.furb.jsondb.parser.TableColumn;
 import br.furb.jsondb.parser.TableIdentifier;
 import br.furb.jsondb.parser.core.Token;
 
@@ -9,6 +13,8 @@ public class StatementParser {
 
 	private IStatement statement;
 	private boolean doneRec;
+	private String lastTableName;
+	private String lastId;
 
 	public void executeAction(int action, Token token) {
 		switch (action) {
@@ -160,19 +166,25 @@ public class StatementParser {
 	private void acaoSemantica11(Token token) {
 	}
 
-	/** Nome de coluna. **/
+	/**
+	 * Nome de coluna. O token reconhecido aqui pode ser transformado em coluna
+	 * se for seguido pela ação #14.
+	 **/
 	private void acaoSemantica12(Token token) {
+		this.lastId = token.getLexeme();
 	}
 
 	/** Nome de tabela. **/
 	private void acaoSemantica13(Token token) {
+		this.lastTableName = token.getLexeme();
 	}
 
 	/**
-	 * Reconhece nome de coluna, e faz com que o ultimo nome de coluna (#12)
+	 * Reconhece nome de coluna, e faz com que o último nome de coluna (#12)
 	 * seja considerado nome de tabela (#13).
 	 **/
 	private void acaoSemantica14(Token token) {
+		this.lastTableName = this.lastId;
 	}
 
 	/** Nome de restrição usada no CREATE. **/
@@ -260,6 +272,7 @@ public class StatementParser {
 
 	/** Nome de tabela e ser removida (DROP). **/
 	private void acaoSemantica61(Token token) {
+		statement = new DropStatement<IStructure>(tableFromId(token.getLexeme()));
 	}
 
 	/** Nome de tabela a ser descrita (DESCRIBE). **/
@@ -271,21 +284,14 @@ public class StatementParser {
 		statement = new SetDatabaseStatement(tableFromId(token.getLexeme()));
 	}
 
-	private static TableIdentifier tableFromId(String lexeme) {
-		String tableName = cleanId(lexeme);
-		return new TableIdentifier(tableName);
-	}
-
-	private static String cleanId(String lexeme) {
-		return lexeme.replaceAll("\'", "");
-	}
-
 	/** CREATE INDEX. **/
 	private void acaoSemantica66(Token token) {
 	}
 
 	/** DROP INDEX. **/
 	private void acaoSemantica67(Token token) {
+		Index index = new Index(new TableColumn(tableFromId(lastTableName), lastId));
+		this.statement = new DropStatement<IStructure>(index);
 	}
 
 	/** Finaliza reconhecimento de sentenca. **/
@@ -303,6 +309,17 @@ public class StatementParser {
 			return null;
 		}
 		return statement;
+	}
+
+	// Métodos auxiliares
+
+	private static TableIdentifier tableFromId(String lexeme) {
+		String tableName = cleanId(lexeme);
+		return new TableIdentifier(tableName);
+	}
+
+	private static String cleanId(String lexeme) {
+		return lexeme.replaceAll("\'", "");
 	}
 
 }
