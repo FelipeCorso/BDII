@@ -171,12 +171,12 @@ public class StatementParser {
 	 * se for seguido pela ação #14.
 	 **/
 	private void acaoSemantica12(Token token) {
-		this.lastId = token.getLexeme();
+		this.lastId = cleanId(token.getLexeme());
 	}
 
 	/** Nome de tabela. **/
 	private void acaoSemantica13(Token token) {
-		this.lastTableName = token.getLexeme();
+		this.lastTableName = cleanId(token.getLexeme());
 	}
 
 	/**
