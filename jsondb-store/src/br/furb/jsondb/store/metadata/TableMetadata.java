@@ -1,22 +1,23 @@
-package jsondb.core.metadata;
+package br.furb.jsondb.store.metadata;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 public class TableMetadata {
 
-	private String tableName;
-	private Map<String, FieldMetadata> fields;
+	private String name;
+	private Map<String, FieldMetadata> fields = new HashMap<String, FieldMetadata>();
 	private Set<String> primaryKey;
 
 	// FIXME references ?
 
-	public String getTableName() {
-		return tableName;
+	public String getName() {
+		return name;
 	}
 
-	public void setTableName(String tableName) {
-		this.tableName = tableName;
+	public void setName(String tableName) {
+		this.name = tableName;
 	}
 
 	public void addField(FieldMetadata field) {
@@ -33,6 +34,12 @@ public class TableMetadata {
 
 	public void setPrimaryKey(Set<String> primaryKey) {
 		this.primaryKey = primaryKey;
+	}
+
+	@Override
+	public String toString() {
+		return "TableMetadata [name=" + name + ", fields=" + fields
+				+ ", primaryKey=" + primaryKey + "]";
 	}
 
 }

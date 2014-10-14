@@ -1,4 +1,4 @@
-package jsondb.core.metadata;
+package br.furb.jsondb.store.metadata;
 
 public class FieldMetadata {
 
@@ -39,6 +39,12 @@ public class FieldMetadata {
 
 	public void setLenght(int lenght) {
 		this.lenght = lenght;
+	}
+
+	@Override
+	public String toString() {
+		return "FieldMetadata [name=" + name + ", type=" + type + ", lenght="
+				+ lenght + "]";
 	}
 
 }

@@ -1,4 +1,4 @@
-package jsondb.core.metadata;
+package br.furb.jsondb.store.metadata;
 
 public enum FieldType {
 	NUMBER, // 
