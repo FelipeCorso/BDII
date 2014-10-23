@@ -1,9 +1,15 @@
 package br.furb.jsondb.parser.core.$helper;
 
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
+
 import br.furb.jsondb.parser.DropStatement;
 import br.furb.jsondb.parser.IStatement;
 import br.furb.jsondb.parser.IStructure;
 import br.furb.jsondb.parser.Index;
+import br.furb.jsondb.parser.SelectStatement;
 import br.furb.jsondb.parser.SetDatabaseStatement;
 import br.furb.jsondb.parser.TableColumn;
 import br.furb.jsondb.parser.TableIdentifier;
@@ -11,10 +17,12 @@ import br.furb.jsondb.parser.core.Token;
 
 public class StatementParser {
 
+	private static final String CONST_ALL_FIELDS = "*";
+
 	private IStatement statement;
 	private boolean doneRec;
-	private String lastTableName;
-	private String lastId;
+	private TableIdentifier lastTable;
+	private Deque<TableColumn> columnStack = new LinkedList<>();
 
 	public void executeAction(int action, Token token) {
 		switch (action) {
@@ -171,12 +179,12 @@ public class StatementParser {
 	 * se for seguido pela ação #14.
 	 **/
 	private void acaoSemantica12(Token token) {
-		this.lastId = cleanId(token.getLexeme());
+		columnStack.push(new TableColumn(cleanId(token.getLexeme())));
 	}
 
 	/** Nome de tabela. **/
 	private void acaoSemantica13(Token token) {
-		this.lastTableName = cleanId(token.getLexeme());
+		this.lastTable = new TableIdentifier(cleanId(token.getLexeme()));
 	}
 
 	/**
@@ -184,7 +192,12 @@ public class StatementParser {
 	 * seja considerado nome de tabela (#13).
 	 **/
 	private void acaoSemantica14(Token token) {
-		this.lastTableName = this.lastId;
+		TableColumn lastColumn = columnStack.pop();
+		this.lastTable = new TableIdentifier(lastColumn.getColumnName());
+
+		String actualColumnLexeme = cleanId(token.getLexeme());
+		TableColumn actualColumn = new TableColumn(this.lastTable, actualColumnLexeme);
+		columnStack.push(actualColumn);
 	}
 
 	/** Nome de restrição usada no CREATE. **/
@@ -201,6 +214,16 @@ public class StatementParser {
 
 	/** Encerra reconhecimento de lista de campos (SELECT «campos»). **/
 	private void acaoSemantica18(Token token) {
+		String lexeme = token.getLexeme();
+		List<TableColumn> selectFields;
+		if (CONST_ALL_FIELDS.equals(lexeme)) {
+			selectFields = new ArrayList<>(1);
+			selectFields.add(TableColumn.ALL);
+		} else {
+			selectFields = new ArrayList<>(this.columnStack);
+		}
+		this.columnStack.clear();
+		this.statement = new SelectStatement(selectFields);
 	}
 
 	/**
@@ -208,6 +231,10 @@ public class StatementParser {
 	 * «tabelas»).
 	 **/
 	private void acaoSemantica19(Token token) {
+		List<TableIdentifier> tables = new ArrayList<>(columnStack.size());
+		columnStack.forEach(column -> tables.add(new TableIdentifier(column.getColumnName())));
+		columnStack.clear();
+		((SelectStatement) statement).setTables(tables);
 	}
 
 	/** Restrição NULL. **/
@@ -290,7 +317,8 @@ public class StatementParser {
 
 	/** DROP INDEX. **/
 	private void acaoSemantica67(Token token) {
-		Index index = new Index(new TableColumn(tableFromId(lastTableName), lastId));
+		TableColumn lastColumn = this.columnStack.pop();
+		Index index = new Index(new TableColumn(lastTable, lastColumn.getColumnName()));
 		this.statement = new DropStatement<IStructure>(index);
 	}
 

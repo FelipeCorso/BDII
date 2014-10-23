@@ -1,20 +1,26 @@
 package br.furb.jsondb.parser;
 
+import java.util.Objects;
+import java.util.Optional;
+
 public class TableColumn {
 
-	private TableIdentifier table;
+	public static final TableColumn ALL = new TableColumn("*");
+
+	private Optional<TableIdentifier> maybeTable;
 	private String columnName;
 
 	public TableColumn(TableIdentifier table, String columnName) {
-		if (columnName == null) {
-			throw new IllegalArgumentException("é necessário informar o nome da coluna");
-		}
-		this.table = table;
-		this.columnName = columnName;
+		this.maybeTable = Optional.ofNullable(table);
+		this.columnName = Objects.requireNonNull(columnName, "é necessário informar o nome da coluna");
 	}
 
-	public TableIdentifier getTable() {
-		return table;
+	public TableColumn(String columnName) {
+		this(null, columnName);
+	}
+
+	public Optional<TableIdentifier> getTable() {
+		return maybeTable;
 	}
 
 	public final String getColumnName() {
@@ -22,8 +28,8 @@ public class TableColumn {
 	}
 
 	public String toPrettyString() {
-		String result = table == null ? "" : table.getIdentifier() + ".";
-		return result + columnName;
+		String qualifier = maybeTable.isPresent() ? maybeTable.get().getIdentifier() + "." : "";
+		return qualifier + columnName;
 	}
 
 }
