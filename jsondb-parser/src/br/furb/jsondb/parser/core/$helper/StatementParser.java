@@ -5,6 +5,8 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
+import br.furb.jsondb.parser.CreateStatement;
+import br.furb.jsondb.parser.DatabaseIdentifier;
 import br.furb.jsondb.parser.DropStatement;
 import br.furb.jsondb.parser.IStatement;
 import br.furb.jsondb.parser.IStructure;
@@ -184,7 +186,7 @@ public class StatementParser {
 
 	/** Nome de tabela. **/
 	private void acaoSemantica13(Token token) {
-		this.lastTable = new TableIdentifier(cleanId(token.getLexeme()));
+		this.lastTable = tableFromId(token.getLexeme());
 	}
 
 	/**
@@ -287,6 +289,7 @@ public class StatementParser {
 
 	/** Nome de base de dados. **/
 	private void acaoSemantica51(Token token) {
+		this.statement = new CreateStatement(new DatabaseIdentifier(cleanId(token.getLexeme())));
 	}
 
 	/** Encerra reconhecimento do tipo. **/
