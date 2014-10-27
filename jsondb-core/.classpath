@@ -8,5 +8,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jsondb-store"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jsondb-parser"/>
 	<classpathentry kind="lib" path="/Resources/libs/apache-commons/commons-io-2.4.jar" sourcepath="/Resources/libs/apache-commons/commons-io-2.4-sources.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jsondb-parser"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
