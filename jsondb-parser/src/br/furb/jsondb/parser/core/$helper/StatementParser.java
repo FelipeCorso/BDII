@@ -15,6 +15,7 @@ import br.furb.jsondb.parser.CreateStatement;
 import br.furb.jsondb.parser.DataType;
 import br.furb.jsondb.parser.DatabaseIdentifier;
 import br.furb.jsondb.parser.DropStatement;
+import br.furb.jsondb.parser.ForeignKeyDefinition;
 import br.furb.jsondb.parser.IStatement;
 import br.furb.jsondb.parser.IStructure;
 import br.furb.jsondb.parser.Index;
@@ -37,6 +38,8 @@ public class StatementParser {
 	private ColumnType columnType;
 
 	private String constraintName;
+
+	private boolean isForeignKey;
 
 	public void executeAction(int action, Token token) {
 		switch (action) {
@@ -263,15 +266,17 @@ public class StatementParser {
 	/** Restrição NULL. **/
 	private void acaoSemantica20(Token token) {
 		ColumnDefinition column = this.columnDefStack.peek();
-		ConstraintDefinition constraint = new ConstraintDefinition(ConstraintKind.NULL);
+		ConstraintDefinition constraint = new ConstraintDefinition(this.constraintName, ConstraintKind.NULL);
 		column.setConstraint(constraint);
+		this.constraintName = null;
 	}
 
 	/** Restrição NOT NULL. **/
 	private void acaoSemantica21(Token token) {
 		ColumnDefinition column = this.columnDefStack.peek();
-		ConstraintDefinition constraint = new ConstraintDefinition(ConstraintKind.NOT_NULL);
+		ConstraintDefinition constraint = new ConstraintDefinition(this.constraintName, ConstraintKind.NOT_NULL);
 		column.setConstraint(constraint);
+		this.constraintName = null;
 	}
 
 	/** Restrição PRIMARY KEY. **/
@@ -283,7 +288,7 @@ public class StatementParser {
 
 	/** Restrição [FOREIGN KEY] REFERENCES. **/
 	private void acaoSemantica23(Token token) {
-		// TODO: continuar aqui
+		this.isForeignKey = true;
 	}
 
 	/** Restrição FOREIGN KEY. **/
@@ -332,9 +337,21 @@ public class StatementParser {
 	/** Encerra reconhecimento da restrição. **/
 	private void acaoSemantica55(Token token) {
 		ColumnDefinition column = this.columnDefStack.pop();
+
+		if (this.isForeignKey) {
+			ColumnIdentifier targetColumn = columnStack.pop();
+			targetColumn = new ColumnIdentifier(this.lastTable, targetColumn.getColumnName());
+
+			ForeignKeyDefinition foreignKey = new ForeignKeyDefinition(this.constraintName, ConstraintKind.FOREIGN_KEY, column.getIdentifier(), targetColumn);
+			column.setConstraint(foreignKey);
+			this.isForeignKey = false;
+		}
+
 		CreateStatement createStatement = (CreateStatement) this.statement;
+		// FIXME: NullPointer: adicionar ação semântica que permita reconhecer o CREATE «TABLE» antes deste momento
 		TableDefinition tableDef = (TableDefinition) createStatement.getStructure();
 		tableDef.addColumnDefinition(column);
+
 	}
 
 	/** Nome de tabela e ser removida (DROP). **/
