@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
+import br.furb.jsondb.parser.ColumnDefinition;
+import br.furb.jsondb.parser.ColumnType;
 import br.furb.jsondb.parser.CreateStatement;
+import br.furb.jsondb.parser.DataType;
 import br.furb.jsondb.parser.DatabaseIdentifier;
 import br.furb.jsondb.parser.DropStatement;
 import br.furb.jsondb.parser.IStatement;
@@ -14,6 +18,7 @@ import br.furb.jsondb.parser.Index;
 import br.furb.jsondb.parser.SelectStatement;
 import br.furb.jsondb.parser.SetDatabaseStatement;
 import br.furb.jsondb.parser.TableColumn;
+import br.furb.jsondb.parser.TableDefinition;
 import br.furb.jsondb.parser.TableIdentifier;
 import br.furb.jsondb.parser.core.Token;
 
@@ -25,6 +30,8 @@ public class StatementParser {
 	private boolean doneRec;
 	private TableIdentifier lastTable;
 	private Deque<TableColumn> columnStack = new LinkedList<>();
+	private Deque<ColumnDefinition> tableAttributeStack = new LinkedList<>();
+	private ColumnType columnType;
 
 	public void executeAction(int action, Token token) {
 		switch (action) {
@@ -146,26 +153,32 @@ public class StatementParser {
 
 	/** Declaração de NUMBER. **/
 	private void acaoSemantica01(Token token) {
+		this.columnType = new ColumnType(DataType.NUMBER);
 	}
 
 	/** Declaração de VARCHAR. **/
 	private void acaoSemantica02(Token token) {
+		this.columnType = new ColumnType(DataType.VARCHAR);
 	}
 
 	/** Declaração de DATE. **/
 	private void acaoSemantica03(Token token) {
+		this.columnType = new ColumnType(DataType.DATE);
 	}
 
 	/** Declaração de CHAR. **/
 	private void acaoSemantica04(Token token) {
+		this.columnType = new ColumnType(DataType.CHAR);
 	}
 
 	/** Precisão de tipo. **/
 	private void acaoSemantica08(Token token) {
+		this.columnType.setPrecision(Optional.of(Integer.parseInt(token.getLexeme())));
 	}
 
 	/** Tamanho de tipo. **/
 	private void acaoSemantica09(Token token) {
+		this.columnType.setSize(Integer.parseInt(token.getLexeme()));
 	}
 
 	/** Inicia reconhecimento de colunas no INSERT. **/
@@ -212,6 +225,8 @@ public class StatementParser {
 
 	/** Nome de campo/atributo usado no CREATE. **/
 	private void acaoSemantica17(Token token) {
+		String lexeme = token.getLexeme();
+		this.statement = new CreateStatement(new TableDefinition(tableFromId(lexeme)));
 	}
 
 	/** Encerra reconhecimento de lista de campos (SELECT «campos»). **/
@@ -294,6 +309,9 @@ public class StatementParser {
 
 	/** Encerra reconhecimento do tipo. **/
 	private void acaoSemantica53(Token token) {
+		CreateStatement createStatement = (CreateStatement) this.statement;
+		ColumnDefinition columnDefinition = ((TableDefinition) createStatement.getStructure()).getColumnDefinition();
+		columnDefinition.setColumnType(this.columnType);
 	}
 
 	/** Encerra reconhecimento da restrição. **/
