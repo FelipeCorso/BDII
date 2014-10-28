@@ -1,14 +1,17 @@
 package br.furb.jsondb.parser;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 public class TableDefinition implements IStructure {
 
 	private TableIdentifier tableName;
-	private ColumnDefinition columnDefinition;
+	private final List<ColumnDefinition> columns;
 
 	public TableDefinition(TableIdentifier tableName) {
 		this.tableName = Objects.requireNonNull(tableName, "a table identifier must be provided for the table definition");
+		this.columns = new LinkedList<>();
 	}
 
 	@Override
@@ -16,15 +19,11 @@ public class TableDefinition implements IStructure {
 		return tableName.getIdentifier();
 	}
 
-	public final ColumnDefinition getColumnDefinition() {
-		return columnDefinition;
+	public final void addColumnDefinition(ColumnDefinition column) {
+		this.columns.add(column);
 	}
 
-	public final void setColumnDefinition(ColumnDefinition columnDefinition) {
-		this.columnDefinition = columnDefinition;
-	}
-
-	public final TableIdentifier getTableName() {
+	public final TableIdentifier getTableIdentifier() {
 		return tableName;
 	}
 

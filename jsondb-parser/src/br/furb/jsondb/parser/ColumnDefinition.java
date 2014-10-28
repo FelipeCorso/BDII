@@ -6,12 +6,12 @@ import br.furb.jsondb.utils.ArgumentValidator;
 
 public class ColumnDefinition {
 
-	private String name;
+	private ColumnIdentifier identifier;
 	private ColumnType columnType;
-	private RestrictionDefinition columnRestriction;
+	private ConstraintDefinition constraint;
 
 	public ColumnDefinition(String name) {
-		this.name = ArgumentValidator.requireNonEmpty(name, "a name must be provided for the column definition");
+		this.identifier = new ColumnIdentifier(ArgumentValidator.requireNonEmpty(name, "a name must be provided for the column definition"));
 	}
 
 	public final ColumnType getColumnType() {
@@ -22,16 +22,20 @@ public class ColumnDefinition {
 		this.columnType = Objects.requireNonNull(columnType, "a column type must be provided for the column definition");
 	}
 
-	public final RestrictionDefinition getColumnRestriction() {
-		return columnRestriction;
+	public final ConstraintDefinition getConstraint() {
+		return constraint;
 	}
 
-	public final void setColumnRestriction(RestrictionDefinition columnRestriction) {
-		this.columnRestriction = columnRestriction;
+	public final void setConstraint(ConstraintDefinition constraint) {
+		this.constraint = constraint;
 	}
 
 	public final String getName() {
-		return name;
+		return identifier.getColumnName();
+	}
+
+	public ColumnIdentifier getIdentifier() {
+		return identifier;
 	}
 
 }
