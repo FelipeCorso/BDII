@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import br.furb.jsondb.parser.ColumnDefinition;
+import br.furb.jsondb.parser.ColumnIdentifier;
 import br.furb.jsondb.parser.ColumnType;
 import br.furb.jsondb.parser.CreateStatement;
 import br.furb.jsondb.parser.DataType;
@@ -17,7 +18,6 @@ import br.furb.jsondb.parser.IStructure;
 import br.furb.jsondb.parser.Index;
 import br.furb.jsondb.parser.SelectStatement;
 import br.furb.jsondb.parser.SetDatabaseStatement;
-import br.furb.jsondb.parser.TableColumn;
 import br.furb.jsondb.parser.TableDefinition;
 import br.furb.jsondb.parser.TableIdentifier;
 import br.furb.jsondb.parser.core.Token;
@@ -29,8 +29,8 @@ public class StatementParser {
 	private IStatement statement;
 	private boolean doneRec;
 	private TableIdentifier lastTable;
-	private Deque<TableColumn> columnStack = new LinkedList<>();
-	private Deque<ColumnDefinition> tableAttributeStack = new LinkedList<>();
+	private Deque<ColumnIdentifier> columnStack = new LinkedList<>();
+	private Deque<ColumnDefinition> columnDefStack = new LinkedList<>();
 	private ColumnType columnType;
 
 	public void executeAction(int action, Token token) {
@@ -194,7 +194,7 @@ public class StatementParser {
 	 * se for seguido pela ação #14.
 	 **/
 	private void acaoSemantica12(Token token) {
-		columnStack.push(new TableColumn(cleanId(token.getLexeme())));
+		columnStack.push(new ColumnIdentifier(cleanId(token.getLexeme())));
 	}
 
 	/** Nome de tabela. **/
@@ -207,11 +207,11 @@ public class StatementParser {
 	 * seja considerado nome de tabela (#13).
 	 **/
 	private void acaoSemantica14(Token token) {
-		TableColumn lastColumn = columnStack.pop();
+		ColumnIdentifier lastColumn = columnStack.pop();
 		this.lastTable = new TableIdentifier(lastColumn.getColumnName());
 
 		String actualColumnLexeme = cleanId(token.getLexeme());
-		TableColumn actualColumn = new TableColumn(this.lastTable, actualColumnLexeme);
+		ColumnIdentifier actualColumn = new ColumnIdentifier(this.lastTable, actualColumnLexeme);
 		columnStack.push(actualColumn);
 	}
 
@@ -226,16 +226,20 @@ public class StatementParser {
 	/** Nome de campo/atributo usado no CREATE. **/
 	private void acaoSemantica17(Token token) {
 		String lexeme = token.getLexeme();
-		this.statement = new CreateStatement(new TableDefinition(tableFromId(lexeme)));
+		TableDefinition tableDefinition = new TableDefinition(this.lastTable);
+		ColumnDefinition columnDefinition = new ColumnDefinition(cleanId(lexeme));
+		tableDefinition.setColumnDefinition(columnDefinition);
+		
+		this.statement = new CreateStatement(tableDefinition);
 	}
 
 	/** Encerra reconhecimento de lista de campos (SELECT «campos»). **/
 	private void acaoSemantica18(Token token) {
 		String lexeme = token.getLexeme();
-		List<TableColumn> selectFields;
+		List<ColumnIdentifier> selectFields;
 		if (CONST_ALL_FIELDS.equals(lexeme)) {
 			selectFields = new ArrayList<>(1);
-			selectFields.add(TableColumn.ALL);
+			selectFields.add(ColumnIdentifier.ALL);
 		} else {
 			selectFields = new ArrayList<>(this.columnStack);
 		}
@@ -338,8 +342,8 @@ public class StatementParser {
 
 	/** DROP INDEX. **/
 	private void acaoSemantica67(Token token) {
-		TableColumn lastColumn = this.columnStack.pop();
-		Index index = new Index(new TableColumn(lastTable, lastColumn.getColumnName()));
+		ColumnIdentifier lastColumn = this.columnStack.pop();
+		Index index = new Index(new ColumnIdentifier(lastTable, lastColumn.getColumnName()));
 		this.statement = new DropStatement<IStructure>(index);
 	}
 

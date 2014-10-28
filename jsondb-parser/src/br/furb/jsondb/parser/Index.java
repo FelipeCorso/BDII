@@ -1,10 +1,11 @@
 package br.furb.jsondb.parser;
 
+
 public class Index implements IStructure {
 
-	private TableColumn tableColumn;
+	private ColumnIdentifier tableColumn;
 
-	public Index(TableColumn identifier) {
+	public Index(ColumnIdentifier identifier) {
 		if (identifier.getTable() == null) {
 			throw new IllegalArgumentException("é necessário informar a tabela");
 		}
@@ -16,7 +17,7 @@ public class Index implements IStructure {
 		return tableColumn.toPrettyString();
 	}
 
-	public TableColumn getTableColumn() {
+	public ColumnIdentifier getTableColumn() {
 		return tableColumn;
 	}
 

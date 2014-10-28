@@ -3,19 +3,19 @@ package br.furb.jsondb.parser;
 import java.util.Objects;
 import java.util.Optional;
 
-public class TableColumn {
+public class ColumnIdentifier {
 
-	public static final TableColumn ALL = new TableColumn("*");
+	public static final ColumnIdentifier ALL = new ColumnIdentifier("*");
 
 	private Optional<TableIdentifier> maybeTable;
 	private String columnName;
 
-	public TableColumn(TableIdentifier table, String columnName) {
+	public ColumnIdentifier(TableIdentifier table, String columnName) {
 		this.maybeTable = Optional.ofNullable(table);
 		this.columnName = Objects.requireNonNull(columnName, "é necessário informar o nome da coluna");
 	}
 
-	public TableColumn(String columnName) {
+	public ColumnIdentifier(String columnName) {
 		this(null, columnName);
 	}
 
