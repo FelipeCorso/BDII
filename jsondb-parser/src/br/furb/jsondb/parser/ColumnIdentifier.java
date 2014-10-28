@@ -1,7 +1,8 @@
 package br.furb.jsondb.parser;
 
-import java.util.Objects;
 import java.util.Optional;
+
+import br.furb.jsondb.utils.ArgumentValidator;
 
 public class ColumnIdentifier {
 
@@ -12,7 +13,7 @@ public class ColumnIdentifier {
 
 	public ColumnIdentifier(TableIdentifier table, String columnName) {
 		this.maybeTable = Optional.ofNullable(table);
-		this.columnName = Objects.requireNonNull(columnName, "é necessário informar o nome da coluna");
+		this.columnName = ArgumentValidator.requireNonEmpty(columnName, "a column name must be provided as identifier");
 	}
 
 	public ColumnIdentifier(String columnName) {

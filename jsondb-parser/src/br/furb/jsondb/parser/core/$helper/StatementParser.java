@@ -9,6 +9,8 @@ import java.util.Optional;
 import br.furb.jsondb.parser.ColumnDefinition;
 import br.furb.jsondb.parser.ColumnIdentifier;
 import br.furb.jsondb.parser.ColumnType;
+import br.furb.jsondb.parser.ConstraintDefinition;
+import br.furb.jsondb.parser.ConstraintKind;
 import br.furb.jsondb.parser.CreateStatement;
 import br.furb.jsondb.parser.DataType;
 import br.furb.jsondb.parser.DatabaseIdentifier;
@@ -16,6 +18,7 @@ import br.furb.jsondb.parser.DropStatement;
 import br.furb.jsondb.parser.IStatement;
 import br.furb.jsondb.parser.IStructure;
 import br.furb.jsondb.parser.Index;
+import br.furb.jsondb.parser.KeyDefinition;
 import br.furb.jsondb.parser.SelectStatement;
 import br.furb.jsondb.parser.SetDatabaseStatement;
 import br.furb.jsondb.parser.TableDefinition;
@@ -32,6 +35,8 @@ public class StatementParser {
 	private Deque<ColumnIdentifier> columnStack = new LinkedList<>();
 	private Deque<ColumnDefinition> columnDefStack = new LinkedList<>();
 	private ColumnType columnType;
+
+	private String constraintName;
 
 	public void executeAction(int action, Token token) {
 		switch (action) {
@@ -217,6 +222,7 @@ public class StatementParser {
 
 	/** Nome de restrição usada no CREATE. **/
 	private void acaoSemantica15(Token token) {
+		this.constraintName = cleanId(token.getLexeme());
 	}
 
 	/** Finaliza reconhecimento de lista de IDs. **/
@@ -226,11 +232,7 @@ public class StatementParser {
 	/** Nome de campo/atributo usado no CREATE. **/
 	private void acaoSemantica17(Token token) {
 		String lexeme = token.getLexeme();
-		TableDefinition tableDefinition = new TableDefinition(this.lastTable);
-		ColumnDefinition columnDefinition = new ColumnDefinition(cleanId(lexeme));
-		tableDefinition.setColumnDefinition(columnDefinition);
-		
-		this.statement = new CreateStatement(tableDefinition);
+		this.columnDefStack.push(new ColumnDefinition(cleanId(lexeme)));
 	}
 
 	/** Encerra reconhecimento de lista de campos (SELECT «campos»). **/
@@ -260,18 +262,28 @@ public class StatementParser {
 
 	/** Restrição NULL. **/
 	private void acaoSemantica20(Token token) {
+		ColumnDefinition column = this.columnDefStack.peek();
+		ConstraintDefinition constraint = new ConstraintDefinition(ConstraintKind.NULL);
+		column.setConstraint(constraint);
 	}
 
 	/** Restrição NOT NULL. **/
 	private void acaoSemantica21(Token token) {
+		ColumnDefinition column = this.columnDefStack.peek();
+		ConstraintDefinition constraint = new ConstraintDefinition(ConstraintKind.NOT_NULL);
+		column.setConstraint(constraint);
 	}
 
 	/** Restrição PRIMARY KEY. **/
 	private void acaoSemantica22(Token token) {
+		ColumnDefinition column = this.columnDefStack.peek();
+		ConstraintDefinition constraint = new KeyDefinition(null, ConstraintKind.PRIMARY_KEY, column.getIdentifier());
+		column.setConstraint(constraint);
 	}
 
 	/** Restrição [FOREIGN KEY] REFERENCES. **/
 	private void acaoSemantica23(Token token) {
+		// TODO: continuar aqui
 	}
 
 	/** Restrição FOREIGN KEY. **/
@@ -313,13 +325,16 @@ public class StatementParser {
 
 	/** Encerra reconhecimento do tipo. **/
 	private void acaoSemantica53(Token token) {
-		CreateStatement createStatement = (CreateStatement) this.statement;
-		ColumnDefinition columnDefinition = ((TableDefinition) createStatement.getStructure()).getColumnDefinition();
-		columnDefinition.setColumnType(this.columnType);
+		ColumnDefinition column = this.columnDefStack.peek();
+		column.setColumnType(this.columnType);
 	}
 
 	/** Encerra reconhecimento da restrição. **/
 	private void acaoSemantica55(Token token) {
+		ColumnDefinition column = this.columnDefStack.pop();
+		CreateStatement createStatement = (CreateStatement) this.statement;
+		TableDefinition tableDef = (TableDefinition) createStatement.getStructure();
+		tableDef.addColumnDefinition(column);
 	}
 
 	/** Nome de tabela e ser removida (DROP). **/
