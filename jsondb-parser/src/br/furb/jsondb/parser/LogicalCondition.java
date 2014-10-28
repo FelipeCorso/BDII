@@ -1,6 +1,10 @@
 package br.furb.jsondb.parser;
 
-public abstract class LogicalCondition implements ICondition {
+
+/**
+ * Condição lógica, composta de um operador e dois operandos.
+ */
+public abstract class LogicalCondition implements IExpression {
 
 	private LogicalOperator operator;
 
@@ -9,9 +13,9 @@ public abstract class LogicalCondition implements ICondition {
 		return true;
 	}
 
-	public abstract ICondition getLeftOperand();
+	public abstract IExpression getLeftOperand();
 
-	public abstract ICondition getRightOperand();
+	public abstract IExpression getRightOperand();
 
 	public LogicalOperator getOperator() {
 		return operator;

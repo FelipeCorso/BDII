@@ -4,7 +4,7 @@ import java.util.List;
 
 public class SelectStatement implements IStatement {
 
-	private List<TableColumn> columns;
+	private List<ColumnIdentifier> columns;
 	private WhereClause whereClause;
 	private List<TableIdentifier> tables;
 
@@ -12,20 +12,20 @@ public class SelectStatement implements IStatement {
 		this(null, null);
 	}
 
-	public SelectStatement(List<TableColumn> columns) {
+	public SelectStatement(List<ColumnIdentifier> columns) {
 		this(columns, null);
 	}
 
-	public SelectStatement(List<TableColumn> columns, WhereClause whereClause) {
+	public SelectStatement(List<ColumnIdentifier> columns, WhereClause whereClause) {
 		this.columns = columns;
 		this.whereClause = whereClause;
 	}
 
-	public final List<TableColumn> getColumns() {
+	public final List<ColumnIdentifier> getColumns() {
 		return columns;
 	}
 
-	public final void setColumns(List<TableColumn> columns) {
+	public final void setColumns(List<ColumnIdentifier> columns) {
 		this.columns = columns;
 	}
 

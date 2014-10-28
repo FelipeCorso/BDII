@@ -4,6 +4,6 @@ import java.util.TreeSet;
 
 public class WhereClause {
 	
-	private TreeSet<ICondition> evalTree;
+	private TreeSet<IExpression> evalTree;
 
 }

@@ -8,7 +8,7 @@ public class ColumnDefinition {
 
 	private String name;
 	private ColumnType columnType;
-	private ColumnRestriction columnRestriction;
+	private RestrictionDefinition columnRestriction;
 
 	public ColumnDefinition(String name) {
 		this.name = ArgumentValidator.requireNonEmpty(name, "a name must be provided for the column definition");
@@ -22,11 +22,11 @@ public class ColumnDefinition {
 		this.columnType = Objects.requireNonNull(columnType, "a column type must be provided for the column definition");
 	}
 
-	public final ColumnRestriction getColumnRestriction() {
+	public final RestrictionDefinition getColumnRestriction() {
 		return columnRestriction;
 	}
 
-	public final void setColumnRestriction(ColumnRestriction columnRestriction) {
+	public final void setColumnRestriction(RestrictionDefinition columnRestriction) {
 		this.columnRestriction = columnRestriction;
 	}
 

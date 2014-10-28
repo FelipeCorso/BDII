@@ -1,5 +1,6 @@
 package br.furb.jsondb.parser;
 
+
 public class SetDatabaseStatement implements IStatement {
 
 	private TableIdentifier table;

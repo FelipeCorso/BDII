@@ -1,6 +1,6 @@
 package br.furb.jsondb.parser;
 
-public interface ICondition {
+public interface IExpression {
 
 	boolean isLogical();
 
