@@ -7,15 +7,26 @@ import java.util.Objects;
 
 public class KeyDefinition extends ConstraintDefinition {
 
-	private List<ColumnIdentifier> sourceColumns;
+	private List<ColumnIdentifier> columns;
 
-	public KeyDefinition(String name, ConstraintKind kind, ColumnIdentifier sourceColum) {
-		this(name, kind, Arrays.asList(sourceColum));
+	public KeyDefinition(String name, ConstraintKind kind) {
+		this(name, kind, (List<ColumnIdentifier>) null);
 	}
 
-	public KeyDefinition(String name, ConstraintKind kind, List<ColumnIdentifier> sourceColumns) {
+	public KeyDefinition(String name, ConstraintKind kind, ColumnIdentifier column) {
+		this(name, kind, Arrays.asList(column));
+	}
+
+	public KeyDefinition(String name, ConstraintKind kind, List<ColumnIdentifier> column) {
 		super(name, kind);
-		this.sourceColumns = new LinkedList<ColumnIdentifier>(Objects.requireNonNull(sourceColumns, "source columns must be provided for the key constraint definition"));
+		this.columns = new LinkedList<ColumnIdentifier>();
+		if (column != null && !column.isEmpty()) {
+			this.columns.addAll(column);
+		}
+	}
+
+	public void addColumn(ColumnIdentifier column) {
+		this.columns.add(Objects.requireNonNull(column, "cannot add null as a column"));
 	}
 
 }
