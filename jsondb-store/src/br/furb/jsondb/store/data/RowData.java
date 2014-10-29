@@ -1,4 +1,4 @@
-package br.furb.jsondb.store;
+package br.furb.jsondb.store.data;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

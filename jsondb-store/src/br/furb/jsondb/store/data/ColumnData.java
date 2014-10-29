@@ -1,4 +1,4 @@
-package br.furb.jsondb.store;
+package br.furb.jsondb.store.data;
 
 public class ColumnData {
 
