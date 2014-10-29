@@ -35,6 +35,7 @@ public class StatementParser {
 	private TableIdentifier lastTable;
 	private Deque<ColumnIdentifier> columnStack = new LinkedList<>();
 	private Deque<ColumnDefinition> columnDefStack = new LinkedList<>();
+	private Deque<ConstraintDefinition> constraintStack = new LinkedList<>();
 	private ColumnType columnType;
 
 	private String constraintName;
@@ -268,30 +269,30 @@ public class StatementParser {
 
 	/** Restrição NULL. **/
 	private void acaoSemantica20(Token token) {
-		ColumnDefinition column = this.columnDefStack.peek();
 		ConstraintDefinition constraint = new ConstraintDefinition(this.constraintName, ConstraintKind.NULL);
-		column.setConstraint(constraint);
+		this.constraintStack.push(constraint);
 		this.constraintName = null;
 	}
 
 	/** Restrição NOT NULL. **/
 	private void acaoSemantica21(Token token) {
-		ColumnDefinition column = this.columnDefStack.peek();
 		ConstraintDefinition constraint = new ConstraintDefinition(this.constraintName, ConstraintKind.NOT_NULL);
-		column.setConstraint(constraint);
+		this.constraintStack.push(constraint);
 		this.constraintName = null;
 	}
 
 	/** Restrição PRIMARY KEY. **/
 	private void acaoSemantica22(Token token) {
-		ColumnDefinition column = this.columnDefStack.peek();
-		ConstraintDefinition constraint = new KeyDefinition(null, ConstraintKind.PRIMARY_KEY, column.getIdentifier());
-		column.setConstraint(constraint);
+		ConstraintDefinition constraint = new KeyDefinition(this.constraintName, ConstraintKind.PRIMARY_KEY);
+		this.constraintStack.push(constraint);
+		this.constraintName = null;
 	}
 
 	/** Restrição [FOREIGN KEY] REFERENCES. **/
 	private void acaoSemantica23(Token token) {
-		this.isForeignKey = true;
+		ConstraintDefinition constraint = new KeyDefinition(this.constraintName, ConstraintKind.FOREIGN_KEY);
+		this.constraintStack.push(constraint);
+		this.constraintName = null;
 	}
 
 	/** Restrição FOREIGN KEY. **/
@@ -335,7 +336,7 @@ public class StatementParser {
 	private void acaoSemantica52(Token token) {
 		this.statement = new CreateStatement(new TableDefinition(tableFromId(token.getLexeme())));
 	}
-	
+
 	/** Encerra reconhecimento do tipo. **/
 	private void acaoSemantica53(Token token) {
 		ColumnDefinition column = this.columnDefStack.peek();
@@ -345,8 +346,11 @@ public class StatementParser {
 	/** Encerra reconhecimento da restrição. **/
 	private void acaoSemantica55(Token token) {
 		ColumnDefinition column = this.columnDefStack.pop();
-
-		if (this.isForeignKey) {
+		ConstraintDefinition constraint = this.constraintStack.isEmpty() ? null : this.constraintStack.pop();
+		
+		if (constraint != null && constraint instanceof ForeignKeyDefinition) {
+			// FIXME: não pode
+			// FIXME: continuar aqui
 			ColumnIdentifier targetColumn = columnStack.pop();
 			targetColumn = new ColumnIdentifier(this.lastTable, targetColumn.getColumnName());
 
@@ -356,8 +360,8 @@ public class StatementParser {
 		}
 
 		CreateStatement createStatement = (CreateStatement) this.statement;
-		TableDefinition tableDef = (TableDefinition) createStatement.getStructure();
-		tableDef.addColumnDefinition(column);
+		TableDefinition table = (TableDefinition) createStatement.getStructure();
+		table.addColumnDefinition(column);
 
 	}
 
