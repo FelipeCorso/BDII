@@ -2,7 +2,7 @@ package br.furb.jsondb.core.result;
 
 import java.util.List;
 
-import br.furb.jsondb.store.RowData;
+import br.furb.jsondb.store.data.RowData;
 
 public class ResultSet extends Result implements IResultSet {
 
