@@ -12,10 +12,14 @@ public class DatabaseMetadata {
 		tables.put(table.getName(), table);
 	}
 
-	public void removeTable(String tableName){
+	public void removeTable(String tableName) {
 		tables.remove(tableName);
 	}
-	
+
+	public boolean hasTable(String tableName) {
+		return tables.containsKey(tableName);
+	}
+
 	public TableMetadata getTable(String tableName) {
 		return tables.get(tableName);
 	}
@@ -36,6 +40,5 @@ public class DatabaseMetadata {
 	public String toString() {
 		return "DatabaseMetadata [name=" + name + ", tables=" + tables + "]";
 	}
-	
-	
+
 }
