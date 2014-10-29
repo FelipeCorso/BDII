@@ -40,8 +40,6 @@ public class StatementParser {
 
 	private String constraintName;
 
-	private boolean isForeignKey;
-
 	public void executeAction(int action, Token token) {
 		switch (action) {
 		case 1:
@@ -80,9 +78,6 @@ public class StatementParser {
 		case 15:
 			acaoSemantica15(token);
 			break;
-		case 16:
-			acaoSemantica16(token);
-			break;
 		case 17:
 			acaoSemantica17(token);
 			break;
@@ -106,6 +101,15 @@ public class StatementParser {
 			break;
 		case 24:
 			acaoSemantica24(token);
+			break;
+		case 26:
+			acaoSemantica26();
+			break;
+		case 28:
+			acaoSemantica28();
+			break;
+		case 29:
+			acaoSemantica29();
 			break;
 		case 30:
 			acaoSemantica30(token);
@@ -195,6 +199,7 @@ public class StatementParser {
 
 	/** Inicia reconhecimento de colunas no INSERT. **/
 	private void acaoSemantica10(Token token) {
+		this.columnStack.clear();
 	}
 
 	/** Encerra reconhecimento de colunas no INSERT. **/
@@ -230,10 +235,6 @@ public class StatementParser {
 	/** Nome de restrição usada no CREATE. **/
 	private void acaoSemantica15(Token token) {
 		this.constraintName = cleanId(token.getLexeme());
-	}
-
-	/** Finaliza reconhecimento de lista de IDs. **/
-	private void acaoSemantica16(Token token) {
 	}
 
 	/** Nome de campo/atributo usado no CREATE. **/
@@ -289,14 +290,43 @@ public class StatementParser {
 	}
 
 	/** Restrição [FOREIGN KEY] REFERENCES. **/
+	// TODO: ao final, ver se pode ser substituída pela ação 24
 	private void acaoSemantica23(Token token) {
-		ConstraintDefinition constraint = new KeyDefinition(this.constraintName, ConstraintKind.FOREIGN_KEY);
+		ConstraintDefinition constraint = new ForeignKeyDefinition(this.constraintName);
 		this.constraintStack.push(constraint);
 		this.constraintName = null;
 	}
 
 	/** Restrição FOREIGN KEY. **/
 	private void acaoSemantica24(Token token) {
+		ConstraintDefinition constraint = new ForeignKeyDefinition(this.constraintName);
+		this.constraintStack.push(constraint);
+		this.constraintName = null;
+	}
+
+	/** Encerra reconhecimento de IDs no {@code PRIMARY KEY ( <<ids>>)}. */
+	private void acaoSemantica26() {
+		KeyDefinition key = (KeyDefinition) this.constraintStack.peek();
+		this.columnStack.forEach(column -> key.addColumn(column));
+		this.columnStack.clear();
+	}
+
+	/**
+	 * Encerra reconhecimento de IDs no {@code FOREIGN KEY
+	 * <table> (<<ids>>)}.
+	 **/
+	// TODO: ver se pode substituir pela ação 26
+	private void acaoSemantica28() {
+		ForeignKeyDefinition key = (ForeignKeyDefinition) this.constraintStack.peek();
+		this.columnStack.forEach(column -> key.addColumn(column));
+		this.columnStack.clear();
+	}
+
+	/**
+	 * Encerra reconhecimento de IDs no {@code REFERENCES
+	 * <table> (<<ids>>)}.
+	 **/
+	private void acaoSemantica29() {
 	}
 
 	/** Reconhece operador relacional. **/
@@ -327,7 +357,7 @@ public class StatementParser {
 	private void acaoSemantica39(Token token) {
 	}
 
-	/** Nome de base de dados. **/
+	/** Nome de base de dados sendo criada. **/
 	private void acaoSemantica51(Token token) {
 		this.statement = new CreateStatement(new DatabaseIdentifier(cleanId(token.getLexeme())));
 	}
@@ -345,24 +375,7 @@ public class StatementParser {
 
 	/** Encerra reconhecimento da restrição. **/
 	private void acaoSemantica55(Token token) {
-		ColumnDefinition column = this.columnDefStack.pop();
-		ConstraintDefinition constraint = this.constraintStack.isEmpty() ? null : this.constraintStack.pop();
-		
-		if (constraint != null && constraint instanceof ForeignKeyDefinition) {
-			// FIXME: não pode
-			// FIXME: continuar aqui
-			ColumnIdentifier targetColumn = columnStack.pop();
-			targetColumn = new ColumnIdentifier(this.lastTable, targetColumn.getColumnName());
-
-			ForeignKeyDefinition foreignKey = new ForeignKeyDefinition(this.constraintName, ConstraintKind.FOREIGN_KEY, column.getIdentifier(), targetColumn);
-			column.setConstraint(foreignKey);
-			this.isForeignKey = false;
-		}
-
-		CreateStatement createStatement = (CreateStatement) this.statement;
-		TableDefinition table = (TableDefinition) createStatement.getStructure();
-		table.addColumnDefinition(column);
-
+		// TODO
 	}
 
 	/** Nome de tabela e ser removida (DROP). **/
