@@ -39,7 +39,7 @@ Acoes semanticas
 --		-----
 
 51		Nome de base de dados
-
+52		Nome de tabela sendo criada
 53		Encerra reconhecimento do tipo
 
 55		Encerra reconhecimento da restricao
