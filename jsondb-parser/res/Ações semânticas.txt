@@ -1,4 +1,4 @@
-Acoes semanticas
+﻿Acoes semanticas
 
 #Acao	Descricao
 01		Declaracao de NUMBER
@@ -9,16 +9,16 @@ Acoes semanticas
 08		Precisao de tipo
 09		Tamanho de tipo
 --		-----
-10		Inicia reconhecimento de colunas no INSERT
+10		Inicia reconhecimento de IDs
 11		Encerra reconhecimento de colunas no INSERT
 12		Nome de coluna
 13		Nome de tabela
 14		Reconhece nome de coluna, e faz com que o ultimo nome de coluna (#12) seja considerado nome de tabela (#13)
 15		Nome de restricao usada no CREATE
-16		Finaliza reconhecimento de lista de IDs
+
 17		Nome de campo/atributo usado no CREATE
-18		Encerra reconhecimento de lista de campos (SELECT ��campos��)
-19		Encerra reconhecimento de lista de tabelas (SELECT campos from ��tabelas��)
+18		Encerra reconhecimento de lista de campos (SELECT <<campos>>)
+19		Encerra reconhecimento de lista de tabelas (SELECT campos from <<tabelas>>)
 --		-----
 20		Restricao NULL
 21		Restricao NOT NULL
@@ -26,6 +26,9 @@ Acoes semanticas
 23		Restricao [FOREIGN KEY] REFERENCES
 24		Restricao FOREIGN KEY
 
+26		Encerra reconhecimento de IDs no PRIMARY KEY (<<ids>>)
+28		Encerra reconhecimento de IDs no FOREIGN KEY <table> (<<ids>>)
+29		Encerra reconhecimento de IDs no REFERENCES <table> (<<ids>>)
 --		-----
 30		Reconhece operador relacional
 31		Reconhece operador logico
