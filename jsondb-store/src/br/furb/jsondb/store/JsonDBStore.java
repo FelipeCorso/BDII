@@ -26,7 +26,7 @@ public class JsonDBStore {
 
 	public File getJsonDBDir() {
 		if (jsonDBDir == null) {
-			jsonDBDir = new File(System.getProperty("user.home"), ".jsondb");
+			jsonDBDir = new File(JsonDBProperty.JSON_DB_DIR.get(), ".jsondb");
 			if (!jsonDBDir.exists()) {
 				boolean mkdir = jsonDBDir.mkdir();
 				if (!mkdir) {
@@ -40,7 +40,7 @@ public class JsonDBStore {
 
 	public boolean createDatabase(String database) throws StoreException {
 		File databaseDir = new File(getJsonDBDir(), database);
-		if (!databaseDir.mkdir()) {
+		if (!databaseDir.mkdirs()) {
 			return false;
 		}
 
