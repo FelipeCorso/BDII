@@ -2,19 +2,23 @@ package br.furb.jsondb.core.command;
 
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.core.result.Result;
+import br.furb.jsondb.parser.CreateStatement;
 import br.furb.jsondb.store.JsonDBStore;
 import br.furb.jsondb.store.StoreException;
 import br.furb.jsondb.store.metadata.DatabaseMetadataProvider;
 
-public class CreateDatabaseCommmand implements ICommand {
+public class CreateDatabaseCommand implements ICommand {
 
-	public CreateDatabaseCommmand(/* TODO receber o IStatement de create database */) {
+	private CreateStatement createStatement;
+
+	public CreateDatabaseCommand(CreateStatement createStatement) {
+		this.createStatement = createStatement;
 
 	}
 
 	@Override
 	public IResult execute() {
-		String database = ""; // TODO obter do IStatement
+		String database = createStatement.getStructure().getIdentifier();
 
 		IResult result = null;
 

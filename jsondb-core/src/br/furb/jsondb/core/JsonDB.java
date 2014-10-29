@@ -1,8 +1,9 @@
 package br.furb.jsondb.core;
 
-import br.furb.jsondb.core.command.CreateDatabaseCommmand;
+import br.furb.jsondb.core.command.CreateDatabaseCommand;
 import br.furb.jsondb.core.command.CreateTableCommand;
 import br.furb.jsondb.core.result.IResult;
+import br.furb.jsondb.parser.CreateStatement;
 
 public class JsonDB {
 
@@ -54,8 +55,8 @@ public class JsonDB {
 		return null;
 	}
 	
-	private IResult createDatabase(/*TODO recebe o IStatement*/){
-		return new CreateDatabaseCommmand().execute();
+	private IResult createDatabase(CreateStatement statement){
+		return new CreateDatabaseCommand(statement).execute();
 	}
 	
 	private IResult createTableCommand(/*TODO recebe o IStatement*/){
