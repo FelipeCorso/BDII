@@ -130,6 +130,9 @@ public class StatementParser {
 		case 51:
 			acaoSemantica51(token);
 			break;
+		case 52:
+			acaoSemantica52(token);
+			break;
 		case 53:
 			acaoSemantica53(token);
 			break;
@@ -328,6 +331,11 @@ public class StatementParser {
 		this.statement = new CreateStatement(new DatabaseIdentifier(cleanId(token.getLexeme())));
 	}
 
+	/** Nome de tabela sendo criada. **/
+	private void acaoSemantica52(Token token) {
+		this.statement = new CreateStatement(new TableDefinition(tableFromId(token.getLexeme())));
+	}
+	
 	/** Encerra reconhecimento do tipo. **/
 	private void acaoSemantica53(Token token) {
 		ColumnDefinition column = this.columnDefStack.peek();
@@ -348,7 +356,6 @@ public class StatementParser {
 		}
 
 		CreateStatement createStatement = (CreateStatement) this.statement;
-		// FIXME: NullPointer: adicionar ação semântica que permita reconhecer o CREATE «TABLE» antes deste momento
 		TableDefinition tableDef = (TableDefinition) createStatement.getStructure();
 		tableDef.addColumnDefinition(column);
 
