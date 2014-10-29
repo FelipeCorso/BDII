@@ -5,39 +5,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.parser.CreateStatement;
 import br.furb.jsondb.parser.DatabaseIdentifier;
-import br.furb.jsondb.store.JsonDBProperty;
 import br.furb.jsondb.store.JsonDBStore;
 
-public class CreateDatabaseCommandTest {
-
-	private File tempDir;
-	private String bkpProperty;
-
-	@Before
-	public void before() throws IOException {
-
-		tempDir = File.createTempFile("jsondb", null);
-		tempDir.delete();
-		assertTrue(tempDir.getAbsolutePath(), tempDir.mkdir());
-
-		bkpProperty = JsonDBProperty.JSON_DB_DIR.set(tempDir.getAbsolutePath());
-	}
-
-	@After
-	public void after() throws IOException {
-		JsonDBProperty.JSON_DB_DIR.set(bkpProperty);
-		FileUtils.deleteDirectory(tempDir);
-	}
+public class CreateDatabaseCommandTest extends BaseCommandTest {
 
 	/**
 	 * Testa a execução do comando quando ainda não existe um banco com o mesmo
@@ -65,7 +41,7 @@ public class CreateDatabaseCommandTest {
 	}
 
 	/**
-	 * Testa a execuÃ§Ã£o do comando quando o jÃ¡ existe um banco com o mesmo
+	 * Testa a execução do comando quando já existe um banco com o mesmo
 	 * nome
 	 */
 	@Test
@@ -78,7 +54,7 @@ public class CreateDatabaseCommandTest {
 				createStatement);
 		IResult result = command.execute();
 		assertFalse(result.hasError());
-		
+
 		result = command.execute();
 
 		assertTrue(result.hasError());

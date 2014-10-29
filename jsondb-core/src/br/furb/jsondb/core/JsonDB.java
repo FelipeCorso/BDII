@@ -2,24 +2,33 @@ package br.furb.jsondb.core;
 
 import br.furb.jsondb.core.command.CreateDatabaseCommand;
 import br.furb.jsondb.core.command.CreateTableCommand;
+import br.furb.jsondb.core.command.DropTableCommand;
+import br.furb.jsondb.core.command.SetDatabaseCommand;
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.parser.CreateStatement;
+import br.furb.jsondb.parser.DropStatement;
+import br.furb.jsondb.parser.SetDatabaseStatement;
+import br.furb.jsondb.parser.TableIdentifier;
 
 public class JsonDB {
 
 	private static JsonDB intance = new JsonDB();
 
 	private String currentDatabase;
-	
+
 	private JsonDB() {
 	}
 
 	public static JsonDB getInstance() {
 		return intance;
 	}
-	
+
 	public String getCurrentDatabase() {
 		return currentDatabase;
+	}
+
+	public void setCurrentDatabase(String currentDatabase) {
+		this.currentDatabase = currentDatabase;
 	}
 
 	public IResult executeSQL(String sql) {
@@ -35,8 +44,8 @@ public class JsonDB {
 		// 08. JsonDb solicita interpretação da sentença SQL para o SqlParser
 		// 09. SqlParser reconhece a sentença, cria o objeto de IStatement
 		// correspondente e retorna para o JsonDb
-		
-		/* === Os passos abaixo são executados pelas classes ICommand ===*/
+
+		/* === Os passos abaixo são executados pelas classes ICommand === */
 		// 10. JsonDb verifica no metadados da base se a tabela envolvida no
 		// comando existe
 		// 11. JsonDb efetua as validações do comando
@@ -44,7 +53,7 @@ public class JsonDB {
 		// 13. Store executa e retorna o resultado das alterações
 
 		// TODO if para saber qual comando executar
-		
+
 		// 14. JsonDb cria e armazena na sessão um objeto de resultados com o
 		// comando executado, tempo decorrido desde o passo 07 e tempo absoluto
 		// do SO
@@ -54,14 +63,21 @@ public class JsonDB {
 
 		return null;
 	}
-	
-	private IResult createDatabase(CreateStatement statement){
+
+	private IResult createDatabase(CreateStatement statement) {
 		return new CreateDatabaseCommand(statement).execute();
 	}
-	
-	private IResult createTableCommand(/*TODO recebe o IStatement*/){
+
+	private IResult setDatabase(SetDatabaseStatement statement) {
+		return new SetDatabaseCommand(statement).execute();
+	}
+
+	private IResult createTable(/* TODO recebe o IStatement */) {
 		return new CreateTableCommand().execute();
 	}
-	
-	
+
+	private IResult dropTable(DropStatement<TableIdentifier> statement) {
+		return new DropTableCommand(statement).execute();
+	}
+
 }
