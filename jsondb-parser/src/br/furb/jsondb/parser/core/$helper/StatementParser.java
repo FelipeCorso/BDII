@@ -416,7 +416,8 @@ public class StatementParser {
 
 	/** Nome de base a ser usada (SET DATABASE). **/
 	private void acaoSemantica65(Token token) {
-		statement = new SetDatabaseStatement(tableFromId(token.getLexeme()));
+		DatabaseIdentifier database = new DatabaseIdentifier(cleanId(token.getLexeme()));
+		statement = new SetDatabaseStatement(database);
 	}
 
 	/** CREATE INDEX. **/
