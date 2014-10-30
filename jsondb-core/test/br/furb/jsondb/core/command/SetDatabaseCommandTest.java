@@ -17,7 +17,7 @@ public class SetDatabaseCommandTest extends BaseCommandTest {
 	public void testSetDabase01() {
 
 		SetDatabaseStatement statement = new SetDatabaseStatement(
-				new TableIdentifier("banco1"));
+				new DatabaseIdentifier("banco1"));
 		SetDatabaseCommand setDatabaseCommand = new SetDatabaseCommand(
 				statement);
 		IResult result = setDatabaseCommand.execute();
@@ -43,7 +43,7 @@ public class SetDatabaseCommandTest extends BaseCommandTest {
 		//
 
 		SetDatabaseStatement statement = new SetDatabaseStatement(
-				new TableIdentifier(database));
+				new DatabaseIdentifier(database));
 		SetDatabaseCommand setDatabaseCommand = new SetDatabaseCommand(
 				statement);
 		IResult result = setDatabaseCommand.execute();

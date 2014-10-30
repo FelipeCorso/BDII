@@ -19,7 +19,7 @@ public class SetDatabaseCommand implements ICommand {
 
 		IResult result = null;
 
-		String database = statement.getTable().getIdentifier();
+		String database = statement.getDatabase().getIdentifier();
 		if (!DatabaseMetadataProvider.getInstance().containsDatabase(database)) {
 			result = new Result(true, String.format("Database %s not found",
 					database));
