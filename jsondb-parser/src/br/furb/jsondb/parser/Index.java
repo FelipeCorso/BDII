@@ -1,6 +1,11 @@
 package br.furb.jsondb.parser;
 
-
+/**
+ * @deprecated A estrutura gramática será alterada
+ * @author william.seefeld
+ *
+ */
+@Deprecated
 public class Index implements IStructure {
 
 	private ColumnIdentifier tableColumn;
@@ -14,11 +19,16 @@ public class Index implements IStructure {
 
 	@Override
 	public String getIdentifier() {
-		return tableColumn.toPrettyString();
+		return tableColumn.toString();
 	}
 
 	public ColumnIdentifier getTableColumn() {
 		return tableColumn;
+	}
+
+	@Override
+	public String toString() {
+		return getIdentifier();
 	}
 
 }

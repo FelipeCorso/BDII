@@ -15,5 +15,10 @@ public class DatabaseIdentifier implements IStructure {
 	public String getIdentifier() {
 		return databaseName;
 	}
+	
+	@Override
+	public String toString() {
+		return getIdentifier();
+	}
 
 }

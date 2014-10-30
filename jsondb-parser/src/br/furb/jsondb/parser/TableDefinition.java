@@ -33,4 +33,19 @@ public class TableDefinition implements IStructure {
 		this.finalConstraints.add(Objects.requireNonNull(constraint, "cannot add a null constraint"));
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder structure = new StringBuilder();
+		structure.append("(");
+		this.columns.forEach(column -> structure.append(column).append(", "));
+		this.finalConstraints.forEach(constraint -> structure.append(constraint).append(", "));
+		int length = structure.length();
+		if (length > 1) {
+			structure.delete(length - 2, length);
+		}
+		structure.append(")");
+
+		return "TABLE ".concat(getIdentifier()).concat(structure.toString());
+	}
+
 }

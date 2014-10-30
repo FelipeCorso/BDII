@@ -6,31 +6,43 @@ import java.util.Optional;
 public class ColumnType {
 
 	private DataType dataType;
-	private int size;
-	private Optional<Integer> precision;
+	private Optional<Integer> maybeSize = Optional.empty();
+	private Optional<Integer> maybePrecision = Optional.empty();
 
 	public ColumnType(DataType dataType) {
 		this.dataType = Objects.requireNonNull(dataType, "a data type must be provided as the column type");
 	}
 
-	public final int getSize() {
-		return size;
+	public Optional<Integer> getSize() {
+		return maybeSize;
 	}
 
-	public final void setSize(int size) {
-		this.size = size;
+	public void setSize(Integer size) {
+		this.maybeSize = Optional.ofNullable(size);
 	}
 
-	public final Optional<Integer> getPrecision() {
-		return precision;
+	public Optional<Integer> getPrecision() {
+		return maybePrecision;
 	}
 
-	public final void setPrecision(Optional<Integer> precision) {
-		this.precision = precision;
+	public void setPrecision(Integer precision) {
+		this.maybePrecision = Optional.ofNullable(precision);
 	}
 
-	public final DataType getDataType() {
+	public DataType getDataType() {
 		return dataType;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder ret = new StringBuilder(getDataType().toString());
+		if (getSize().isPresent()) {
+			ret.append(" (").append(getSize().get());
+			if (getPrecision().isPresent()) {
+				ret.append(", ").append(getPrecision().get());
+			}
+			ret.append(")");
+		}
+		return ret.toString();
+	}
 }

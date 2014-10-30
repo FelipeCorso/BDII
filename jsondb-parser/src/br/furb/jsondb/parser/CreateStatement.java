@@ -18,4 +18,9 @@ public class CreateStatement implements IStatement {
 		this.structure = Objects.requireNonNull(structure, "uma estrutura deve ser informada para criação");
 	}
 
+	@Override
+	public String toString() {
+		return "CREATE ".concat(getStructure().toString());
+	}
+
 }
