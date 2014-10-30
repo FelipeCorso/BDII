@@ -40,6 +40,8 @@ public class StatementParser {
 
 	private String constraintName;
 
+	private ColumnDefinition lastColumn;
+
 	public void executeAction(int action, Token token) {
 		switch (action) {
 		case 1:
@@ -77,6 +79,9 @@ public class StatementParser {
 			break;
 		case 15:
 			acaoSemantica15(token);
+			break;
+		case 16:
+			acaoSemantica16(token);
 			break;
 		case 17:
 			acaoSemantica17(token);
@@ -237,10 +242,17 @@ public class StatementParser {
 		this.constraintName = cleanId(token.getLexeme());
 	}
 
+	/** Nome de restrição final usada no CREATE. **/
+	private void acaoSemantica16(Token token) {
+		this.constraintName = cleanId(token.getLexeme());
+		this.lastColumn = null;
+	}
+
 	/** Nome de campo/atributo usado no CREATE. **/
 	private void acaoSemantica17(Token token) {
 		String lexeme = token.getLexeme();
-		this.columnDefStack.push(new ColumnDefinition(cleanId(lexeme)));
+		this.lastColumn = new ColumnDefinition(cleanId(lexeme));
+		this.columnDefStack.push(this.lastColumn);
 	}
 
 	/** Encerra reconhecimento de lista de campos (SELECT «campos»). **/
@@ -327,6 +339,9 @@ public class StatementParser {
 	 * <table> (<<ids>>)}.
 	 **/
 	private void acaoSemantica29() {
+		ForeignKeyDefinition key = (ForeignKeyDefinition) this.constraintStack.peek();
+		this.columnStack.forEach(column -> key.addTargetColumn(column));
+		this.columnStack.clear();
 	}
 
 	/** Reconhece operador relacional. **/
@@ -373,9 +388,21 @@ public class StatementParser {
 		column.setColumnType(this.columnType);
 	}
 
-	/** Encerra reconhecimento da restrição. **/
+	/**
+	 * Encerra reconhecimento da restrição. Atribui a restrição à última coluna
+	 * reconhecida, caso faça parte da declaração da mesma. Do contrário,
+	 * armazena na definição da tabela.
+	 */
 	private void acaoSemantica55(Token token) {
-		// TODO
+		TableDefinition table = (TableDefinition) ((CreateStatement) this.statement).getStructure();
+		ConstraintDefinition constraint = this.constraintStack.pop();
+		if (this.lastColumn != null) {
+			this.lastColumn.setConstraint(constraint);
+			this.lastColumn = null;
+			table.addColumnDefinition(this.columnDefStack.pop());
+		} else {
+			table.addFinalConstraint(constraint);
+		}
 	}
 
 	/** Nome de tabela e ser removida (DROP). **/

@@ -15,7 +15,7 @@
 13		Nome de tabela
 14		Reconhece nome de coluna, e faz com que o ultimo nome de coluna (#12) seja considerado nome de tabela (#13)
 15		Nome de restricao usada no CREATE
-
+16		Nome de restrição final usada no CREATE
 17		Nome de campo/atributo usado no CREATE
 18		Encerra reconhecimento de lista de campos (SELECT <<campos>>)
 19		Encerra reconhecimento de lista de tabelas (SELECT campos from <<tabelas>>)
@@ -27,6 +27,7 @@
 24		Restricao FOREIGN KEY
 
 26		Encerra reconhecimento de IDs no PRIMARY KEY (<<ids>>)
+
 28		Encerra reconhecimento de IDs no FOREIGN KEY <table> (<<ids>>)
 29		Encerra reconhecimento de IDs no REFERENCES <table> (<<ids>>)
 --		-----
