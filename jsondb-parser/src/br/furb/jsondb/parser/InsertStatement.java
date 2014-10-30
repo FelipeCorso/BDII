@@ -4,20 +4,33 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Queue;
 
 public class InsertStatement implements IStatement {
 
 	private final List<ColumnIdentifier> columns;
 	private final TableIdentifier table;
-	private final List<Value> values;
+	private final List<Value<?>> values;
 
-	public InsertStatement(TableIdentifier table,
-			Collection<ColumnIdentifier> columns, Collection<Value> values) {
-		this.table = Objects.requireNonNull(table,
-				"a table name must be provided");
-		this.columns = new LinkedList<ColumnIdentifier>(columns);
-		// TODO: non-empty
-		this.values = new LinkedList<Value>(values);
+	public InsertStatement(TableIdentifier table, Collection<ColumnIdentifier> columns, Collection<Value<?>> values) {
+		this.table = table;
+		this.columns = new LinkedList<>();
+		this.values = new LinkedList<>();
+
+		if (columns != null && !columns.isEmpty()) {
+			this.columns.addAll(columns);
+		}
+		if (values != null && !values.isEmpty()) {
+			this.values.addAll(values);
+		}
+	}
+
+	public InsertStatement() {
+		this(null, null, null);
+	}
+
+	public void addValues(List<Value<?>> valuesStack) {
+		valuesStack.forEach(value -> this.values.add(Objects.requireNonNull(value, "null values must be specified as Value.NULL")));
 	}
 
 }
