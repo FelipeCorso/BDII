@@ -35,3 +35,5 @@ DESCRIBE tabela;
 
 SET DATABASE nome_base;
 SET DATABASE 'nome_base';
+
+INSERT INTO 'table' VALUES ("literal simples", "\\", "\"", "\\\"");
