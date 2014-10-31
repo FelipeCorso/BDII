@@ -3,6 +3,7 @@ package br.furb.jsondb.core.command;
 import br.furb.jsondb.core.JsonDB;
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.core.result.Result;
+import br.furb.jsondb.parser.CreateStatement;
 import br.furb.jsondb.store.JsonDBStore;
 import br.furb.jsondb.store.StoreException;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
@@ -10,8 +11,10 @@ import br.furb.jsondb.store.metadata.DatabaseMetadataProvider;
 
 public class CreateTableCommand implements ICommand {
 
-	public CreateTableCommand(/* TODO receber IStatement */) {
+	private CreateStatement statement;
 
+	public CreateTableCommand(CreateStatement statement) {
+		this.statement = statement;
 	}
 
 	@Override
@@ -23,7 +26,7 @@ public class CreateTableCommand implements ICommand {
 		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider
 				.getInstance().getDatabaseMetadata(database);
 
-		String tableName = ""; // TODO obter do IStatement
+		String tableName = statement.getStructure().getIdentifier();
 
 		// valida se a tabela já existe
 		if (databaseMetadata.getTable(tableName) != null) {
@@ -31,10 +34,8 @@ public class CreateTableCommand implements ICommand {
 					"Table %s already exists in database %s", tableName,
 					database));
 		} else {
-			// FIXME considerar que os campos já estão ok???
-
 			try {
-				JsonDBStore.getInstance().createTable();
+				JsonDBStore.getInstance().createTable(database, statement);
 				result = new Result(false, String.format( "Table %s created with success", tableName));
 			} catch (StoreException e) {
 				result = new Result(true, e.getMessage());

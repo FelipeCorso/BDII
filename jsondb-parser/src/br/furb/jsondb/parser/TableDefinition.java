@@ -33,4 +33,11 @@ public class TableDefinition implements IStructure {
 		this.finalConstraints.add(Objects.requireNonNull(constraint, "cannot add a null constraint"));
 	}
 
+	public List<ColumnDefinition> getColumns() {
+		return columns;
+	}
+	
+	public List<ConstraintDefinition> getFinalConstraints() {
+		return finalConstraints;
+	}
 }

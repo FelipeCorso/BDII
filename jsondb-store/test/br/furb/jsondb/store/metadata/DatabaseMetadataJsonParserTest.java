@@ -8,6 +8,8 @@ import java.io.StringWriter;
 
 import org.junit.Test;
 
+import br.furb.jsondb.parser.DataType;
+
 public class DatabaseMetadataJsonParserTest {
 
 	@Test
@@ -18,17 +20,17 @@ public class DatabaseMetadataJsonParserTest {
 		TableMetadata table = new TableMetadata();
 
 		table.setName("Table1");
-		table.addField(new FieldMetadata("Field1", FieldType.VARCHAR, 20));
-		table.addField(new FieldMetadata("Field2", FieldType.CHAR, 1));
-		table.addField(new FieldMetadata("Field3", FieldType.NUMBER, 2));
+		table.addField(new FieldMetadata("Field1", DataType.VARCHAR, 20,0));
+		table.addField(new FieldMetadata("Field2", DataType.CHAR, 1));
+		table.addField(new FieldMetadata("Field3", DataType.NUMBER, 2));
 
 		metadata.addTable(table);
 
 		table = new TableMetadata();
 
 		table.setName("Table2");
-		table.addField(new FieldMetadata("Field1", FieldType.VARCHAR, 20));
-		table.addField(new FieldMetadata("Field2", FieldType.NUMBER, 2));
+		table.addField(new FieldMetadata("Field1", DataType.VARCHAR, 20));
+		table.addField(new FieldMetadata("Field2", DataType.NUMBER, 2));
 
 		metadata.addTable(table);
 
@@ -52,13 +54,13 @@ public class DatabaseMetadataJsonParserTest {
 	
 		assertEquals(3,  table1.getFields().size());
 		
-		assertEquals(FieldType.VARCHAR, table1.getFields().get("Field1").getType());
-		assertEquals(FieldType.CHAR, table1.getFields().get("Field2").getType());
-		assertEquals(FieldType.NUMBER, table1.getFields().get("Field3").getType());
+		assertEquals(DataType.VARCHAR, table1.getFields().get("Field1").getType());
+		assertEquals(DataType.CHAR, table1.getFields().get("Field2").getType());
+		assertEquals(DataType.NUMBER, table1.getFields().get("Field3").getType());
 		
 		assertEquals(2, table2.getFields().size());
-		assertEquals(FieldType.VARCHAR, table2.getFields().get("Field1").getType());
-		assertEquals(FieldType.NUMBER, table2.getFields().get("Field2").getType());
+		assertEquals(DataType.VARCHAR, table2.getFields().get("Field1").getType());
+		assertEquals(DataType.NUMBER, table2.getFields().get("Field2").getType());
 	}
 	@Test
 	public void testParseToObject02() throws IOException {

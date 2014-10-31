@@ -72,8 +72,8 @@ public class JsonDB {
 		return new SetDatabaseCommand(statement).execute();
 	}
 
-	private IResult createTable(/* TODO recebe o IStatement */) {
-		return new CreateTableCommand().execute();
+	private IResult createTable(CreateStatement statement) {
+		return new CreateTableCommand(statement).execute();
 	}
 
 	private IResult dropTable(DropStatement<TableIdentifier> statement) {

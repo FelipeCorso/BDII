@@ -9,8 +9,7 @@ public class TableMetadata {
 	private String name;
 	private Map<String, FieldMetadata> fields = new HashMap<String, FieldMetadata>();
 	private Set<String> primaryKey;
-
-	// FIXME references ?
+	private IndexMetadata indexMetadata;
 
 	public String getName() {
 		return name;
@@ -36,10 +35,17 @@ public class TableMetadata {
 		this.primaryKey = primaryKey;
 	}
 
+	public void setIndexMetadata(IndexMetadata indexMetadata) {
+		this.indexMetadata = indexMetadata;
+	}
+
+	public IndexMetadata getIndexMetadata() {
+		return indexMetadata;
+	}
+
 	@Override
 	public String toString() {
 		return "TableMetadata [name=" + name + ", fields=" + fields
 				+ ", primaryKey=" + primaryKey + "]";
 	}
-
 }

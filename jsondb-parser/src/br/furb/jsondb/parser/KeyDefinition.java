@@ -28,5 +28,9 @@ public class KeyDefinition extends ConstraintDefinition {
 	public void addColumn(ColumnIdentifier column) {
 		this.columns.add(Objects.requireNonNull(column, "cannot add null as a column"));
 	}
+	
+	public List<ColumnIdentifier> getColumns() {
+		return columns;
+	}
 
 }

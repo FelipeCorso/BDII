@@ -5,10 +5,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
-import br.furb.jsondb.store.metadata.DatabaseMetadata;
-import br.furb.jsondb.store.metadata.DatabaseMetadataProvider;
-import br.furb.jsondb.store.metadata.FieldType;
-import br.furb.jsondb.store.metadata.TableMetadata;
+import br.furb.jsondb.parser.DataType;
 
 public class DatabaseMetadataProviderTest {
 
@@ -25,13 +22,13 @@ public class DatabaseMetadataProviderTest {
 	
 		assertEquals(3,  table1.getFields().size());
 		
-		assertEquals(FieldType.VARCHAR, table1.getFields().get("Field1").getType());
-		assertEquals(FieldType.CHAR, table1.getFields().get("Field2").getType());
-		assertEquals(FieldType.NUMBER, table1.getFields().get("Field3").getType());
+		assertEquals(DataType.VARCHAR, table1.getFields().get("Field1").getType());
+		assertEquals(DataType.CHAR, table1.getFields().get("Field2").getType());
+		assertEquals(DataType.NUMBER, table1.getFields().get("Field3").getType());
 		
 		assertEquals(2, table2.getFields().size());
-		assertEquals(FieldType.VARCHAR, table2.getFields().get("Field1").getType());
-		assertEquals(FieldType.NUMBER, table2.getFields().get("Field2").getType());
+		assertEquals(DataType.VARCHAR, table2.getFields().get("Field1").getType());
+		assertEquals(DataType.NUMBER, table2.getFields().get("Field2").getType());
 	}
 	
 }

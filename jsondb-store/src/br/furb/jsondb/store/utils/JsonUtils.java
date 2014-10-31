@@ -54,7 +54,9 @@ public final class JsonUtils {
 			Class<T> type, String indent) {
 		JsonWriter jsonWriter = new JsonWriter(writer);
 		jsonWriter.setIndent(indent);
-		Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+		GsonBuilder gsonBuilder = new GsonBuilder();
+		gsonBuilder.enableComplexMapKeySerialization();
+		Gson gson = gsonBuilder.disableHtmlEscaping().create();
 		gson.toJson(objectToJson, type, jsonWriter);
 	}
 
