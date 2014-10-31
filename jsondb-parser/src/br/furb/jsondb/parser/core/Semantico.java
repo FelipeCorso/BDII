@@ -1,5 +1,6 @@
 package br.furb.jsondb.parser.core;
 
+import br.furb.jsondb.parser.IStatement;
 import br.furb.jsondb.parser.core.$helper.StatementParser;
 
 public class Semantico implements Constants {
@@ -13,5 +14,9 @@ public class Semantico implements Constants {
 	public void executeAction(int action, Token token) {
 		System.out.println("Ação #" + action + ", Token: " + token);
 		stmParser.executeAction(action, token);
+	}
+
+	public IStatement getStatement() {
+		return stmParser.getStatement();
 	}
 }

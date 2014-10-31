@@ -10,7 +10,7 @@ public class TableIdentifier implements IStructure {
 
 	@Override
 	public final String getIdentifier() {
-		return tableName;
+		return "'".concat(tableName).concat("'");
 	}
 
 }

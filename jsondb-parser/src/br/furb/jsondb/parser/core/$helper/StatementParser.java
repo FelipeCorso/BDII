@@ -1,10 +1,12 @@
 package br.furb.jsondb.parser.core.$helper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import br.furb.jsondb.parser.ColumnDefinition;
 import br.furb.jsondb.parser.ColumnIdentifier;
@@ -19,28 +21,34 @@ import br.furb.jsondb.parser.ForeignKeyDefinition;
 import br.furb.jsondb.parser.IStatement;
 import br.furb.jsondb.parser.IStructure;
 import br.furb.jsondb.parser.Index;
+import br.furb.jsondb.parser.InsertStatement;
 import br.furb.jsondb.parser.KeyDefinition;
+import br.furb.jsondb.parser.NumberValue;
 import br.furb.jsondb.parser.SelectStatement;
 import br.furb.jsondb.parser.SetDatabaseStatement;
+import br.furb.jsondb.parser.StringValue;
 import br.furb.jsondb.parser.TableDefinition;
 import br.furb.jsondb.parser.TableIdentifier;
+import br.furb.jsondb.parser.Value;
 import br.furb.jsondb.parser.core.Token;
 
 public class StatementParser {
 
 	private static final String CONST_ALL_FIELDS = "*";
+	private final Matcher escapeCharMatcher = Pattern.compile("\\\\(\\\\|\\\")").matcher(""); // bytecode: \\(\\|\")
 
 	private IStatement statement;
-	private boolean doneRec;
 	private TableIdentifier lastTable;
-	private Deque<ColumnIdentifier> columnStack = new LinkedList<>();
-	private Deque<ColumnDefinition> columnDefStack = new LinkedList<>();
-	private Deque<ConstraintDefinition> constraintStack = new LinkedList<>();
+	private ColumnDefinition lastColumn;
+	private Deque<ColumnIdentifier> idStack = new LinkedList<>();
+	private Deque<ColumnDefinition> columnDefStack;
+	private Deque<ConstraintDefinition> constraintStack;
+	private Deque<Value<?>> valuesStack;
 	private ColumnType columnType;
 
 	private String constraintName;
-
-	private ColumnDefinition lastColumn;
+	private boolean doneRec;
+	private boolean isFinal;
 
 	public void executeAction(int action, Token token) {
 		switch (action) {
@@ -194,7 +202,7 @@ public class StatementParser {
 
 	/** Precisão de tipo. **/
 	private void acaoSemantica08(Token token) {
-		this.columnType.setPrecision(Optional.of(Integer.parseInt(token.getLexeme())));
+		this.columnType.setPrecision(Integer.parseInt(token.getLexeme()));
 	}
 
 	/** Tamanho de tipo. **/
@@ -204,11 +212,13 @@ public class StatementParser {
 
 	/** Inicia reconhecimento de colunas no INSERT. **/
 	private void acaoSemantica10(Token token) {
-		this.columnStack.clear();
+		this.idStack.clear();
 	}
 
 	/** Encerra reconhecimento de colunas no INSERT. **/
 	private void acaoSemantica11(Token token) {
+		this.statement = new InsertStatement(this.lastTable, this.idStack, null);
+		this.idStack.clear();
 	}
 
 	/**
@@ -216,7 +226,7 @@ public class StatementParser {
 	 * se for seguido pela ação #14.
 	 **/
 	private void acaoSemantica12(Token token) {
-		columnStack.push(new ColumnIdentifier(cleanId(token.getLexeme())));
+		idStack.push(new ColumnIdentifier(cleanId(token.getLexeme())));
 	}
 
 	/** Nome de tabela. **/
@@ -229,12 +239,12 @@ public class StatementParser {
 	 * seja considerado nome de tabela (#13).
 	 **/
 	private void acaoSemantica14(Token token) {
-		ColumnIdentifier lastColumn = columnStack.pop();
+		ColumnIdentifier lastColumn = idStack.pop();
 		this.lastTable = new TableIdentifier(lastColumn.getColumnName());
 
 		String actualColumnLexeme = cleanId(token.getLexeme());
 		ColumnIdentifier actualColumn = new ColumnIdentifier(this.lastTable, actualColumnLexeme);
-		columnStack.push(actualColumn);
+		idStack.push(actualColumn);
 	}
 
 	/** Nome de restrição usada no CREATE. **/
@@ -245,7 +255,7 @@ public class StatementParser {
 	/** Nome de restrição final usada no CREATE. **/
 	private void acaoSemantica16(Token token) {
 		this.constraintName = cleanId(token.getLexeme());
-		this.lastColumn = null;
+		this.isFinal = true;
 	}
 
 	/** Nome de campo/atributo usado no CREATE. **/
@@ -253,6 +263,7 @@ public class StatementParser {
 		String lexeme = token.getLexeme();
 		this.lastColumn = new ColumnDefinition(cleanId(lexeme));
 		this.columnDefStack.push(this.lastColumn);
+		this.isFinal = false;
 	}
 
 	/** Encerra reconhecimento de lista de campos (SELECT «campos»). **/
@@ -263,9 +274,9 @@ public class StatementParser {
 			selectFields = new ArrayList<>(1);
 			selectFields.add(ColumnIdentifier.ALL);
 		} else {
-			selectFields = new ArrayList<>(this.columnStack);
+			selectFields = new ArrayList<>(this.idStack);
 		}
-		this.columnStack.clear();
+		this.idStack.clear();
 		this.statement = new SelectStatement(selectFields);
 	}
 
@@ -274,9 +285,9 @@ public class StatementParser {
 	 * «tabelas»).
 	 **/
 	private void acaoSemantica19(Token token) {
-		List<TableIdentifier> tables = new ArrayList<>(columnStack.size());
-		columnStack.forEach(column -> tables.add(new TableIdentifier(column.getColumnName())));
-		columnStack.clear();
+		List<TableIdentifier> tables = new ArrayList<>(idStack.size());
+		idStack.forEach(column -> tables.add(new TableIdentifier(column.getColumnName())));
+		idStack.clear();
 		((SelectStatement) statement).setTables(tables);
 	}
 
@@ -304,7 +315,8 @@ public class StatementParser {
 	/** Restrição [FOREIGN KEY] REFERENCES. **/
 	// TODO: ao final, ver se pode ser substituída pela ação 24
 	private void acaoSemantica23(Token token) {
-		ConstraintDefinition constraint = new ForeignKeyDefinition(this.constraintName);
+		ForeignKeyDefinition constraint = new ForeignKeyDefinition(this.constraintName);
+		constraint.addColumn(this.lastColumn.getIdentifier());
 		this.constraintStack.push(constraint);
 		this.constraintName = null;
 	}
@@ -319,8 +331,11 @@ public class StatementParser {
 	/** Encerra reconhecimento de IDs no {@code PRIMARY KEY ( <<ids>>)}. */
 	private void acaoSemantica26() {
 		KeyDefinition key = (KeyDefinition) this.constraintStack.peek();
-		this.columnStack.forEach(column -> key.addColumn(column));
-		this.columnStack.clear();
+		List<ColumnIdentifier> orderedCols = new ArrayList<>(this.idStack);
+		Collections.reverse(orderedCols);
+
+		orderedCols.forEach(column -> key.addColumn(column));
+		this.idStack.clear();
 	}
 
 	/**
@@ -330,8 +345,11 @@ public class StatementParser {
 	// TODO: ver se pode substituir pela ação 26
 	private void acaoSemantica28() {
 		ForeignKeyDefinition key = (ForeignKeyDefinition) this.constraintStack.peek();
-		this.columnStack.forEach(column -> key.addColumn(column));
-		this.columnStack.clear();
+		List<ColumnIdentifier> orderedCols = new ArrayList<>(this.idStack);
+		Collections.reverse(orderedCols);
+
+		orderedCols.forEach(column -> key.addColumn(column));
+		this.idStack.clear();
 	}
 
 	/**
@@ -340,8 +358,12 @@ public class StatementParser {
 	 **/
 	private void acaoSemantica29() {
 		ForeignKeyDefinition key = (ForeignKeyDefinition) this.constraintStack.peek();
-		this.columnStack.forEach(column -> key.addTargetColumn(column));
-		this.columnStack.clear();
+		List<ColumnIdentifier> orderedCols = new ArrayList<>(this.idStack);
+		Collections.reverse(orderedCols);
+
+		orderedCols.forEach(column -> key.addTargetColumn(column));
+		this.idStack.clear();
+		key.setTargetTable(this.lastTable);
 	}
 
 	/** Reconhece operador relacional. **/
@@ -354,10 +376,21 @@ public class StatementParser {
 
 	/** Reconhece número. **/
 	private void acaoSemantica32(Token token) {
+		this.valuesStack.push(NumberValue.parseNumber(token.getLexeme()));
 	}
 
 	/** Reconhece literal. **/
 	private void acaoSemantica33(Token token) {
+		String rawLiteral = token.getLexeme();
+
+		// remove caractere de escape
+		escapeCharMatcher.reset(rawLiteral);
+		String parsedLiteral = escapeCharMatcher.replaceAll("$1");
+
+		// remove aspas de início e fim
+		parsedLiteral = parsedLiteral.replaceAll("^\"|\"$", "");
+
+		this.valuesStack.push(new StringValue(parsedLiteral));
 	}
 
 	/** Reconhece data. **/
@@ -366,10 +399,19 @@ public class StatementParser {
 
 	/** Inicia reconhecimento de valores no INSERT. **/
 	private void acaoSemantica38(Token token) {
+		if (this.statement == null) {
+			this.statement = new InsertStatement(this.lastTable, null, null);
+		}
+		this.valuesStack = new LinkedList<>();
 	}
 
 	/** Encerra reconhecimento de valores no INSERT. **/
 	private void acaoSemantica39(Token token) {
+		InsertStatement insert = (InsertStatement) this.statement;
+		ArrayList<Value<?>> orderedValues = new ArrayList<>(this.valuesStack);
+		Collections.reverse(orderedValues);
+		insert.addValues(orderedValues);
+		this.valuesStack.clear();
 	}
 
 	/** Nome de base de dados sendo criada. **/
@@ -380,12 +422,17 @@ public class StatementParser {
 	/** Nome de tabela sendo criada. **/
 	private void acaoSemantica52(Token token) {
 		this.statement = new CreateStatement(new TableDefinition(tableFromId(token.getLexeme())));
+		this.columnDefStack = new LinkedList<>();
+		this.constraintStack = new LinkedList<>();
 	}
 
 	/** Encerra reconhecimento do tipo. **/
 	private void acaoSemantica53(Token token) {
-		ColumnDefinition column = this.columnDefStack.peek();
+		ColumnDefinition column = this.columnDefStack.pop();
 		column.setColumnType(this.columnType);
+
+		TableDefinition table = (TableDefinition) ((CreateStatement) this.statement).getStructure();
+		table.addColumnDefinition(column);
 	}
 
 	/**
@@ -396,16 +443,16 @@ public class StatementParser {
 	private void acaoSemantica55(Token token) {
 		TableDefinition table = (TableDefinition) ((CreateStatement) this.statement).getStructure();
 		ConstraintDefinition constraint = this.constraintStack.pop();
-		if (this.lastColumn != null) {
+		if (this.isFinal) {
+			table.addFinalConstraint(constraint);
+			((KeyDefinition) constraint).setFinal(true);
+		} else {
 			this.lastColumn.setConstraint(constraint);
 			this.lastColumn = null;
-			table.addColumnDefinition(this.columnDefStack.pop());
-		} else {
-			table.addFinalConstraint(constraint);
 		}
 	}
 
-	/** Nome de tabela e ser removida (DROP). **/
+	/** Nome de tabela a ser removida (DROP). **/
 	private void acaoSemantica61(Token token) {
 		statement = new DropStatement<IStructure>(tableFromId(token.getLexeme()));
 	}
@@ -426,7 +473,7 @@ public class StatementParser {
 
 	/** DROP INDEX. **/
 	private void acaoSemantica67(Token token) {
-		ColumnIdentifier lastColumn = this.columnStack.pop();
+		ColumnIdentifier lastColumn = this.idStack.pop();
 		Index index = new Index(new ColumnIdentifier(lastTable, lastColumn.getColumnName()));
 		this.statement = new DropStatement<IStructure>(index);
 	}

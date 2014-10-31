@@ -28,9 +28,10 @@ public class ColumnIdentifier {
 		return columnName;
 	}
 
-	public String toPrettyString() {
+	@Override
+	public String toString() {
 		String qualifier = maybeTable.isPresent() ? maybeTable.get().getIdentifier() + "." : "";
-		return qualifier + columnName;
+		return qualifier + "'".concat(columnName).concat("'");
 	}
 
 }

@@ -36,8 +36,24 @@ public class TableDefinition implements IStructure {
 	public List<ColumnDefinition> getColumns() {
 		return columns;
 	}
-	
+
 	public List<ConstraintDefinition> getFinalConstraints() {
 		return finalConstraints;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder structure = new StringBuilder();
+		structure.append("(");
+		this.columns.forEach(column -> structure.append(column).append(", "));
+		this.finalConstraints.forEach(constraint -> structure.append(constraint).append(", "));
+		int length = structure.length();
+		if (length > 1) {
+			structure.delete(length - 2, length);
+		}
+		structure.append(")");
+
+		return "TABLE ".concat(getIdentifier()).concat(structure.toString());
+	}
+
 }

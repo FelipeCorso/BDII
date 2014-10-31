@@ -71,10 +71,10 @@ public class TableCreator {
 		for (ColumnDefinition column : tableDefinition.getColumns()) {
 			ColumnType columnType = column.getColumnType();
 			int precision = columnType.getPrecision().isPresent() ? columnType.getPrecision().get() : 0;
-			FieldMetadata fieldMetadata = new FieldMetadata(column.getName(), columnType.getDataType(), columnType.getSize(), precision);
+			FieldMetadata fieldMetadata = new FieldMetadata(column.getName(), columnType.getDataType(), columnType.getSize().orElse(0), precision);
 			
 			if(column.getConstraint()!= null){
-				ConstraintKind constraintKind = column.getConstraint().getKind();
+				ConstraintKind constraintKind = column.getConstraint().get().getKind();
 				fieldMetadata.setConstraint(constraintKind);
 			}
 			

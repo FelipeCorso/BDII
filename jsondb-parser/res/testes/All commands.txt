@@ -6,7 +6,7 @@ CREATE TABLE 'tabela' (
 	col_3 VARCHAR (001) CONSTRAINT ccol_3_nn NOT NULL,
 	col_4 DATE constraint 'constraint' NULL,
 	col_5 CHAR (010) references 'table'(col_pk),
-	CONSTRAINT c1 FOREIGN KEY (col_1, 'col_2') REFERENCES 'table2'(col1, col2),
+	CONSTRAINT c1 FOREIGN KEY (col_1, 'col_2') REFERENCES 'table2'(other_col1, other_col2),
 	constraint c2 PRIMARY KEY (cola, colb)
 );
 
@@ -35,3 +35,5 @@ DESCRIBE tabela;
 
 SET DATABASE nome_base;
 SET DATABASE 'nome_base';
+
+INSERT INTO 'table' VALUES ("literal simples", "\\", "\"", "\\\"");

@@ -1,6 +1,7 @@
 package br.furb.jsondb.parser;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import br.furb.jsondb.utils.ArgumentValidator;
 
@@ -8,7 +9,7 @@ public class ColumnDefinition {
 
 	private ColumnIdentifier identifier;
 	private ColumnType columnType;
-	private ConstraintDefinition constraint;
+	private Optional<ConstraintDefinition> maybeConstraint = Optional.empty();
 
 	public ColumnDefinition(String name) {
 		this.identifier = new ColumnIdentifier(ArgumentValidator.requireNonEmpty(name, "a name must be provided for the column definition"));
@@ -22,12 +23,12 @@ public class ColumnDefinition {
 		this.columnType = Objects.requireNonNull(columnType, "a column type must be provided for the column definition");
 	}
 
-	public final ConstraintDefinition getConstraint() {
-		return constraint;
+	public final Optional<ConstraintDefinition> getConstraint() {
+		return maybeConstraint;
 	}
 
 	public final void setConstraint(ConstraintDefinition constraint) {
-		this.constraint = constraint;
+		this.maybeConstraint = Optional.ofNullable(constraint);
 	}
 
 	public final String getName() {
@@ -36,6 +37,16 @@ public class ColumnDefinition {
 
 	public ColumnIdentifier getIdentifier() {
 		return identifier;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("'".concat(getName()).concat("'"));
+		sb.append(' ').append(getColumnType());
+		if (maybeConstraint.isPresent()) {
+			sb.append(' ').append(maybeConstraint.get());
+		}
+		return sb.toString();
 	}
 
 }

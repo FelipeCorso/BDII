@@ -1,7 +1,7 @@
 package br.furb.jsondb.parser;
 
 public interface IStructure {
-	
-	public String getIdentifier();
+
+	String getIdentifier();
 
 }
