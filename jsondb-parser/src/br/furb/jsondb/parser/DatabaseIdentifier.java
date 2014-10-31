@@ -13,7 +13,7 @@ public class DatabaseIdentifier implements IStructure {
 
 	@Override
 	public String getIdentifier() {
-		return databaseName;
+		return "'".concat(databaseName).concat("'");
 	}
 	
 	@Override

@@ -4,6 +4,7 @@ public abstract class Value<BaseType> {
 
 	public static final Value<Object> NULL = new Value<Object>(null) {
 
+		@Override
 		public String toString() {
 			return "NULL";
 		}

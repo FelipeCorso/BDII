@@ -31,7 +31,7 @@ public class ColumnIdentifier {
 	@Override
 	public String toString() {
 		String qualifier = maybeTable.isPresent() ? maybeTable.get().getIdentifier() + "." : "";
-		return qualifier + columnName;
+		return qualifier + "'".concat(columnName).concat("'");
 	}
 
 }

@@ -50,7 +50,7 @@
 
 --		-----
 
-61		Nome de tabela e ser removida (DROP)
+61		Nome de tabela a ser removida (DROP)
 
 63		Nome de tabela a ser descrita (DESCRIBE)
 

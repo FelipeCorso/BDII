@@ -7,7 +7,7 @@ import java.util.Objects;
 public class ForeignKeyDefinition extends KeyDefinition {
 
 	private TableIdentifier targetTable;
-	private List<ColumnIdentifier> targetColumns;
+	private final List<ColumnIdentifier> targetColumns;
 
 	public ForeignKeyDefinition(String name) {
 		this(name, null, null);
@@ -33,6 +33,34 @@ public class ForeignKeyDefinition extends KeyDefinition {
 
 	public void setTargetTable(TableIdentifier targetTable) {
 		this.targetTable = Objects.requireNonNull(targetTable, "cannot set null as target table");
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder ret = new StringBuilder();
+		if (getName().isPresent()) {
+			ret.append("CONSTRAINT '").append(getName().get()).append("' ");
+		}
+		if (isFinal()) {
+			ret.append(getKind().toString()).append(' ');
+			ret.append('(');
+			columns.forEach(column -> ret.append("'").append(column.getColumnName()).append("', "));
+			if (!columns.isEmpty()) {
+				int length = ret.length();
+				ret.delete(length - 2, length);
+			}
+			ret.append(") ");
+		}
+
+		ret.append("REFERENCES ").append(targetTable == null ? "«undefined»" : targetTable.getIdentifier());
+		if (!this.targetColumns.isEmpty()) {
+			ret.append('(');
+			this.targetColumns.forEach(column -> ret.append("'").append(column.getColumnName()).append("', "));
+			int length = ret.length();
+			ret.delete(length - 2, length);
+			ret.append(')');
+		}
+		return ret.toString();
 	}
 
 }

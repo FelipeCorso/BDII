@@ -9,7 +9,7 @@ public class ColumnDefinition {
 
 	private ColumnIdentifier identifier;
 	private ColumnType columnType;
-	private Optional<ConstraintDefinition> maybeConstraint;
+	private Optional<ConstraintDefinition> maybeConstraint = Optional.empty();
 
 	public ColumnDefinition(String name) {
 		this.identifier = new ColumnIdentifier(ArgumentValidator.requireNonEmpty(name, "a name must be provided for the column definition"));
@@ -41,10 +41,10 @@ public class ColumnDefinition {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder(getName());
-		sb.append(" ").append(getColumnType());
+		StringBuilder sb = new StringBuilder("'".concat(getName()).concat("'"));
+		sb.append(' ').append(getColumnType());
 		if (maybeConstraint.isPresent()) {
-			sb.append(" CONSTRAINT ").append(maybeConstraint.get());
+			sb.append(' ').append(maybeConstraint.get());
 		}
 		return sb.toString();
 	}

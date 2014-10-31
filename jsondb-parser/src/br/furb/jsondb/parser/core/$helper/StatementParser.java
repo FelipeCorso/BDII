@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,8 +38,8 @@ public class StatementParser {
 	private final Matcher escapeCharMatcher = Pattern.compile("\\\\(\\\\|\\\")").matcher(""); // bytecode: \\(\\|\")
 
 	private IStatement statement;
-	private boolean doneRec;
 	private TableIdentifier lastTable;
+	private ColumnDefinition lastColumn;
 	private Deque<ColumnIdentifier> idStack = new LinkedList<>();
 	private Deque<ColumnDefinition> columnDefStack;
 	private Deque<ConstraintDefinition> constraintStack;
@@ -48,8 +47,8 @@ public class StatementParser {
 	private ColumnType columnType;
 
 	private String constraintName;
-
-	private ColumnDefinition lastColumn;
+	private boolean doneRec;
+	private boolean isFinal;
 
 	public void executeAction(int action, Token token) {
 		switch (action) {
@@ -256,7 +255,7 @@ public class StatementParser {
 	/** Nome de restrição final usada no CREATE. **/
 	private void acaoSemantica16(Token token) {
 		this.constraintName = cleanId(token.getLexeme());
-		this.lastColumn = null;
+		this.isFinal = true;
 	}
 
 	/** Nome de campo/atributo usado no CREATE. **/
@@ -264,6 +263,7 @@ public class StatementParser {
 		String lexeme = token.getLexeme();
 		this.lastColumn = new ColumnDefinition(cleanId(lexeme));
 		this.columnDefStack.push(this.lastColumn);
+		this.isFinal = false;
 	}
 
 	/** Encerra reconhecimento de lista de campos (SELECT «campos»). **/
@@ -315,7 +315,8 @@ public class StatementParser {
 	/** Restrição [FOREIGN KEY] REFERENCES. **/
 	// TODO: ao final, ver se pode ser substituída pela ação 24
 	private void acaoSemantica23(Token token) {
-		ConstraintDefinition constraint = new ForeignKeyDefinition(this.constraintName);
+		ForeignKeyDefinition constraint = new ForeignKeyDefinition(this.constraintName);
+		constraint.addColumn(this.lastColumn.getIdentifier());
 		this.constraintStack.push(constraint);
 		this.constraintName = null;
 	}
@@ -330,7 +331,10 @@ public class StatementParser {
 	/** Encerra reconhecimento de IDs no {@code PRIMARY KEY ( <<ids>>)}. */
 	private void acaoSemantica26() {
 		KeyDefinition key = (KeyDefinition) this.constraintStack.peek();
-		this.idStack.forEach(column -> key.addColumn(column));
+		List<ColumnIdentifier> orderedCols = new ArrayList<>(this.idStack);
+		Collections.reverse(orderedCols);
+
+		orderedCols.forEach(column -> key.addColumn(column));
 		this.idStack.clear();
 	}
 
@@ -341,7 +345,10 @@ public class StatementParser {
 	// TODO: ver se pode substituir pela ação 26
 	private void acaoSemantica28() {
 		ForeignKeyDefinition key = (ForeignKeyDefinition) this.constraintStack.peek();
-		this.idStack.forEach(column -> key.addColumn(column));
+		List<ColumnIdentifier> orderedCols = new ArrayList<>(this.idStack);
+		Collections.reverse(orderedCols);
+
+		orderedCols.forEach(column -> key.addColumn(column));
 		this.idStack.clear();
 	}
 
@@ -351,8 +358,12 @@ public class StatementParser {
 	 **/
 	private void acaoSemantica29() {
 		ForeignKeyDefinition key = (ForeignKeyDefinition) this.constraintStack.peek();
-		this.idStack.forEach(column -> key.addTargetColumn(column));
+		List<ColumnIdentifier> orderedCols = new ArrayList<>(this.idStack);
+		Collections.reverse(orderedCols);
+
+		orderedCols.forEach(column -> key.addTargetColumn(column));
 		this.idStack.clear();
+		key.setTargetTable(this.lastTable);
 	}
 
 	/** Reconhece operador relacional. **/
@@ -417,8 +428,11 @@ public class StatementParser {
 
 	/** Encerra reconhecimento do tipo. **/
 	private void acaoSemantica53(Token token) {
-		ColumnDefinition column = this.columnDefStack.peek();
+		ColumnDefinition column = this.columnDefStack.pop();
 		column.setColumnType(this.columnType);
+
+		TableDefinition table = (TableDefinition) ((CreateStatement) this.statement).getStructure();
+		table.addColumnDefinition(column);
 	}
 
 	/**
@@ -429,16 +443,16 @@ public class StatementParser {
 	private void acaoSemantica55(Token token) {
 		TableDefinition table = (TableDefinition) ((CreateStatement) this.statement).getStructure();
 		ConstraintDefinition constraint = this.constraintStack.pop();
-		if (this.lastColumn != null) {
+		if (this.isFinal) {
+			table.addFinalConstraint(constraint);
+			((KeyDefinition) constraint).setFinal(true);
+		} else {
 			this.lastColumn.setConstraint(constraint);
 			this.lastColumn = null;
-			table.addColumnDefinition(this.columnDefStack.pop());
-		} else {
-			table.addFinalConstraint(constraint);
 		}
 	}
 
-	/** Nome de tabela e ser removida (DROP). **/
+	/** Nome de tabela a ser removida (DROP). **/
 	private void acaoSemantica61(Token token) {
 		statement = new DropStatement<IStructure>(tableFromId(token.getLexeme()));
 	}

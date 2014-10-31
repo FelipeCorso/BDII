@@ -17,6 +17,7 @@ public class Main {
 			Semantico semantico = new Semantico();
 			sintatico.parse(lexico, semantico);
 			System.out.println("Programa compilado com sucesso!");
+			System.out.println(semantico.getStatement().toString());
 		}
 	}
 

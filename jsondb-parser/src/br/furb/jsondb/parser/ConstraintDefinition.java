@@ -32,5 +32,16 @@ public class ConstraintDefinition {
 	public void setKind(ConstraintKind kind) {
 		this.kind = kind;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder ret = new StringBuilder();
+		if (getName().isPresent()) {
+			ret.append("CONSTRAINT '").append(getName().get()).append("' ");
+		}
+		ret.append(kind);
+		
+		return ret.toString();
+	}
 
 }
