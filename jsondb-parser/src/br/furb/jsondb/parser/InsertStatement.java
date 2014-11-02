@@ -11,7 +11,8 @@ public class InsertStatement implements IStatement {
 	private final TableIdentifier table;
 	private final List<Value<?>> values;
 
-	public InsertStatement(TableIdentifier table, Collection<ColumnIdentifier> columns, Collection<Value<?>> values) {
+	public InsertStatement(TableIdentifier table,
+			Collection<ColumnIdentifier> columns, Collection<Value<?>> values) {
 		this.table = table;
 		this.columns = new LinkedList<>();
 		this.values = new LinkedList<>();
@@ -29,7 +30,19 @@ public class InsertStatement implements IStatement {
 	}
 
 	public void addValues(List<Value<?>> valuesStack) {
-		valuesStack.forEach(value -> this.values.add(Objects.requireNonNull(value, "null values must be specified as Value.NULL")));
+		valuesStack.forEach(value -> this.values.add(Objects.requireNonNull(
+				value, "null values must be specified as Value.NULL")));
 	}
 
+	public List<ColumnIdentifier> getColumns() {
+		return columns;
+	}
+
+	public TableIdentifier getTable() {
+		return table;
+	}
+
+	public List<Value<?>> getValues() {
+		return values;
+	}
 }
