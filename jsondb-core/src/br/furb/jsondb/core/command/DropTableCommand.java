@@ -27,22 +27,19 @@ public class DropTableCommand implements ICommand {
 			return result;
 		}
 
-		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider
-				.getInstance().getDatabaseMetadata(
-						JsonDB.getInstance().getCurrentDatabase());
+		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(JsonDB.getInstance().getCurrentDatabase());
 		String tableName = statement.getStructure().getIdentifier();
 
 		if (!databaseMetadata.hasTable(tableName)) {
-			result = new Result(true, String.format("Table %s not found",
-					tableName));
-		}else{
+			result = new Result(true, String.format("Table %s not found", tableName));
+		} else {
 			try {
 				JsonDBStore.getInstance().dropTable(JsonDB.getInstance().getCurrentDatabase(), tableName);
 			} catch (StoreException e) {
 				result = new Result(true, "Was not possible to drop table", e.getMessage());
 			}
 		}
-		
+
 		return result;
 	}
 

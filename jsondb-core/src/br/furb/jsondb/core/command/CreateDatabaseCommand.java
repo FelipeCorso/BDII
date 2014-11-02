@@ -23,8 +23,7 @@ public class CreateDatabaseCommand implements ICommand {
 		IResult result = null;
 
 		if (DatabaseMetadataProvider.getInstance().containsDatabase(database)) {
-			result = new Result(true, String.format(
-					"Database %s already exists", database));
+			result = new Result(true, String.format("Database %s already exists", database));
 		} else {
 
 			boolean success = false;
@@ -33,17 +32,13 @@ public class CreateDatabaseCommand implements ICommand {
 
 				if (success) {
 
-					result = new Result(false, String.format(
-							"Database %s created with success", database));
+					result = new Result(false, String.format("Database %s created with success", database));
 				} else {
-					result = new Result(true,
-							"Was not possible to create database " + database);
+					result = new Result(true, "Was not possible to create database " + database);
 				}
-				
+
 			} catch (StoreException e) {
-				result = new Result(true,
-						"Was not possible to create database " + database,
-						e.getMessage());
+				result = new Result(true, "Was not possible to create database " + database, e.getMessage());
 			}
 
 		}
