@@ -17,7 +17,7 @@ public class Result implements IResult {
 	public List<String> getMessages() {
 		return messages;
 	}
-	
+
 	@Override
 	public boolean hasError() {
 		return hasError;
