@@ -15,12 +15,10 @@ public class TableDataReadTest {
 	@SuppressWarnings("resource")
 	@Test
 	public void testGetRowData() throws IOException {
-		BufferedReader bufferedReader = new BufferedReader(new FileReader(
-				new File("")));
+		BufferedReader bufferedReader = new BufferedReader(new FileReader(new File("")));
 
 		bufferedReader.skip(1);
-	
-	
+
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File("")));
 
 		RandomAccessFile randomAccessFile = new RandomAccessFile(new File(""), "rw");

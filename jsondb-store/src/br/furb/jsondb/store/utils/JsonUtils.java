@@ -2,6 +2,8 @@ package br.furb.jsondb.store.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,13 +47,22 @@ public final class JsonUtils {
 		return gson.fromJson(jsonReader, type);
 	}
 
-	public static <T> void parseObjectToJson(Writer writer, T objectToJson,
-			Class<T> type) {
+	public static <T> T parseJsonToObject(InputStream is, Class<T> type) {
+		return parseJsonToObject(new InputStreamReader(is), type);
+	}
+
+	public static <T> T parseJsonToObject(File file, Class<T> type) throws IOException {
+		FileReader reader = new FileReader(file);
+		T object = parseJsonToObject(reader, type);
+		reader.close();
+		return object;
+	}
+
+	public static <T> void parseObjectToJson(Writer writer, T objectToJson, Class<T> type) {
 		parseObjectToJson(writer, objectToJson, type, DEFAULT_INDENT);
 	}
 
-	public static <T> void parseObjectToJson(Writer writer, T objectToJson,
-			Class<T> type, String indent) {
+	public static <T> void parseObjectToJson(Writer writer, T objectToJson, Class<T> type, String indent) {
 		JsonWriter jsonWriter = new JsonWriter(writer);
 		jsonWriter.setIndent(indent);
 		GsonBuilder gsonBuilder = new GsonBuilder();
@@ -60,13 +71,11 @@ public final class JsonUtils {
 		gson.toJson(objectToJson, type, jsonWriter);
 	}
 
-	public static JsonElement parseElement(String input)
-			throws JsonIOException, JsonSyntaxException {
+	public static JsonElement parseElement(String input) throws JsonIOException, JsonSyntaxException {
 		return parseElement(new StringReader(input));
 	}
 
-	public static JsonObject parse(Reader reader) throws JsonIOException,
-			JsonSyntaxException {
+	public static JsonObject parse(Reader reader) throws JsonIOException, JsonSyntaxException {
 		JsonElement ret = parseElement(reader);
 		if (!ret.isJsonObject()) {
 			throw new JsonSyntaxException("Invalid json object");
@@ -75,18 +84,15 @@ public final class JsonUtils {
 
 	}
 
-	public static JsonObject parse(InputStream stream) throws JsonIOException,
-			JsonSyntaxException {
+	public static JsonObject parse(InputStream stream) throws JsonIOException, JsonSyntaxException {
 		return parse(new InputStreamReader(stream));
 	}
 
-	public static JsonObject parse(String json) throws JsonIOException,
-			JsonSyntaxException {
+	public static JsonObject parse(String json) throws JsonIOException, JsonSyntaxException {
 		return parse(new StringReader(json));
 	}
 
-	public static JsonObject parse(File file) throws JsonIOException,
-			JsonSyntaxException {
+	public static JsonObject parse(File file) throws JsonIOException, JsonSyntaxException {
 		try {
 			FileInputStream stream = new FileInputStream(file);
 			try {
@@ -99,4 +105,17 @@ public final class JsonUtils {
 		}
 	}
 
+	public static <T> void write(T object, Class<T> type, File file) throws IOException {
+
+		FileWriter fileWriter = new FileWriter(file);
+		try {
+
+			parseObjectToJson(fileWriter, object, type);
+			fileWriter.flush();
+
+		} finally {
+			fileWriter.close();
+		}
+
+	}
 }

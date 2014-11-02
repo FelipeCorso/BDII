@@ -5,6 +5,8 @@ import java.util.Map;
 
 public class RowData {
 
+	private int rowId;
+
 	private Map<String, ColumnData> columns = new LinkedHashMap<String, ColumnData>();
 
 	public void addColumn(ColumnData columnData) {
@@ -17,6 +19,14 @@ public class RowData {
 
 	public ColumnData getColumn(String columnName) {
 		return columns.get(columnName);
+	}
+
+	public int getRowId() {
+		return rowId;
+	}
+
+	public void setRowId(int rowId) {
+		this.rowId = rowId;
 	}
 
 }

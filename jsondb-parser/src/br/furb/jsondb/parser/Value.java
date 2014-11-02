@@ -21,6 +21,10 @@ public abstract class Value<BaseType> {
 		return baseValue;
 	}
 
+	public String stringValue() {
+		return baseValue.toString();
+	}
+
 	/**
 	 * Retorna a representação do valor armazenado, no padrão:
 	 * <p>
@@ -29,5 +33,6 @@ public abstract class Value<BaseType> {
 	 */
 	@Override
 	public abstract String toString();
+
 
 }

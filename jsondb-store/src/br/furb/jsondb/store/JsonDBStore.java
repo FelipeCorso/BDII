@@ -1,22 +1,18 @@
 package br.furb.jsondb.store;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
 import br.furb.jsondb.parser.ColumnIdentifier;
-import br.furb.jsondb.parser.ConstraintDefinition;
-import br.furb.jsondb.parser.ConstraintKind;
 import br.furb.jsondb.parser.CreateStatement;
-import br.furb.jsondb.parser.KeyDefinition;
-import br.furb.jsondb.parser.TableDefinition;
-import br.furb.jsondb.store.data.Index;
-import br.furb.jsondb.store.data.TableData;
+import br.furb.jsondb.parser.InsertStatement;
+import br.furb.jsondb.store.data.ColumnData;
+import br.furb.jsondb.store.data.RowData;
+import br.furb.jsondb.store.data.TableDataProvider;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
-import br.furb.jsondb.store.metadata.DatabaseMetadataIO;
 import br.furb.jsondb.store.metadata.DatabaseMetadataProvider;
 import br.furb.jsondb.store.metadata.TableMetadata;
 import br.furb.jsondb.store.utils.JsonUtils;
@@ -41,8 +37,7 @@ public class JsonDBStore {
 			if (!jsonDBDir.exists()) {
 				boolean mkdir = jsonDBDir.mkdir();
 				if (!mkdir) {
-					throw new IllegalStateException(
-							"Was not possible to create jsondb directory.");
+					throw new IllegalStateException("Was not possible to create jsondb directory.");
 				}
 			}
 		}
@@ -58,10 +53,19 @@ public class JsonDBStore {
 		File metadataFile = new File(databaseDir, "database.metadata");
 
 		try {
-			return metadataFile.createNewFile();
+			if (metadataFile.createNewFile()) {
+
+				DatabaseMetadata metadata = new DatabaseMetadata();
+				metadata.setName(database);
+				JsonUtils.write(metadata, DatabaseMetadata.class, metadataFile);
+				return true;
+
+			}
 		} catch (IOException e) {
 			throw new StoreException(e);
 		}
+
+		return false;
 	}
 
 	public File getDatabaseDir(String database) {
@@ -110,7 +114,38 @@ public class JsonDBStore {
 		// FIXME atualizar o metadados em disco neste momento???
 	}
 
-	public void insertData(/* TODO receber InsertStatement */) {
+	public int insertData(String database, InsertStatement statement) throws StoreException {
+		RowData rowData = new RowData();
 
+		List<ColumnIdentifier> columns = statement.getColumns();
+
+		for (int i = 0; i < columns.size(); i++) {
+			ColumnData columnData = new ColumnData();
+			columnData.setName(columns.get(i).getColumnName());
+			columnData.setValue(statement.getValues().get(i).getBaseValue());
+			rowData.addColumn(columnData);
+		}
+
+		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(database);
+		String tableName = statement.getTable().getIdentifier();
+		TableMetadata tableMetadata = databaseMetadata.getTable(tableName);
+		int rowId = tableMetadata.getLastRowId() + 1;
+
+		rowData.setRowId(rowId);
+
+		tableMetadata.setLastRowId(rowId);
+
+		File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
+		File tableDir = new File(databaseDir, tableName);
+
+		try {
+			JsonUtils.write(rowData, RowData.class, new File(tableDir, rowId + ".dat"));
+		} catch (IOException e) {
+			throw new StoreException(e);
+		}
+
+		TableDataProvider.getInstance().getTableData(database, tableName).addRow(rowData);
+		
+		return rowId;
 	}
 }
