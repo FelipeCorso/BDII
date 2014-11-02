@@ -7,7 +7,6 @@ public class IndexMetadata {
 
 	private String name;
 	private List<String> columns = new ArrayList<String>();
-	
 
 	public String getName() {
 		return name;
@@ -24,6 +23,7 @@ public class IndexMetadata {
 	public void setColumns(List<String> columns) {
 		this.columns = columns;
 	}
+
 	public void addColumn(String column) {
 		this.columns.add(column);
 	}

@@ -1,15 +1,17 @@
 package br.furb.jsondb.store.metadata;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class TableMetadata {
 
 	private String name;
-	private Map<String, FieldMetadata> fields = new HashMap<String, FieldMetadata>();
+	private Map<String, ColumnMetadata> columns = new HashMap<String, ColumnMetadata>();
 	private Set<String> primaryKey;
-	private IndexMetadata indexMetadata;
+	private List< IndexMetadata> indexes;
+	private int lastRowId = -1;
 
 	public String getName() {
 		return name;
@@ -19,12 +21,12 @@ public class TableMetadata {
 		this.name = tableName;
 	}
 
-	public void addField(FieldMetadata field) {
-		this.fields.put(field.getName(), field);
+	public void addColumn(ColumnMetadata field) {
+		this.columns.put(field.getName(), field);
 	}
 
-	public Map<String, FieldMetadata> getFields() {
-		return fields;
+	public Map<String, ColumnMetadata> getColumns() {
+		return columns;
 	}
 
 	public Set<String> getPrimaryKey() {
@@ -35,17 +37,24 @@ public class TableMetadata {
 		this.primaryKey = primaryKey;
 	}
 
-	public void setIndexMetadata(IndexMetadata indexMetadata) {
-		this.indexMetadata = indexMetadata;
+	public void addIndexMetadata(IndexMetadata indexMetadata) {
+		this.indexes.add(indexMetadata);
 	}
 
-	public IndexMetadata getIndexMetadata() {
-		return indexMetadata;
+	public List<IndexMetadata> getIndexes() {
+		return indexes;
 	}
 
 	@Override
 	public String toString() {
-		return "TableMetadata [name=" + name + ", fields=" + fields
-				+ ", primaryKey=" + primaryKey + "]";
+		return "TableMetadata [name=" + name + ", fields=" + columns + ", primaryKey=" + primaryKey + "]";
+	}
+
+	public int getLastRowId() {
+		return lastRowId;
+	}
+
+	public void setLastRowId(int lastRowId) {
+		this.lastRowId = lastRowId;
 	}
 }
