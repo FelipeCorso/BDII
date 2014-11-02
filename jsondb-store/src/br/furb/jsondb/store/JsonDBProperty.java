@@ -29,9 +29,9 @@ public enum JsonDBProperty {
 
 		return defaultValue;
 	}
-	
-	public String set(String value){
-		if(value == null){
+
+	public String set(String value) {
+		if (value == null) {
 			System.clearProperty(property);
 			return null;
 		}

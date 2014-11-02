@@ -23,15 +23,12 @@ public class CreateDatabaseCommandTest extends BaseCommandTest {
 	public void testCreateDatabase01() {
 
 		String database = "database1";
-		CreateStatement createStatement = new CreateStatement(
-				new DatabaseIdentifier(database));
-		CreateDatabaseCommand command = new CreateDatabaseCommand(
-				createStatement);
+		CreateStatement createStatement = new CreateStatement(new DatabaseIdentifier(database));
+		CreateDatabaseCommand command = new CreateDatabaseCommand(createStatement);
 
 		IResult result = command.execute();
 
-		assertEquals("Database database1 created with success", result
-				.getMessages().get(0));
+		assertEquals("Database database1 created with success", result.getMessages().get(0));
 		assertFalse(result.hasError());
 
 		File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
