@@ -8,6 +8,7 @@ import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JLabel;
@@ -20,7 +21,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import br.furb.json.ui.Principal;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
-import br.furb.jsondb.store.metadata.DatabaseMetadataIO;
+import br.furb.jsondb.store.utils.JsonUtils;
 
 public class TreeMenuPanel extends JPanel {
 
@@ -52,7 +53,7 @@ public class TreeMenuPanel extends JPanel {
 				try {
 					String databaseDir = loadDataBaseDir(TreeMenuPanel.this.principal);
 
-					DatabaseMetadata database = DatabaseMetadataIO.read(databaseDir);
+					DatabaseMetadata database = JsonUtils.parseJsonToObject(new File( databaseDir), DatabaseMetadata.class);
 					TreeMenuPanel.this.principal.addDataBase(database);
 
 					createNodesDatabase(top, database);
