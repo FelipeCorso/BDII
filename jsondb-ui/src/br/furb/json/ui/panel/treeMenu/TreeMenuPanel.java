@@ -18,6 +18,7 @@ import javax.swing.JTree;
 import javax.swing.UIManager;
 import javax.swing.border.MatteBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import br.furb.json.ui.Principal;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
@@ -25,14 +26,13 @@ import br.furb.jsondb.store.utils.JsonUtils;
 
 public class TreeMenuPanel extends JPanel {
 
+	private static final String DATA_BASE_STR = "DataBase";
+
 	private static final long serialVersionUID = 8080924607252341731L;
 
-	private DefaultMutableTreeNode top = new DefaultMutableTreeNode("DataBase");
-
-	private Principal principal;
+	private DefaultMutableTreeNode dataBaseNode;
 
 	public TreeMenuPanel(Principal principal) {
-		this.principal = principal;
 		setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
 
 		defineLookAndFeel();
@@ -42,21 +42,27 @@ public class TreeMenuPanel extends JPanel {
 		add(panelBotoes, BorderLayout.NORTH);
 		panelBotoes.setLayout(new GridLayout(0, 2, 0, 0));
 
-		JPanel panel_1 = new JPanel();
-		// add(panel_1);
-		panel_1.setLayout(new GridLayout(0, 2, 0, 0));
+		JScrollPane scrollPaneTree = new JScrollPane();
+		add(scrollPaneTree, BorderLayout.CENTER);
+
+		dataBaseNode = new DefaultMutableTreeNode(DATA_BASE_STR);
+		JTree jTree = new JTree(new javax.swing.tree.DefaultTreeModel(dataBaseNode));
+		scrollPaneTree.setViewportView(jTree);
 
 		JLabel lblAdd = new JLabel("Adicionar");
 		lblAdd.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				try {
-					String databaseDir = loadDataBaseDir(TreeMenuPanel.this.principal);
+					String databaseDir = loadDataBaseDir(principal);
 
-					DatabaseMetadata database = JsonUtils.parseJsonToObject(new File( databaseDir), DatabaseMetadata.class);
-					TreeMenuPanel.this.principal.addDataBase(database);
+					DatabaseMetadata database = JsonUtils.parseJsonToObject(new File(databaseDir), DatabaseMetadata.class);
+					principal.addDataBase(database);
+					lblAdd.toString();
 
-					createNodesDatabase(top, database);
+					createNodesDatabase(dataBaseNode, database);
+
+					((javax.swing.tree.DefaultTreeModel) jTree.getModel()).reload(sort(dataBaseNode));
 
 				} catch (IOException io) {
 					System.err.println("ERRO FATAL!\nNão foi possível realizar a leitura do arquivo!");
@@ -64,6 +70,7 @@ public class TreeMenuPanel extends JPanel {
 				}
 			}
 		});
+
 		lblAdd.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		lblAdd.setIcon(principal.getImageIcon("Add folder.png"));
 		panelBotoes.add(lblAdd);
@@ -71,13 +78,48 @@ public class TreeMenuPanel extends JPanel {
 		JLabel lblRemover = new JLabel("Remover");
 		lblRemover.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		lblRemover.setIcon(principal.getImageIcon("Remove folder.png"));
+		lblRemover.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				TreePath selectionPath = jTree.getSelectionPath();
+
+				if (selectionPath != null) {
+					javax.swing.tree.DefaultMutableTreeNode dmt = (javax.swing.tree.DefaultMutableTreeNode) selectionPath.getLastPathComponent();
+
+					if (!dmt.getUserObject().toString().equalsIgnoreCase(DATA_BASE_STR)) {
+						//nodeChanged
+						((javax.swing.tree.DefaultTreeModel) jTree.getModel()).removeNodeFromParent(dmt);
+					}
+				}
+			}
+		});
+
 		panelBotoes.add(lblRemover);
 
-		JScrollPane scrollPaneTree = new JScrollPane();
-		add(scrollPaneTree, BorderLayout.CENTER);
+	}
 
-		JTree tree = new JTree(top);
-		scrollPaneTree.setViewportView(tree);
+	public DefaultMutableTreeNode sort(DefaultMutableTreeNode node) {
+		//sort alphabetically
+		for (int i = 0; i < node.getChildCount() - 1; i++) {
+			DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
+			String nt = child.getUserObject().toString();
+
+			for (int j = i + 1; j <= node.getChildCount() - 1; j++) {
+				DefaultMutableTreeNode prevNode = (DefaultMutableTreeNode) node.getChildAt(j);
+				String np = prevNode.getUserObject().toString();
+
+				System.out.println(nt + " " + np);
+				if (nt.compareToIgnoreCase(np) > 0) {
+					node.insert(child, j);
+					node.insert(prevNode, i);
+				}
+			}
+			if (child.getChildCount() > 0) {
+				sort(child);
+			}
+		}
+
+		return node;
 
 	}
 
@@ -86,7 +128,7 @@ public class TreeMenuPanel extends JPanel {
 		top.add(databaseNode);
 
 		createNodesTable(databaseNode, database);
-		// createNodesIndex(databaseNode, database);
+		createNodesIndex(databaseNode, database);
 	}
 
 	private void createNodesTable(DefaultMutableTreeNode databaseNode, DatabaseMetadata database) {
@@ -100,15 +142,14 @@ public class TreeMenuPanel extends JPanel {
 
 	}
 
-	// FIXME: Aguardando definição
 	private void createNodesIndex(DefaultMutableTreeNode databaseNode, DatabaseMetadata database) {
-		DefaultMutableTreeNode indexNode = new DefaultMutableTreeNode("Tabelas");
+		DefaultMutableTreeNode indexNode = new DefaultMutableTreeNode("Índices");
 		databaseNode.add(indexNode);
 
-		for (String indexName : database.getTables().keySet()) {
-			DefaultMutableTreeNode index = new DefaultMutableTreeNode(indexName);
-			indexNode.add(index);
-		}
+		//		for (String indexName : database.getIndex().keySet()) {
+		//			DefaultMutableTreeNode index = new DefaultMutableTreeNode(indexName);
+		//			indexNode.add(index);
+		//		}
 	}
 
 	private String loadDataBaseDir(Frame frame) {
