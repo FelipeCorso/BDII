@@ -52,7 +52,7 @@ public class ForeignKeyDefinition extends KeyDefinition {
 			ret.append(") ");
 		}
 
-		ret.append("REFERENCES ").append(targetTable == null ? "«undefined»" : targetTable.getIdentifier());
+		ret.append("REFERENCES ").append(targetTable == null ? "«undefined»" : targetTable.toString());
 		if (!this.targetColumns.isEmpty()) {
 			ret.append('(');
 			this.targetColumns.forEach(column -> ret.append("'").append(column.getColumnName()).append("', "));

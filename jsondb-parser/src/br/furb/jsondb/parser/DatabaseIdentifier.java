@@ -13,12 +13,12 @@ public class DatabaseIdentifier implements IStructure {
 
 	@Override
 	public String getIdentifier() {
-		return "'".concat(databaseName).concat("'");
+		return databaseName;
 	}
 	
 	@Override
 	public String toString() {
-		return getIdentifier();
+		return "'".concat(getIdentifier()).concat("'") ;
 	}
 
 }

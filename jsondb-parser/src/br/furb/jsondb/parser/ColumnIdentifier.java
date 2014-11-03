@@ -30,7 +30,7 @@ public class ColumnIdentifier {
 
 	@Override
 	public String toString() {
-		String qualifier = maybeTable.isPresent() ? maybeTable.get().getIdentifier() + "." : "";
+		String qualifier = maybeTable.isPresent() ? maybeTable.get().toString() + "." : "";
 		return qualifier + "'".concat(columnName).concat("'");
 	}
 
