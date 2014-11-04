@@ -30,6 +30,9 @@ public class TreeMenuPanel extends JPanel {
 
 	private static final long serialVersionUID = 8080924607252341731L;
 
+	protected static final String TABLES_STR = "Tabelas";
+	protected static final String INDEX_STR = "Índices";
+
 	private DefaultMutableTreeNode dataBaseNode;
 
 	public TreeMenuPanel(Principal principal) {
@@ -47,6 +50,34 @@ public class TreeMenuPanel extends JPanel {
 
 		dataBaseNode = new DefaultMutableTreeNode(DATA_BASE_STR);
 		JTree jTree = new JTree(new javax.swing.tree.DefaultTreeModel(dataBaseNode));
+		jTree.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+
+				TreePath selectionPath = jTree.getSelectionPath();
+
+				if (selectionPath != null) {
+					javax.swing.tree.DefaultMutableTreeNode dmt = (javax.swing.tree.DefaultMutableTreeNode) selectionPath.getLastPathComponent();
+
+					if (!dmt.getUserObject().toString().equalsIgnoreCase(DATA_BASE_STR)) {
+						if (dmt.getParent().toString().equalsIgnoreCase(DATA_BASE_STR)) {
+							// é uma base, fazer select
+							principal.getTabbedPanel().createTabDataBase(dmt.toString());
+						} else {
+							if (dmt.getParent().toString().equalsIgnoreCase(TABLES_STR)) {
+								// é uma tabela, describe
+							} else {
+								if (dmt.getParent().toString().equalsIgnoreCase(TABLES_STR)) {
+									// é um índice, apresentar nome, colunas
+								}
+							}
+						}
+
+					}
+				}
+
+			}
+		});
 		scrollPaneTree.setViewportView(jTree);
 
 		JLabel lblAdd = new JLabel("Adicionar");
@@ -89,6 +120,7 @@ public class TreeMenuPanel extends JPanel {
 					if (!dmt.getUserObject().toString().equalsIgnoreCase(DATA_BASE_STR)) {
 						//nodeChanged
 						((javax.swing.tree.DefaultTreeModel) jTree.getModel()).removeNodeFromParent(dmt);
+						principal.getTabbedPanel().remove(dmt.toString());
 					}
 				}
 			}

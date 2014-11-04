@@ -23,7 +23,7 @@ public class SaveButton extends JButton implements Action {
 	}
 
 	@Override
-	public void executaAcao(Principal principal) {
+	public void executeAction(Principal principal) {
 		if (principal.getCommandPanel().getLbStatus().getText().equalsIgnoreCase(EStatus.MODIFICADO.toString())) {
 			String absolutePath = principal.getCommandPanel().getLbFilePath().getText();
 

@@ -29,42 +29,42 @@ public class ShortCutListener implements KeyListener {
 		switch (event.getKeyCode()) {
 		case KeyEvent.VK_N:
 			if (isCtrlDown) {
-				new NewButton().executaAcao(compUi);
+				new NewButton().executeAction(compUi);
 			}
 			break;
 		case KeyEvent.VK_A:
 			if (isCtrlDown) {
-				new OpenButton().executaAcao(compUi);
+				new OpenButton().executeAction(compUi);
 			}
 			break;
 		case KeyEvent.VK_S:
 			if (isCtrlDown) {
-				new SaveButton().executaAcao(compUi);
+				new SaveButton().executeAction(compUi);
 			}
 			break;
 		case KeyEvent.VK_C:
 			if (isCtrlDown) {
-				new CopyButton().executaAcao(compUi);
+				new CopyButton().executeAction(compUi);
 			}
 			break;
 		case KeyEvent.VK_V:
 			if (isCtrlDown) {
-				new PasteButton().executaAcao(compUi);
+				new PasteButton().executeAction(compUi);
 			}
 			break;
 		case KeyEvent.VK_X:
 			if (isCtrlDown) {
-				new CutButton().executaAcao(compUi);
+				new CutButton().executeAction(compUi);
 			}
 			break;
 		// case KeyEvent.VK_F8:
-		// new BotaoCompilar().executaAcao(compUi);
+		// new BotaoCompilar().executeAction(compUi);
 		// break;
 		// case KeyEvent.VK_F9:
-		// new BotaoGerarCodigo().executaAcao(compUi);
+		// new BotaoGerarCodigo().executeAction(compUi);
 		// break;
 		case KeyEvent.VK_F1:
-			new TeamButton().executaAcao(compUi);
+			new TeamButton().executeAction(compUi);
 			break;
 		}
 	}

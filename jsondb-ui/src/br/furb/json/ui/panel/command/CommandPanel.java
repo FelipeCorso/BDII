@@ -85,7 +85,7 @@ public class CommandPanel extends JPanel {
 		btnExecute.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				btnExecute.executaAcao(principal);
+				btnExecute.executeAction(principal);
 			}
 		});
 		btnExecute.setIcon(principal.getImageIcon("compile.png"));
@@ -99,7 +99,7 @@ public class CommandPanel extends JPanel {
 		btnNew.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				btnNew.executaAcao(principal);
+				btnNew.executeAction(principal);
 			}
 		});
 
@@ -108,13 +108,13 @@ public class CommandPanel extends JPanel {
 		btnNew.setVerticalTextPosition(SwingConstants.BOTTOM);
 		btnNew.addKeyListener(principal.getKeyListener());
 		btnNew.setFont(fonte);
-		panelFerramentas.add(btnNew);
+		//		panelFerramentas.add(btnNew);
 
 		btnOpen = new OpenButton("abrir [ctrl-a]");
 		btnOpen.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				btnOpen.executaAcao(principal);
+				btnOpen.executeAction(principal);
 			}
 		});
 		btnOpen.setIcon(principal.getImageIcon("openFile.png"));
@@ -122,13 +122,13 @@ public class CommandPanel extends JPanel {
 		btnOpen.setVerticalTextPosition(SwingConstants.BOTTOM);
 		btnOpen.addKeyListener(principal.getKeyListener());
 		btnOpen.setFont(fonte);
-		panelFerramentas.add(btnOpen);
+		//		panelFerramentas.add(btnOpen);
 
 		btnSave = new SaveButton("salvar [ctrl-s]");
 		btnSave.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				btnSave.executaAcao(principal);
+				btnSave.executeAction(principal);
 			}
 
 		});
@@ -137,13 +137,13 @@ public class CommandPanel extends JPanel {
 		btnSave.setVerticalTextPosition(SwingConstants.BOTTOM);
 		btnSave.addKeyListener(principal.getKeyListener());
 		btnSave.setFont(fonte);
-		panelFerramentas.add(btnSave);
+		//		panelFerramentas.add(btnSave);
 
 		btnCopy = new CopyButton("copiar [ctrl-c]");
 		btnCopy.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				btnCopy.executaAcao(principal);
+				btnCopy.executeAction(principal);
 			}
 		});
 		btnCopy.setIcon(principal.getImageIcon("copy.png"));
@@ -151,13 +151,13 @@ public class CommandPanel extends JPanel {
 		btnCopy.setVerticalTextPosition(SwingConstants.BOTTOM);
 		btnCopy.addKeyListener(principal.getKeyListener());
 		btnCopy.setFont(fonte);
-		panelFerramentas.add(btnCopy);
+		//		panelFerramentas.add(btnCopy);
 
 		btnPaste = new PasteButton("colar [ctrl-v]");
 		btnPaste.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				btnPaste.executaAcao(principal);
+				btnPaste.executeAction(principal);
 			}
 		});
 		btnPaste.setIcon(principal.getImageIcon("paste.png"));
@@ -165,13 +165,13 @@ public class CommandPanel extends JPanel {
 		btnPaste.setVerticalTextPosition(SwingConstants.BOTTOM);
 		btnPaste.addKeyListener(principal.getKeyListener());
 		btnPaste.setFont(fonte);
-		panelFerramentas.add(btnPaste);
+		//		panelFerramentas.add(btnPaste);
 
 		btnCut = new CutButton("recortar [ctrl-x]");
 		btnCut.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				btnCut.executaAcao(principal);
+				btnCut.executeAction(principal);
 			}
 		});
 		btnCut.setIcon(principal.getImageIcon("cut.png"));
@@ -179,13 +179,13 @@ public class CommandPanel extends JPanel {
 		btnCut.setVerticalTextPosition(SwingConstants.BOTTOM);
 		btnCut.addKeyListener(principal.getKeyListener());
 		btnCut.setFont(fonte);
-		panelFerramentas.add(btnCut);
+		//		panelFerramentas.add(btnCut);
 
 		btnTeam = new TeamButton("equipe [F1]");
 		btnTeam.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				btnTeam.executaAcao(principal);
+				btnTeam.executeAction(principal);
 			}
 		});
 		btnTeam.setIcon(principal.getImageIcon("group.png"));
@@ -193,7 +193,7 @@ public class CommandPanel extends JPanel {
 		btnTeam.setVerticalTextPosition(SwingConstants.BOTTOM);
 		btnTeam.addKeyListener(principal.getKeyListener());
 		btnTeam.setFont(fonte);
-		panelFerramentas.add(btnTeam);
+		//		panelFerramentas.add(btnTeam);
 
 		JPanel panelCentral = new JPanel();
 		panelCentral.addKeyListener(principal.getKeyListener());

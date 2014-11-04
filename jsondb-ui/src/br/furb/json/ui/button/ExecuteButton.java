@@ -19,7 +19,7 @@ public class ExecuteButton extends JButton implements Action {
 	}
 
 	@Override
-	public void executaAcao(Principal principal) {
+	public void executeAction(Principal principal) {
 		if (!principal.getCommandPanel().getTextEditor().getText().isEmpty()) {
 			// FIXME: AJUSTAR
 			// AcaoCompilar.compilar(principal, "",

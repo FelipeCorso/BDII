@@ -1,29 +1,15 @@
-package br.furb.json.ui.button;
+package br.furb.json.ui.action;
 
 import java.awt.FileDialog;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import javax.swing.JButton;
-
 import br.furb.json.ui.Principal;
-import br.furb.json.ui.action.Action;
 import br.furb.json.ui.status.EStatus;
 
-public class OpenButton extends JButton implements Action {
-	private static final long serialVersionUID = 1L;
-
-	public OpenButton() {
-		super();
-	}
-
-	public OpenButton(String texto) {
-		super(texto);
-	}
-
-	@Override
-	public void executeAction(Principal principal) {
+public class OpenAction {
+	public static void executeAction(Principal principal) {
 		String filePath = "";
 		FileDialog fileDialog = new FileDialog(principal, "Abrir", FileDialog.LOAD);
 		fileDialog.setDirectory("C:\\");
@@ -49,7 +35,7 @@ public class OpenButton extends JButton implements Action {
 		}
 	}
 
-	private String textFileRead(String fileName) throws ClassNotFoundException, IOException {
+	private static String textFileRead(String fileName) throws ClassNotFoundException, IOException {
 		FileReader fr = new FileReader(fileName);
 		StringBuilder sb = new StringBuilder();
 		BufferedReader bufferedReader = new BufferedReader(fr);

@@ -17,7 +17,7 @@ public class CopyButton extends JButton implements Action {
 	}
 
 	@Override
-	public void executaAcao(Principal principal) {
+	public void executeAction(Principal principal) {
 		principal.getCommandPanel().getTextEditor().copy();
 	}
 }

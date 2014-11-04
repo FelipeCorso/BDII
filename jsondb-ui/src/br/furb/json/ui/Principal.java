@@ -3,15 +3,29 @@ package br.furb.json.ui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 
+import br.furb.json.ui.action.CopyAction;
+import br.furb.json.ui.action.CutAction;
+import br.furb.json.ui.action.NewAction;
+import br.furb.json.ui.action.OpenAction;
+import br.furb.json.ui.action.PasteAction;
+import br.furb.json.ui.action.SaveAction;
+import br.furb.json.ui.action.TeamAction;
 import br.furb.json.ui.panel.command.CommandPanel;
+import br.furb.json.ui.panel.tab.TabbedPanel;
 import br.furb.json.ui.panel.treeMenu.TreeMenuPanel;
 import br.furb.json.ui.shortcut.ShortCutListener;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
@@ -28,6 +42,22 @@ public class Principal extends JFrame {
 	private JPanel contentPane;
 
 	private ShortCutListener keyListener;
+	private JMenuBar menuBar;
+
+	private JMenu mnFile;
+	private JMenuItem mntmNew;
+	private JMenuItem mntmOpen;
+	private JMenuItem mntmSave;
+	private JMenu mnEdit;
+	private JMenuItem mntmCopy;
+	private JMenuItem mntmCut;
+	private JMenuItem mntmPaste;
+	private JMenu mnSobre;
+	private JMenuItem mntmHelp;
+	private JMenuItem mntmEquipe;
+
+	private final TabbedPanel tabbedPanel;
+	private JPanel centerPanel;
 
 	/**
 	 * Launch the application.
@@ -49,9 +79,88 @@ public class Principal extends JFrame {
 	 * Create the frame.
 	 */
 	public Principal() {
+		setTitle("JsOnDb");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setMinimumSize(new Dimension(800, 650));
 		setBounds(100, 100, 1024, 660);
+
+		menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+
+		mnFile = new JMenu("Arquivo");
+		menuBar.add(mnFile);
+
+		mntmNew = new JMenuItem("Novo Ctrl+N");
+		mntmNew.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				NewAction.executeAction(Principal.this);
+			}
+		});
+		mnFile.add(mntmNew);
+
+		mntmOpen = new JMenuItem("Abrir Ctrl+A");
+		mntmOpen.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				OpenAction.executeAction(Principal.this);
+			}
+		});
+		mnFile.add(mntmOpen);
+
+		mntmSave = new JMenuItem("Salvar Ctrl+S");
+		mntmSave.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				SaveAction.executeAction(Principal.this);
+			}
+		});
+		mnFile.add(mntmSave);
+
+		mnEdit = new JMenu("Editar");
+		menuBar.add(mnEdit);
+
+		mntmCopy = new JMenuItem("Copiar Ctrl+C");
+		mntmCopy.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				CopyAction.executeAction(Principal.this);
+			}
+		});
+		mnEdit.add(mntmCopy);
+
+		mntmCut = new JMenuItem("Recortar Ctrl+X");
+		mntmCut.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				CutAction.executeAction(Principal.this);
+			}
+		});
+		mnEdit.add(mntmCut);
+
+		mntmPaste = new JMenuItem("Colar Ctrl+V");
+		mntmPaste.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				PasteAction.executeAction(Principal.this);
+			}
+		});
+		mnEdit.add(mntmPaste);
+
+		mnSobre = new JMenu("Sobre");
+		menuBar.add(mnSobre);
+
+		mntmHelp = new JMenuItem("Help");
+		mnSobre.add(mntmHelp);
+
+		mntmEquipe = new JMenuItem("Equipe");
+		mntmEquipe.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				TeamAction.executeAction(Principal.this);
+			}
+		});
+		mnSobre.add(mntmEquipe);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -65,9 +174,12 @@ public class Principal extends JFrame {
 		treeMenu.setBounds(0, 0, 165, 620);
 		getContentPane().add(treeMenu, BorderLayout.WEST);
 
-		commandPanel = new CommandPanel(this);
-		commandPanel.setBounds(243, 0, 541, 620);
-		getContentPane().add(commandPanel);
+		centerPanel = new JPanel();
+		contentPane.add(centerPanel, BorderLayout.CENTER);
+		centerPanel.setLayout(new BorderLayout(0, 0));
+
+		tabbedPanel = new TabbedPanel(this, JTabbedPane.TOP);
+		centerPanel.add(tabbedPanel, BorderLayout.CENTER);
 
 	}
 
@@ -85,6 +197,10 @@ public class Principal extends JFrame {
 
 	public ShortCutListener getKeyListener() {
 		return keyListener;
+	}
+
+	public TabbedPanel getTabbedPanel() {
+		return tabbedPanel;
 	}
 
 }

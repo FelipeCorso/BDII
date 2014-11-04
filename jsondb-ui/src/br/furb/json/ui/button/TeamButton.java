@@ -17,7 +17,7 @@ public class TeamButton extends JButton implements Action {
 	}
 
 	@Override
-	public void executaAcao(Principal principal) {
+	public void executeAction(Principal principal) {
 		principal.getCommandPanel().getTextMsg().setText("Integrantes Equipe: Felipe Loose Corso, Janaína Carraro Mendonça Lima, William Leander Seefeld\n");
 	}
 }
