@@ -1,0 +1,9 @@
+SELECT * FROM tabela 
+	WHERE campoA = 1 
+		OR campoB = "texto" 
+		AND campoA <> 2.12 
+		OR campoA > "texto2" 
+		OR campoA < 3 
+		OR tabela.'campoA' <= 7 
+		OR 'tabela'.campoA >= 6
+		AND 'campoData' = 25/10/2014;
