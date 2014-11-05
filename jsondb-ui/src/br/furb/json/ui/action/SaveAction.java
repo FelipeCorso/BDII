@@ -10,8 +10,8 @@ import br.furb.json.ui.status.EStatus;
 
 public class SaveAction {
 	public static void executeAction(Principal principal) {
-		if (principal.getCommandPanel().getLbStatus().getText().equalsIgnoreCase(EStatus.MODIFICADO.toString())) {
-			String absolutePath = principal.getCommandPanel().getLbFilePath().getText();
+		if (principal.getTabbedPanel().getCommandPanel().getLbStatus().getText().equalsIgnoreCase(EStatus.MODIFICADO.toString())) {
+			String absolutePath = principal.getTabbedPanel().getCommandPanel().getLbFilePath().getText();
 
 			if (absolutePath.isEmpty()) {
 				// FIXME AJUSTAR
@@ -23,10 +23,10 @@ public class SaveAction {
 
 			try {
 				if (!absolutePath.equalsIgnoreCase("C:\\null")) {
-					SaveAction.salvar(absolutePath, principal.getCommandPanel().getTextEditor().getText());
-					principal.getCommandPanel().getLbFilePath().setText(absolutePath);
-					principal.getCommandPanel().getTextMsg().setText("");
-					principal.getCommandPanel().getLbStatus().setText(EStatus.NAO_MODIFICADO.toString());
+					SaveAction.salvar(absolutePath, principal.getTabbedPanel().getCommandPanel().getTextEditor().getText());
+					principal.getTabbedPanel().getCommandPanel().getLbFilePath().setText(absolutePath);
+					principal.getTabbedPanel().getCommandPanel().getTextMsg().setText("");
+					principal.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.NAO_MODIFICADO.toString());
 				}
 			} catch (IOException e) {
 				System.err.println("ERRO FATAL!\nNão foi possível salvar o arquivo!");

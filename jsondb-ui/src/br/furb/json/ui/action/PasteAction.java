@@ -5,7 +5,7 @@ import br.furb.json.ui.status.EStatus;
 
 public class PasteAction {
 	public static void executeAction(Principal principal) {
-		principal.getCommandPanel().getTextEditor().paste();
-		principal.getCommandPanel().getLbStatus().setText(EStatus.MODIFICADO.toString());
+		principal.getTabbedPanel().getCommandPanel().getTextEditor().paste();
+		principal.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.MODIFICADO.toString());
 	}
 }

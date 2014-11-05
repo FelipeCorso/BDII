@@ -24,7 +24,6 @@ import br.furb.json.ui.action.OpenAction;
 import br.furb.json.ui.action.PasteAction;
 import br.furb.json.ui.action.SaveAction;
 import br.furb.json.ui.action.TeamAction;
-import br.furb.json.ui.panel.command.CommandPanel;
 import br.furb.json.ui.panel.tab.TabbedPanel;
 import br.furb.json.ui.panel.treeMenu.TreeMenuPanel;
 import br.furb.json.ui.shortcut.ShortCutListener;
@@ -37,7 +36,6 @@ public class Principal extends JFrame {
 	private static final String DIR_IMAGES = "/Images/";
 
 	private TreeMenuPanel treeMenu;
-	private CommandPanel commandPanel;
 	private Map<String, DatabaseMetadata> databases = new LinkedHashMap<String, DatabaseMetadata>();
 	private JPanel contentPane;
 
@@ -81,13 +79,44 @@ public class Principal extends JFrame {
 	public Principal() {
 		setTitle("JsOnDb");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setMinimumSize(new Dimension(800, 650));
 		setBounds(100, 100, 1024, 660);
+		keyListener = new ShortCutListener(this);
+		addKeyListener(keyListener);
 
 		menuBar = new JMenuBar();
+		createJMenuBar();
+
+		contentPane = new JPanel();
+		contentPane.addKeyListener(keyListener);
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+
+		getContentPane().setLayout(null);
+
+		contentPane.setLayout(new BorderLayout(0, 0));
+
+		centerPanel = new JPanel();
+		centerPanel.addKeyListener(keyListener);
+		contentPane.add(centerPanel, BorderLayout.CENTER);
+		centerPanel.setLayout(new BorderLayout(0, 0));
+
+		treeMenu = new TreeMenuPanel(this);
+		treeMenu.addKeyListener(keyListener);
+		treeMenu.setMinimumSize(new Dimension(590, 150));
+		treeMenu.setSize(170, 591);
+		contentPane.add(treeMenu, BorderLayout.WEST);
+
+		tabbedPanel = new TabbedPanel(this, JTabbedPane.TOP);
+		centerPanel.add(tabbedPanel, BorderLayout.CENTER);
+
+	}
+
+	private void createJMenuBar() {
+		menuBar.addKeyListener(keyListener);
 		setJMenuBar(menuBar);
 
 		mnFile = new JMenu("Arquivo");
+		mnFile.addKeyListener(keyListener);
 		menuBar.add(mnFile);
 
 		mntmNew = new JMenuItem("Novo Ctrl+N");
@@ -103,7 +132,7 @@ public class Principal extends JFrame {
 		mntmOpen.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				OpenAction.executeAction(Principal.this);
+				OpenAction.executeAction(Principal.this, treeMenu.getjTree(), treeMenu.getDataBaseNode());
 			}
 		});
 		mnFile.add(mntmOpen);
@@ -118,6 +147,7 @@ public class Principal extends JFrame {
 		mnFile.add(mntmSave);
 
 		mnEdit = new JMenu("Editar");
+		mnEdit.addKeyListener(keyListener);
 		menuBar.add(mnEdit);
 
 		mntmCopy = new JMenuItem("Copiar Ctrl+C");
@@ -148,6 +178,7 @@ public class Principal extends JFrame {
 		mnEdit.add(mntmPaste);
 
 		mnSobre = new JMenu("Sobre");
+		mnSobre.addKeyListener(keyListener);
 		menuBar.add(mnSobre);
 
 		mntmHelp = new JMenuItem("Help");
@@ -161,34 +192,14 @@ public class Principal extends JFrame {
 			}
 		});
 		mnSobre.add(mntmEquipe);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
+	}
 
-		getContentPane().setLayout(null);
-
-		keyListener = new ShortCutListener(this);
-		contentPane.setLayout(new BorderLayout(0, 0));
-
-		treeMenu = new TreeMenuPanel(this);
-		treeMenu.setBounds(0, 0, 165, 620);
-		getContentPane().add(treeMenu, BorderLayout.WEST);
-
-		centerPanel = new JPanel();
-		contentPane.add(centerPanel, BorderLayout.CENTER);
-		centerPanel.setLayout(new BorderLayout(0, 0));
-
-		tabbedPanel = new TabbedPanel(this, JTabbedPane.TOP);
-		centerPanel.add(tabbedPanel, BorderLayout.CENTER);
-
+	public Map<String, DatabaseMetadata> getDatabases() {
+		return databases;
 	}
 
 	public void addDataBase(DatabaseMetadata database) {
 		databases.put(database.getName(), database);
-	}
-
-	public CommandPanel getCommandPanel() {
-		return commandPanel;
 	}
 
 	public ImageIcon getImageIcon(String iconName) {
@@ -201,6 +212,10 @@ public class Principal extends JFrame {
 
 	public TabbedPanel getTabbedPanel() {
 		return tabbedPanel;
+	}
+
+	public TreeMenuPanel getTreeMenu() {
+		return treeMenu;
 	}
 
 }

@@ -14,6 +14,7 @@ public class TabbedPanel extends JTabbedPane {
 	private static final long serialVersionUID = 4227160448630150355L;
 	private Principal principal;
 	private Map<String, Component> tabMap = new LinkedHashMap<String, Component>();
+	private CommandPanel commandPanel;
 
 	/**
 	 * Create the panel.
@@ -23,6 +24,7 @@ public class TabbedPanel extends JTabbedPane {
 	public TabbedPanel(Principal principal, int tabPlacement) {
 		this.principal = principal;
 		setTabPlacement(tabPlacement);
+		addKeyListener(principal.getKeyListener());
 	}
 
 	/**
@@ -30,8 +32,12 @@ public class TabbedPanel extends JTabbedPane {
 	 * realizar os selects.
 	 */
 	public void createTabDataBase(String dataBaseName) {
-		final CommandPanel commandPanel = new CommandPanel(principal);
+		commandPanel = new CommandPanel(principal);
 		add(dataBaseName, commandPanel);
+	}
+
+	public CommandPanel getCommandPanel() {
+		return commandPanel;
 	}
 
 	@Override

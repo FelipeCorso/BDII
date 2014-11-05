@@ -10,27 +10,25 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
 import br.furb.json.ui.Principal;
-import br.furb.json.ui.button.CopyButton;
-import br.furb.json.ui.button.CutButton;
-import br.furb.json.ui.button.ExecuteButton;
-import br.furb.json.ui.button.NewButton;
-import br.furb.json.ui.button.OpenButton;
-import br.furb.json.ui.button.PasteButton;
-import br.furb.json.ui.button.SaveButton;
-import br.furb.json.ui.button.TeamButton;
+import br.furb.json.ui.action.ExecuteAction;
 import br.furb.json.ui.shortcut.NumberedBorder;
 import br.furb.json.ui.status.EStatus;
+
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
 
 public class CommandPanel extends JPanel {
 
@@ -38,32 +36,24 @@ public class CommandPanel extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = -3187283892481573406L;
-	private final NewButton btnNew;
-	private final OpenButton btnOpen;
-	private final SaveButton btnSave;
-	private final CopyButton btnCopy;
-	private final PasteButton btnPaste;
-	private final CutButton btnCut;
-	private final ExecuteButton btnExecute;
-	// private final JButton btnGerarCod;
-	private final TeamButton btnTeam;
-	private final JLabel lbStatus;
+	private static final String STR_VAZIA = "";
 	private final JTextArea textEditor;
 	private final JTextArea textMsg;
 
-	private JPanel panelFooter;
-	private JLabel lbFilePath;
 	private JScrollPane scrollPaneEditor;
 	private JPanel panelEditor;
 	private JPanel panelMsg;
 	private JScrollPane scrollPaneMsg;
+	private JLabel lblExecute;
+	private JLabel label;
+	private JPanel panelFooter;
+	private JLabel lbStatus;
+	private JLabel lbFilePath;
 
 	/**
 	 * Create the frame.
 	 */
 	public CommandPanel(Principal principal) {
-		Font fonte = new Font("Dialog", Font.BOLD, 11);
-
 		addKeyListener(principal.getKeyListener());
 
 		setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -77,123 +67,34 @@ public class CommandPanel extends JPanel {
 
 		JPanel panelFerramentas = new JPanel();
 		panelCompilador.add(panelFerramentas, BorderLayout.NORTH);
-		panelFerramentas.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panelFerramentas.setLayout(new GridLayout(0, 8, 0, 0));
 		panelFerramentas.addKeyListener(principal.getKeyListener());
+		panelFerramentas
+				.setLayout(new FormLayout(new ColumnSpec[] { ColumnSpec.decode("left:17px"), ColumnSpec.decode("center:24px"), }, new RowSpec[] { RowSpec.decode("20px"), }));
 
-		btnExecute = new ExecuteButton("executar [F8]");
-		btnExecute.addMouseListener(new MouseAdapter() {
+		panelFooter = new JPanel();
+		panelCompilador.add(panelFooter, BorderLayout.SOUTH);
+		createStatusPathBar(principal);
+
+		lblExecute = new JLabel("");
+		lblExecute.setIcon(new ImageIcon(CommandPanel.class.getResource("/Images/execute.png")));
+		lblExecute.setToolTipText("Executar [F8]");
+		lblExecute.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				btnExecute.executeAction(principal);
+				ExecuteAction.executeAction(principal);
 			}
 		});
-		btnExecute.setIcon(principal.getImageIcon("compile.png"));
-		btnExecute.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnExecute.setVerticalTextPosition(SwingConstants.BOTTOM);
-		btnExecute.addKeyListener(principal.getKeyListener());
-		btnExecute.setFont(fonte);
-		panelFerramentas.add(btnExecute);
+		panelFerramentas.add(lblExecute, "1, 1, fill, fill");
 
-		btnNew = new NewButton("novo [ctrl-n]");
-		btnNew.addMouseListener(new MouseAdapter() {
+		label = new JLabel("");
+		label.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				btnNew.executeAction(principal);
+				textEditor.setText(STR_VAZIA);
 			}
 		});
-
-		btnNew.setIcon(principal.getImageIcon("newFile.png"));
-		btnNew.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnNew.setVerticalTextPosition(SwingConstants.BOTTOM);
-		btnNew.addKeyListener(principal.getKeyListener());
-		btnNew.setFont(fonte);
-		//		panelFerramentas.add(btnNew);
-
-		btnOpen = new OpenButton("abrir [ctrl-a]");
-		btnOpen.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				btnOpen.executeAction(principal);
-			}
-		});
-		btnOpen.setIcon(principal.getImageIcon("openFile.png"));
-		btnOpen.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnOpen.setVerticalTextPosition(SwingConstants.BOTTOM);
-		btnOpen.addKeyListener(principal.getKeyListener());
-		btnOpen.setFont(fonte);
-		//		panelFerramentas.add(btnOpen);
-
-		btnSave = new SaveButton("salvar [ctrl-s]");
-		btnSave.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				btnSave.executeAction(principal);
-			}
-
-		});
-		btnSave.setIcon(principal.getImageIcon("saveFile.png"));
-		btnSave.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnSave.setVerticalTextPosition(SwingConstants.BOTTOM);
-		btnSave.addKeyListener(principal.getKeyListener());
-		btnSave.setFont(fonte);
-		//		panelFerramentas.add(btnSave);
-
-		btnCopy = new CopyButton("copiar [ctrl-c]");
-		btnCopy.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				btnCopy.executeAction(principal);
-			}
-		});
-		btnCopy.setIcon(principal.getImageIcon("copy.png"));
-		btnCopy.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnCopy.setVerticalTextPosition(SwingConstants.BOTTOM);
-		btnCopy.addKeyListener(principal.getKeyListener());
-		btnCopy.setFont(fonte);
-		//		panelFerramentas.add(btnCopy);
-
-		btnPaste = new PasteButton("colar [ctrl-v]");
-		btnPaste.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				btnPaste.executeAction(principal);
-			}
-		});
-		btnPaste.setIcon(principal.getImageIcon("paste.png"));
-		btnPaste.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnPaste.setVerticalTextPosition(SwingConstants.BOTTOM);
-		btnPaste.addKeyListener(principal.getKeyListener());
-		btnPaste.setFont(fonte);
-		//		panelFerramentas.add(btnPaste);
-
-		btnCut = new CutButton("recortar [ctrl-x]");
-		btnCut.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				btnCut.executeAction(principal);
-			}
-		});
-		btnCut.setIcon(principal.getImageIcon("cut.png"));
-		btnCut.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnCut.setVerticalTextPosition(SwingConstants.BOTTOM);
-		btnCut.addKeyListener(principal.getKeyListener());
-		btnCut.setFont(fonte);
-		//		panelFerramentas.add(btnCut);
-
-		btnTeam = new TeamButton("equipe [F1]");
-		btnTeam.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				btnTeam.executeAction(principal);
-			}
-		});
-		btnTeam.setIcon(principal.getImageIcon("group.png"));
-		btnTeam.setHorizontalTextPosition(SwingConstants.CENTER);
-		btnTeam.setVerticalTextPosition(SwingConstants.BOTTOM);
-		btnTeam.addKeyListener(principal.getKeyListener());
-		btnTeam.setFont(fonte);
-		//		panelFerramentas.add(btnTeam);
+		label.setIcon(new ImageIcon(CommandPanel.class.getResource("/Images/eraser.png")));
+		panelFerramentas.add(label, "2, 1, fill, fill");
 
 		JPanel panelCentral = new JPanel();
 		panelCentral.addKeyListener(principal.getKeyListener());
@@ -239,10 +140,12 @@ public class CommandPanel extends JPanel {
 		textMsg.addKeyListener(principal.getKeyListener());
 		textMsg.setFont(new Font("Console", Font.PLAIN, 11));
 
-		panelFooter = new JPanel();
-		panelCompilador.add(panelFooter, BorderLayout.SOUTH);
+		setBorder(new EmptyBorder(5, 5, 5, 5));
+	}
+
+	private void createStatusPathBar(Principal principal) {
+
 		panelFooter.setLayout(new GridLayout(1, 2, 0, 0));
-		panelFooter.addKeyListener(principal.getKeyListener());
 		panelFooter.addKeyListener(principal.getKeyListener());
 
 		lbStatus = new JLabel(EStatus.NAO_MODIFICADO.toString());
@@ -252,11 +155,14 @@ public class CommandPanel extends JPanel {
 		lbFilePath = new JLabel("");
 		lbFilePath.addKeyListener(principal.getKeyListener());
 		panelFooter.add(lbFilePath);
-		setBorder(new EmptyBorder(5, 5, 5, 5));
 	}
 
 	public JTextArea getTextEditor() {
 		return textEditor;
+	}
+
+	public JTextArea getTextMsg() {
+		return textMsg;
 	}
 
 	public JLabel getLbStatus() {
@@ -267,8 +173,19 @@ public class CommandPanel extends JPanel {
 		return lbFilePath;
 	}
 
-	public JTextArea getTextMsg() {
-		return textMsg;
-	}
+	/**
+	 * FIXME TEST
+	 */
+	public static void main(String[] args) {
+		JFrame frame = new JFrame("CommandPanel");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+		// Add content to the window.
+		frame.getContentPane().add(new CommandPanel(new Principal()));
+		frame.setMinimumSize(new Dimension(600, 400));
+
+		// Display the window.
+		frame.pack();
+		frame.setVisible(true);
+	}
 }
