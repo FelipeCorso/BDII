@@ -6,7 +6,7 @@ public class DatabaseIdentifier implements IStructure {
 
 	public DatabaseIdentifier(String databaseName) {
 		if (databaseName == null || databaseName.isEmpty()) {
-			throw new IllegalArgumentException("é necessário informar o nome da base de dados");
+			throw new IllegalArgumentException("a database name is required");
 		}
 		this.databaseName = databaseName;
 	}

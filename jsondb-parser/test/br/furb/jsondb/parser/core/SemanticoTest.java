@@ -19,7 +19,7 @@ public class SemanticoTest {
 
 	private static enum TestFiles {
 
-		TEST_CREATE_DATABASE("testCreateDatabase"), //
+		TEST_CREATE_DATABASE_$QUOTED_ID("testCreateDatabase_quotedId"), //
 		TEST_CREATE_INDEX("testCreateIndex"), //
 		TEST_CREATE_INDEX_$QUOTED_ID("testCreateIndex_quotedId"), //
 		TEST_CREATE_TABLE("testCreateTable"), //
@@ -85,9 +85,13 @@ public class SemanticoTest {
 
 	@Test
 	public void testCreateDatabase() throws Exception {
-		IStatement stm = parse(TestFiles.TEST_CREATE_DATABASE);
-
-		fail("Not yet implemented");
+		IStatement stm = parse(TestFiles.TEST_CREATE_DATABASE_$QUOTED_ID);
+		assertTrue(stm instanceof CreateStatement);
+		
+		CreateStatement createStm = (CreateStatement) stm;
+		assertNotNull(createStm.getStructure());
+		assertTrue(createStm.getStructure() instanceof DatabaseIdentifier);
+		assertEquals(createStm.getStructure().getIdentifier(), "database");
 	}
 
 	public IStatement parse(TestFiles testFile) throws LexicalError, SyntaticError {
