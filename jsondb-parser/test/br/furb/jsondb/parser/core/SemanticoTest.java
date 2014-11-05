@@ -1,6 +1,6 @@
 package br.furb.jsondb.parser.core;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,6 +11,8 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
+import br.furb.jsondb.parser.CreateStatement;
+import br.furb.jsondb.parser.DatabaseIdentifier;
 import br.furb.jsondb.parser.IStatement;
 
 public class SemanticoTest {
@@ -40,15 +42,15 @@ public class SemanticoTest {
 		}
 
 		public String getFileName() {
-			return fileName;
+			return fileName + ".sql";
 		}
 
 		public File getFile() {
-			return new File(this.fileName);
+			return new File(getFileName());
 		}
 
 		public File getFile(File parentDir) {
-			return new File(parentDir, this.fileName);
+			return new File(parentDir, getFileName());
 		}
 
 		public String readFile() throws FileNotFoundException, IOException {
@@ -68,7 +70,8 @@ public class SemanticoTest {
 		}
 	}
 
-	private static final File TESTS_DIR = SemanticoTest.class.getClassLoader().;
+	private static final File TESTS_DIR = new File("res/testes");
+	
 
 	private Sintatico sintatico;
 	private Lexico lexico;
