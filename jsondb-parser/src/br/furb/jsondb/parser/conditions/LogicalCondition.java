@@ -1,6 +1,5 @@
 package br.furb.jsondb.parser.conditions;
 
-import br.furb.jsondb.parser.IExpression;
 
 
 /**
