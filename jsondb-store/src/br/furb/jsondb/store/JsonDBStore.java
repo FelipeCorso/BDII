@@ -7,8 +7,8 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import br.furb.jsondb.parser.ColumnIdentifier;
-import br.furb.jsondb.parser.CreateStatement;
-import br.furb.jsondb.parser.InsertStatement;
+import br.furb.jsondb.parser.statement.CreateStatement;
+import br.furb.jsondb.parser.statement.InsertStatement;
 import br.furb.jsondb.store.data.ColumnData;
 import br.furb.jsondb.store.data.RowData;
 import br.furb.jsondb.store.data.TableDataProvider;
@@ -74,13 +74,13 @@ public class JsonDBStore {
 	}
 
 	/**
-	 * Cria uma nova tabela na base de dados. A criação da tabela envolve:
+	 * Cria uma nova tabela na base de dados. A criaï¿½ï¿½o da tabela envolve:
 	 * 
 	 * <ol>
-	 * <li>criação do diretório da tabela
-	 * <li>criação de um arquivo de índice para cada campo da chave da tabela
-	 * <li>criação de um arquivo para os dados da tabela
-	 * <li>criação do metadados da tabela e inserção do mesmo no metadados do
+	 * <li>criaï¿½ï¿½o do diretï¿½rio da tabela
+	 * <li>criaï¿½ï¿½o de um arquivo de ï¿½ndice para cada campo da chave da tabela
+	 * <li>criaï¿½ï¿½o de um arquivo para os dados da tabela
+	 * <li>criaï¿½ï¿½o do metadados da tabela e inserï¿½ï¿½o do mesmo no metadados do
 	 * banco.
 	 * </ol>
 	 * 
@@ -100,7 +100,7 @@ public class JsonDBStore {
 				.getInstance().getDatabaseMetadata(database);
 		databaseMetadata.removeTable(table);
 
-		// remove o diretório da tabela e todos os seus arquivos;
+		// remove o diretï¿½rio da tabela e todos os seus arquivos;
 		File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
 
 		File tableDir = new File(databaseDir, table);

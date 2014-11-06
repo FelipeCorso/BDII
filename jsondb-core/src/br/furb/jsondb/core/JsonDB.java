@@ -8,14 +8,14 @@ import br.furb.jsondb.core.command.CreateTableCommand;
 import br.furb.jsondb.core.command.DropTableCommand;
 import br.furb.jsondb.core.command.SetDatabaseCommand;
 import br.furb.jsondb.core.result.IResult;
-import br.furb.jsondb.parser.CreateStatement;
-import br.furb.jsondb.parser.DropStatement;
-import br.furb.jsondb.parser.IStatement;
-import br.furb.jsondb.parser.RawStatement;
 import br.furb.jsondb.parser.SQLParser;
 import br.furb.jsondb.parser.SQLParserException;
-import br.furb.jsondb.parser.SetDatabaseStatement;
 import br.furb.jsondb.parser.TableIdentifier;
+import br.furb.jsondb.parser.statement.CreateStatement;
+import br.furb.jsondb.parser.statement.DropStatement;
+import br.furb.jsondb.parser.statement.IStatement;
+import br.furb.jsondb.parser.statement.RawStatement;
+import br.furb.jsondb.parser.statement.SetDatabaseStatement;
 
 public class JsonDB {
 

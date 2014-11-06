@@ -7,6 +7,8 @@ import br.furb.jsondb.parser.core.Lexico;
 import br.furb.jsondb.parser.core.Semantico;
 import br.furb.jsondb.parser.core.Sintatico;
 import br.furb.jsondb.parser.core.SyntaticError;
+import br.furb.jsondb.parser.statement.IStatement;
+import br.furb.jsondb.parser.statement.RawStatement;
 
 /**
  * Reúne todos os métodos para interpretação de comandos SQL.
@@ -30,7 +32,7 @@ public class SQLParser {
 		try {
 			sintatico.parse(lexico, semantico);
 		} catch (SyntaticError | LexicalError e) {
-			throw new SQLParserException("Problema encontrado ao interpretar comando SQL", e, command);
+			throw new SQLParserException("Problem on parsing SQL command", e, command);
 		}
 		return semantico.getStatement();
 	}

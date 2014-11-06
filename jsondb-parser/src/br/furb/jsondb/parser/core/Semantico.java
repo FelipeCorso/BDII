@@ -1,7 +1,8 @@
 package br.furb.jsondb.parser.core;
 
-import br.furb.jsondb.parser.IStatement;
+import br.furb.jsondb.parser.SQLParserException;
 import br.furb.jsondb.parser.core.$helper.StatementParser;
+import br.furb.jsondb.parser.statement.IStatement;
 
 public class Semantico implements Constants {
 
@@ -11,7 +12,7 @@ public class Semantico implements Constants {
 		stmParser = new StatementParser();
 	}
 
-	public void executeAction(int action, Token token) {
+	public void executeAction(int action, Token token) throws SQLParserException {
 		System.out.println("Ação #" + action + ", Token: " + token);
 		stmParser.executeAction(action, token);
 	}

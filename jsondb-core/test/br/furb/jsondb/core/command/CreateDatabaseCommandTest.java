@@ -9,14 +9,14 @@ import java.io.File;
 import org.junit.Test;
 
 import br.furb.jsondb.core.result.IResult;
-import br.furb.jsondb.parser.CreateStatement;
 import br.furb.jsondb.parser.DatabaseIdentifier;
+import br.furb.jsondb.parser.statement.CreateStatement;
 import br.furb.jsondb.store.JsonDBStore;
 
 public class CreateDatabaseCommandTest extends BaseCommandTest {
 
 	/**
-	 * Testa a execução do comando quando ainda não existe um banco com o mesmo
+	 * Testa a execuï¿½ï¿½o do comando quando ainda nï¿½o existe um banco com o mesmo
 	 * nome
 	 */
 	@Test
@@ -38,7 +38,7 @@ public class CreateDatabaseCommandTest extends BaseCommandTest {
 	}
 
 	/**
-	 * Testa a execução do comando quando já existe um banco com o mesmo
+	 * Testa a execuï¿½ï¿½o do comando quando jï¿½ existe um banco com o mesmo
 	 * nome
 	 */
 	@Test

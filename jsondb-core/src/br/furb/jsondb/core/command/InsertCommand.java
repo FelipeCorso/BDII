@@ -17,11 +17,11 @@ import br.furb.jsondb.core.result.Result;
 import br.furb.jsondb.core.util.JsonDBUtils;
 import br.furb.jsondb.parser.ColumnIdentifier;
 import br.furb.jsondb.parser.DataType;
-import br.furb.jsondb.parser.InsertStatement;
 import br.furb.jsondb.parser.NumberValue;
 import br.furb.jsondb.parser.StringValue;
 import br.furb.jsondb.parser.TableIdentifier;
 import br.furb.jsondb.parser.Value;
+import br.furb.jsondb.parser.statement.InsertStatement;
 import br.furb.jsondb.store.JsonDBStore;
 import br.furb.jsondb.store.StoreException;
 import br.furb.jsondb.store.data.IndexData;
@@ -113,7 +113,7 @@ public class InsertCommand implements ICommand {
 			}
 		}
 
-		// já validou tudo, pode gravar no disco
+		// jï¿½ validou tudo, pode gravar no disco
 		int rowId;
 		try {
 			rowId = JsonDBStore.getInstance().insertData(databaseMetadata.getName(), statement);
@@ -121,7 +121,7 @@ public class InsertCommand implements ICommand {
 			return new Result(true, "Was not possible to insert data", e.getCause().getMessage());
 		}
 
-		// atualiza os arquivos de índice
+		// atualiza os arquivos de ï¿½ndice
 
 		List<IndexMetadata> indexes = tableMetadata.getIndexes();
 
@@ -204,11 +204,11 @@ public class InsertCommand implements ICommand {
 	}
 
 	private Result invalidValueResult(String columnName, Value<?> value) {
-		return new Result(true, String.format("Valor '%s' inválido para a coluna %s", value.getBaseValue(), columnName));
+		return new Result(true, String.format("Valor '%s' invï¿½lido para a coluna %s", value.getBaseValue(), columnName));
 	}
 
 	private Result invalidValueSizeResult(String columnName, Value<?> value) {
-		return new Result(true, String.format("Valor '%s' com tamanho inválido para a coluna %s", value.getBaseValue(), columnName));
+		return new Result(true, String.format("Valor '%s' com tamanho invï¿½lido para a coluna %s", value.getBaseValue(), columnName));
 	}
 
 	private Result validateDataType(ColumnMetadata columnMetadata, Value<?> value) {

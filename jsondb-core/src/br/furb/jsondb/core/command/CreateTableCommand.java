@@ -3,7 +3,7 @@ package br.furb.jsondb.core.command;
 import br.furb.jsondb.core.JsonDB;
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.core.result.Result;
-import br.furb.jsondb.parser.CreateStatement;
+import br.furb.jsondb.parser.statement.CreateStatement;
 import br.furb.jsondb.store.JsonDBStore;
 import br.furb.jsondb.store.StoreException;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
@@ -28,7 +28,7 @@ public class CreateTableCommand implements ICommand {
 
 		String tableName = statement.getStructure().getIdentifier();
 
-		// valida se a tabela já existe
+		// valida se a tabela jï¿½ existe
 		if (databaseMetadata.getTable(tableName) != null) {
 			result = new Result(true, String.format(
 					"Table %s already exists in database %s", tableName,

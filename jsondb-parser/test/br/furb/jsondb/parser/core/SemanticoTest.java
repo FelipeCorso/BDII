@@ -11,9 +11,10 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
-import br.furb.jsondb.parser.CreateStatement;
 import br.furb.jsondb.parser.DatabaseIdentifier;
-import br.furb.jsondb.parser.IStatement;
+import br.furb.jsondb.parser.SQLParserException;
+import br.furb.jsondb.parser.statement.CreateStatement;
+import br.furb.jsondb.parser.statement.IStatement;
 
 public class SemanticoTest {
 
@@ -94,7 +95,7 @@ public class SemanticoTest {
 		assertEquals(createStm.getStructure().getIdentifier(), "database");
 	}
 
-	public IStatement parse(TestFiles testFile) throws LexicalError, SyntaticError {
+	public IStatement parse(TestFiles testFile) throws LexicalError, SyntaticError, SQLParserException {
 		try {
 			this.lexico = new Lexico(testFile.readFile(TESTS_DIR));
 		} catch (IOException e) {

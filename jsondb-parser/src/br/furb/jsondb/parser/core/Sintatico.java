@@ -2,6 +2,8 @@ package br.furb.jsondb.parser.core;
 
 import java.util.Stack;
 
+import br.furb.jsondb.parser.SQLParserException;
+
 public class Sintatico implements Constants {
 
 	private Stack<Integer> stack = new Stack<>();
@@ -18,7 +20,7 @@ public class Sintatico implements Constants {
 		return x >= FIRST_NON_TERMINAL && x < FIRST_SEMANTIC_ACTION;
 	}
 
-	private boolean step() throws LexicalError, SyntaticError {
+	private boolean step() throws LexicalError, SyntaticError, SQLParserException {
 		if (currentToken == null) {
 			int pos = 0;
 			if (previousToken != null)
@@ -65,7 +67,7 @@ public class Sintatico implements Constants {
 		return false;
 	}
 
-	public void parse(Lexico scanner, Semantico semanticAnalyser) throws LexicalError, SyntaticError {
+	public void parse(Lexico scanner, Semantico semanticAnalyser) throws LexicalError, SyntaticError, SQLParserException {
 		this.scanner = scanner;
 		this.semanticAnalyser = semanticAnalyser;
 

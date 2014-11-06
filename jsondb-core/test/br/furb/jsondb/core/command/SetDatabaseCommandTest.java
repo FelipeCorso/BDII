@@ -8,9 +8,9 @@ import org.junit.Test;
 
 import br.furb.jsondb.core.JsonDB;
 import br.furb.jsondb.core.result.IResult;
-import br.furb.jsondb.parser.CreateStatement;
 import br.furb.jsondb.parser.DatabaseIdentifier;
-import br.furb.jsondb.parser.SetDatabaseStatement;
+import br.furb.jsondb.parser.statement.CreateStatement;
+import br.furb.jsondb.parser.statement.SetDatabaseStatement;
 
 public class SetDatabaseCommandTest extends BaseCommandTest {
 

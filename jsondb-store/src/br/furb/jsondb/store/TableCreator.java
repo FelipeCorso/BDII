@@ -10,9 +10,9 @@ import br.furb.jsondb.parser.ColumnIdentifier;
 import br.furb.jsondb.parser.ColumnType;
 import br.furb.jsondb.parser.ConstraintDefinition;
 import br.furb.jsondb.parser.ConstraintKind;
-import br.furb.jsondb.parser.CreateStatement;
 import br.furb.jsondb.parser.KeyDefinition;
 import br.furb.jsondb.parser.TableDefinition;
+import br.furb.jsondb.parser.statement.CreateStatement;
 import br.furb.jsondb.store.data.IndexData;
 import br.furb.jsondb.store.metadata.ColumnMetadata;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
@@ -25,7 +25,7 @@ public class TableCreator {
 
 	public static void createTable(String database, CreateStatement statement)
 			throws StoreException {
-		// 1º cria uma pasta para a tabela
+		// 1ï¿½ cria uma pasta para a tabela
 		File tableDir = createDiretory(database, statement);
 
 		TableDefinition tableDefinition = (TableDefinition) statement
@@ -33,15 +33,15 @@ public class TableCreator {
 
 		Set<String> pk = getPrimaryKeyFields(tableDefinition);
 
-		// 2º cria o arquivo de índice da pk da tabela
+		// 2ï¿½ cria o arquivo de ï¿½ndice da pk da tabela
 		IndexMetadata indexMetadata = createPrimaryKeyIndex(tableDir, pk);
 
-		// 3º cria o metadados da tabela
+		// 3ï¿½ cria o metadados da tabela
 
 		TableMetadata tableMetadata = createTableMetadata(tableDefinition, pk,
 				indexMetadata);
 
-		// adiciona o metadatos da tabela ao metadados do banco em memória.
+		// adiciona o metadatos da tabela ao metadados do banco em memï¿½ria.
 		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider
 				.getInstance().getDatabaseMetadata(database);
 		databaseMetadata.addTable(tableMetadata);

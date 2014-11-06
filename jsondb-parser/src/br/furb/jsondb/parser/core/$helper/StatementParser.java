@@ -13,24 +13,25 @@ import br.furb.jsondb.parser.ColumnIdentifier;
 import br.furb.jsondb.parser.ColumnType;
 import br.furb.jsondb.parser.ConstraintDefinition;
 import br.furb.jsondb.parser.ConstraintKind;
-import br.furb.jsondb.parser.CreateStatement;
 import br.furb.jsondb.parser.DataType;
 import br.furb.jsondb.parser.DatabaseIdentifier;
-import br.furb.jsondb.parser.DropStatement;
 import br.furb.jsondb.parser.ForeignKeyDefinition;
-import br.furb.jsondb.parser.IStatement;
 import br.furb.jsondb.parser.IStructure;
 import br.furb.jsondb.parser.Index;
-import br.furb.jsondb.parser.InsertStatement;
 import br.furb.jsondb.parser.KeyDefinition;
 import br.furb.jsondb.parser.NumberValue;
-import br.furb.jsondb.parser.SelectStatement;
-import br.furb.jsondb.parser.SetDatabaseStatement;
+import br.furb.jsondb.parser.SQLParserException;
 import br.furb.jsondb.parser.StringValue;
 import br.furb.jsondb.parser.TableDefinition;
 import br.furb.jsondb.parser.TableIdentifier;
 import br.furb.jsondb.parser.Value;
 import br.furb.jsondb.parser.core.Token;
+import br.furb.jsondb.parser.statement.CreateStatement;
+import br.furb.jsondb.parser.statement.DropStatement;
+import br.furb.jsondb.parser.statement.IStatement;
+import br.furb.jsondb.parser.statement.InsertStatement;
+import br.furb.jsondb.parser.statement.SelectStatement;
+import br.furb.jsondb.parser.statement.SetDatabaseStatement;
 
 public class StatementParser {
 
@@ -50,7 +51,7 @@ public class StatementParser {
 	private boolean doneRec;
 	private boolean isFinal;
 
-	public void executeAction(int action, Token token) {
+	public void executeAction(int action, Token token) throws SQLParserException {
 		switch (action) {
 		case 1:
 			acaoSemantica01(token);
@@ -368,8 +369,30 @@ public class StatementParser {
 		key.setTargetTable(this.lastTable);
 	}
 
-	/** Reconhece operador relacional. **/
-	private void acaoSemantica30(Token token) {
+	/**
+	 * Reconhece operador relacional.
+	 * 
+	 * @throws SQLParserException
+	 *             caso seja encontrado um operador não reconhecido
+	 **/
+	private void acaoSemantica30(Token token) throws SQLParserException {
+		final String operator = token.getLexeme();
+		switch (operator) {
+		case "=":
+			break;
+		case ">":
+			break;
+		case "<":
+			break;
+		case ">=":
+			break;
+		case "<=":
+			break;
+		case "<>":
+			break;
+		default:
+			throw new SQLParserException("unrecognizable operator: " + operator);
+		}
 	}
 
 	/** Reconhece operador lógico. **/

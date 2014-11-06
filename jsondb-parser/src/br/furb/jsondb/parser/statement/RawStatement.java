@@ -1,4 +1,4 @@
-package br.furb.jsondb.parser;
+package br.furb.jsondb.parser.statement;
 
 /**
  * Representa um comando SQL ainda não reconhecido pelo interpretador, mantendo
