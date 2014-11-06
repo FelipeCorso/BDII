@@ -275,6 +275,7 @@ public class StatementParser {
 			selectFields.add(ColumnIdentifier.ALL);
 		} else {
 			selectFields = new ArrayList<>(this.idStack);
+			Collections.reverse(selectFields);
 		}
 		this.idStack.clear();
 		this.statement = new SelectStatement(selectFields);
@@ -287,6 +288,7 @@ public class StatementParser {
 	private void acaoSemantica19(Token token) {
 		List<TableIdentifier> tables = new ArrayList<>(idStack.size());
 		idStack.forEach(column -> tables.add(new TableIdentifier(column.getColumnName())));
+		Collections.reverse(tables);
 		idStack.clear();
 		((SelectStatement) statement).setTables(tables);
 	}
