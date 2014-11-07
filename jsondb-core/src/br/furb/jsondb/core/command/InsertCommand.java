@@ -54,23 +54,29 @@ public class InsertCommand implements ICommand {
 		// verificar se a tabela existe
 		TableIdentifier table = statement.getTable();
 
-		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(JsonDB.getInstance().getCurrentDatabase());
+		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider
+				.getInstance().getDatabaseMetadata(
+						JsonDB.getInstance().getCurrentDatabase());
 
 		if (!databaseMetadata.hasTable(table.getIdentifier())) {
-			return new Result(true, String.format("Table %s not found", table.getIdentifier()));
+			return new Result(true, String.format("Table %s not found",
+					table.getIdentifier()));
 		}
 
 		// verificar se os campos existem
 
 		List<ColumnIdentifier> columns = statement.getColumns();
 
-		TableMetadata tableMetadata = databaseMetadata.getTable(table.getIdentifier());
+		TableMetadata tableMetadata = databaseMetadata.getTable(table
+				.getIdentifier());
 
 		List<String> columnNames = new ArrayList<String>();
 
 		for (ColumnIdentifier column : columns) {
 			if (!tableMetadata.getColumns().containsKey(column.getColumnName())) {
-				return new Result(true, String.format("Column %s not found on table %s", column.getColumnName(), table.getIdentifier()));
+				return new Result(true, String.format(
+						"Column %s not found on table %s",
+						column.getColumnName(), table.getIdentifier()));
 			}
 			columnNames.add(column.getColumnName());
 		}
@@ -86,84 +92,105 @@ public class InsertCommand implements ICommand {
 			Value<?> value = values.get(i);
 			mapValues.put(columnName, value);
 
-			ColumnMetadata columnMetadata = tableMetadata.getColumns().get(columnName);
+			ColumnMetadata columnMetadata = tableMetadata.getColumns().get(
+					columnName);
 
 			// verificar se o valor corresponde ao tipo de dados da coluna
-			Result resultDataTypeValidation = validateDataType(columnMetadata, value);
+			Result resultDataTypeValidation = validateDataType(columnMetadata,
+					value);
 			if (resultDataTypeValidation != null) {
 				return resultDataTypeValidation;
 			}
 
 			// verificar se o tamanho do valor corresponde aos limites da coluna
 
-			Result resultSizeValidation = validateSizeAndPrecision(columnMetadata, value);
+			Result resultSizeValidation = validateSizeAndPrecision(
+					columnMetadata, value);
 			if (resultSizeValidation != null) {
 				return resultSizeValidation;
 			}
 		}
 
-		// verificar se foi informado valores para os campos da pk e campos not null
+		// verificar se foi informado valores para os campos da pk e campos not
+		// null
 		Set<String> primaryKey = tableMetadata.getPrimaryKey();
 		List<String> notNullFields = new ArrayList<String>(primaryKey);
-		notNullFields.addAll(TableMetadataUtils.getNotNullFields(tableMetadata));
+		notNullFields
+				.addAll(TableMetadataUtils.getNotNullFields(tableMetadata));
 
 		for (String field : notNullFields) {
-			if (!columnNames.contains(field) || values.get(columnNames.indexOf(field)).getBaseValue() == Value.NULL) {
-				return new Result(true, String.format("Column %s can't be null.", field));
+			if (!columnNames.contains(field)
+					|| values.get(columnNames.indexOf(field)).getBaseValue() == Value.NULL) {
+				return new Result(true, String.format(
+						"Column %s can't be null.", field));
 			}
 		}
 
 		// já validou tudo, pode gravar no disco
 		int rowId;
 		try {
-			rowId = JsonDBStore.getInstance().insertData(databaseMetadata.getName(), statement);
+			rowId = JsonDBStore.getInstance().insertData(
+					databaseMetadata.getName(), statement);
 		} catch (StoreException e) {
-			return new Result(true, "Was not possible to insert data", e.getCause().getMessage());
+			e.printStackTrace();
+			return new Result(true, "Was not possible to insert data", e
+					.getCause().getMessage());
 		}
 
 		// atualiza os arquivos de índice
 
-		List<IndexMetadata> indexes = tableMetadata.getIndexes();
-
-		for (IndexMetadata index : indexes) {
-
-			Collection<String> indexColumns = CollectionUtils.intersection(index.getColumns(), columnNames);
-
-			if (!indexColumns.isEmpty()) {
-				try {
-					IndexData indexData = IndexDataProvider.getInstance(databaseMetadata.getName()).getIndexData(table.getIdentifier(), index.getName());
-
-					List<String> valuesIndex = new ArrayList<String>();
-
-					for (String col : index.getColumns()) {
-						valuesIndex.add(mapValues.get(col).stringValue());
-					}
-
-					indexData.addEntry(rowId, valuesIndex.toArray(new String[valuesIndex.size()]));
-					
-					File databaseDir = JsonDBStore.getInstance().getDatabaseDir(databaseMetadata.getName());
-					File tableDir = new File(databaseDir, table.getIdentifier());
-
-					File indexDataFile = new File(tableDir, index + ".index");
-					
-					try {
-						JsonUtils.write(indexData, IndexData.class, indexDataFile);
-					} catch (IOException e) {
-						return new Result(true, "Was not possible to add index entry", e.getCause().getMessage());
-					}
-
-				} catch (StoreException e) {
-					return new Result(true, "Was not possible to read index", e.getCause().getMessage());
-				}
-			}
-
+		try {
+			updateIndexes(tableMetadata, mapValues, rowId);
+		} catch (StoreException | IOException e) {
+			e.printStackTrace();
+			return new Result(true, "Was not possible to add index entry", e
+					.getCause().getMessage());
 		}
 
 		return new Result(false, "Insert performed with success.");
-
 	}
 
-	private Result validateSizeAndPrecision(ColumnMetadata columnMetadata, Value<?> value) {
+	private void updateIndexes(TableMetadata tableMetadata,
+			Map<String, Value<?>> mapValues, int rowId) throws StoreException,
+			IOException {
+		List<IndexMetadata> indexes = tableMetadata.getIndexes();
+
+		String database = JsonDB.getInstance().getCurrentDatabase();
+
+		for (IndexMetadata index : indexes) {
+
+			// pega as colunas que fazem parte deste indice.
+			Collection<String> indexColumns = CollectionUtils.intersection(
+					index.getColumns(), mapValues.keySet());
+
+			if (!indexColumns.isEmpty()) {
+				IndexData indexData = IndexDataProvider.getInstance(database)
+						.getIndexData(tableMetadata.getName(), index.getName());
+
+				List<String> valuesIndex = new ArrayList<String>();
+
+				for (String col : index.getColumns()) {
+					valuesIndex.add(mapValues.get(col).stringValue());
+				}
+
+				indexData.addEntry(rowId,
+						valuesIndex.toArray(new String[valuesIndex.size()]));
+
+				File databaseDir = JsonDBStore.getInstance().getDatabaseDir(
+						database);
+				File tableDir = new File(databaseDir, tableMetadata.getName());
+
+				File indexDataFile = new File(tableDir, index.getName() + ".index");
+
+				JsonUtils.write(indexData, IndexData.class, indexDataFile);
+
+			}
+
+		}
+	}
+
+	private Result validateSizeAndPrecision(ColumnMetadata columnMetadata,
+			Value<?> value) {
 
 		DataType type = columnMetadata.getType();
 
@@ -185,15 +212,15 @@ public class InsertCommand implements ICommand {
 
 			break;
 		case CHAR:
-			//TODO
+			// TODO
 
 			break;
 		case DATE:
-			//TODO
+			// TODO
 
 			break;
 		case NUMBER:
-			//TODO
+			// TODO
 
 			break;
 		default:
@@ -204,14 +231,19 @@ public class InsertCommand implements ICommand {
 	}
 
 	private Result invalidValueResult(String columnName, Value<?> value) {
-		return new Result(true, String.format("Valor '%s' inválido para a coluna %s", value.getBaseValue(), columnName));
+		return new Result(true, String.format(
+				"Valor '%s' inválido para a coluna %s", value.getBaseValue(),
+				columnName));
 	}
 
 	private Result invalidValueSizeResult(String columnName, Value<?> value) {
-		return new Result(true, String.format("Valor '%s' com tamanho inválido para a coluna %s", value.getBaseValue(), columnName));
+		return new Result(true, String.format(
+				"Valor '%s' com tamanho inválido para a coluna %s",
+				value.getBaseValue(), columnName));
 	}
 
-	private Result validateDataType(ColumnMetadata columnMetadata, Value<?> value) {
+	private Result validateDataType(ColumnMetadata columnMetadata,
+			Value<?> value) {
 		DataType type = columnMetadata.getType();
 
 		String columnName = columnMetadata.getName();
@@ -225,11 +257,11 @@ public class InsertCommand implements ICommand {
 
 			break;
 		case CHAR:
-			//TODO
+			// TODO
 
 			break;
 		case DATE:
-			//TODO
+			// TODO
 
 			break;
 		case NUMBER:

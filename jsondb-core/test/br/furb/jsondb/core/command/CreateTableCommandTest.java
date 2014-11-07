@@ -74,11 +74,6 @@ public class CreateTableCommandTest extends BaseCommandTest {
 
 	}
 
-	private void createDatabase(String database) {
-		CreateStatement createStatement = new CreateStatement(new DatabaseIdentifier(database));
-		CreateDatabaseCommand command = new CreateDatabaseCommand(createStatement);
 
-		assertFalse(command.execute().hasError());
-	}
 
 }

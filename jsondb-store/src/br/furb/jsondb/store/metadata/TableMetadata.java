@@ -1,6 +1,7 @@
 package br.furb.jsondb.store.metadata;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -8,10 +9,9 @@ import java.util.Set;
 public class TableMetadata {
 
 	private String name;
-	private Map<String, ColumnMetadata> columns = new HashMap<String, ColumnMetadata>();
+	private Map<String, ColumnMetadata> columns = new LinkedHashMap<String, ColumnMetadata>();
 	private Set<String> primaryKey;
-	private List< IndexMetadata> indexes;
-	private int lastRowId = -1;
+	private List<IndexMetadata> indexes = new ArrayList<IndexMetadata>();
 
 	public String getName() {
 		return name;
@@ -47,14 +47,7 @@ public class TableMetadata {
 
 	@Override
 	public String toString() {
-		return "TableMetadata [name=" + name + ", fields=" + columns + ", primaryKey=" + primaryKey + "]";
-	}
-
-	public int getLastRowId() {
-		return lastRowId;
-	}
-
-	public void setLastRowId(int lastRowId) {
-		this.lastRowId = lastRowId;
+		return "TableMetadata [name=" + name + ", fields=" + columns
+				+ ", primaryKey=" + primaryKey + "]";
 	}
 }

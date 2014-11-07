@@ -3,6 +3,7 @@ package br.furb.jsondb.core.command;
 import br.furb.jsondb.core.JsonDB;
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.core.result.Result;
+import br.furb.jsondb.core.util.JsonDBUtils;
 import br.furb.jsondb.parser.CreateStatement;
 import br.furb.jsondb.store.JsonDBStore;
 import br.furb.jsondb.store.StoreException;
@@ -23,6 +24,12 @@ public class CreateTableCommand implements ICommand {
 
 		String database = JsonDB.getInstance().getCurrentDatabase();
 
+		result = JsonDBUtils.validateHasCurrentDatabase();
+
+		if (result != null) {
+			return result;
+		}
+
 		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider
 				.getInstance().getDatabaseMetadata(database);
 
@@ -36,7 +43,8 @@ public class CreateTableCommand implements ICommand {
 		} else {
 			try {
 				JsonDBStore.getInstance().createTable(database, statement);
-				result = new Result(false, String.format( "Table %s created with success", tableName));
+				result = new Result(false, String.format(
+						"Table %s created with success", tableName));
 			} catch (StoreException e) {
 				result = new Result(true, e.getMessage());
 			}

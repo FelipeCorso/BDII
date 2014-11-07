@@ -10,12 +10,14 @@ import br.furb.jsondb.parser.ColumnIdentifier;
 import br.furb.jsondb.parser.CreateStatement;
 import br.furb.jsondb.parser.InsertStatement;
 import br.furb.jsondb.store.data.ColumnData;
+import br.furb.jsondb.store.data.LastRowId;
 import br.furb.jsondb.store.data.RowData;
 import br.furb.jsondb.store.data.TableDataProvider;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
 import br.furb.jsondb.store.metadata.DatabaseMetadataProvider;
 import br.furb.jsondb.store.metadata.TableMetadata;
 import br.furb.jsondb.store.utils.JsonUtils;
+import br.furb.jsondb.store.utils.LastRowIdUtils;
 
 public class JsonDBStore {
 
@@ -126,18 +128,19 @@ public class JsonDBStore {
 			rowData.addColumn(columnData);
 		}
 
-		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(database);
 		String tableName = statement.getTable().getIdentifier();
-		TableMetadata tableMetadata = databaseMetadata.getTable(tableName);
-		int rowId = tableMetadata.getLastRowId() + 1;
-
-		rowData.setRowId(rowId);
-
-		tableMetadata.setLastRowId(rowId);
 
 		File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
 		File tableDir = new File(databaseDir, tableName);
+		
+		
+		LastRowId lastRowId = LastRowIdUtils.getLastRowId(tableDir);
+		
+		int rowId = lastRowId.getLastRowId() + 1;
+		lastRowId.setLastRowId(rowId);
 
+		LastRowIdUtils.saveLastRowId(tableDir, lastRowId);
+		
 		try {
 			JsonUtils.write(rowData, RowData.class, new File(tableDir, rowId + ".dat"));
 		} catch (IOException e) {

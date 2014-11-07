@@ -9,6 +9,7 @@ import br.furb.jsondb.store.JsonDBStore;
 import br.furb.jsondb.store.StoreException;
 import br.furb.jsondb.store.metadata.TableMetadata;
 import br.furb.jsondb.store.utils.JsonUtils;
+import br.furb.jsondb.store.utils.LastRowIdUtils;
 
 public class TableData {
 
@@ -28,14 +29,7 @@ public class TableData {
 			File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
 			File tableDir = new File(databaseDir, tableMetadata.getName());
 
-			File rowDataFile = new File(tableDir, id + ".dat");
-			RowData rowData;
-			try {
-				rowData = JsonUtils.parseJsonToObject(rowDataFile, RowData.class);
-			} catch (IOException e) {
-				throw new StoreException(e);
-			}
-			addRow(rowData);
+			addRowData(tableDir, id);
 		}
 
 		return rows.get(id);
@@ -47,26 +41,33 @@ public class TableData {
 
 	public Map<Integer, RowData> getRows() throws StoreException {
 		//Lê cada registro que ainda não está na memória
+		
+		File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
+		File tableDir = new File(databaseDir, tableMetadata.getName());
 
-		for (int i = 0; i < tableMetadata.getLastRowId(); i++) {
+		LastRowId lastRowId = LastRowIdUtils.getLastRowId(tableDir);
+
+		for (int i = 0; i < lastRowId.getLastRowId(); i++) {
 
 			if (!rows.containsKey(i)) {
 
-				File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
-				File tableDir = new File(databaseDir, tableMetadata.getName());
-
-				File rowDataFile = new File(tableDir, i + ".dat");
-				RowData rowData;
-				try {
-					rowData = JsonUtils.parseJsonToObject(rowDataFile, RowData.class);
-				} catch (IOException e) {
-					throw new StoreException(e);
-				}
-				addRow(rowData);
+				addRowData(tableDir, i);
 			}
 		}
 
 		return rows;
+	}
+
+	private RowData addRowData(File tableDir, int i) throws StoreException {
+		File rowDataFile = new File(tableDir, i + ".dat");
+		RowData rowData;
+		try {
+			rowData = JsonUtils.parseJsonToObject(rowDataFile, RowData.class);
+		} catch (IOException e) {
+			throw new StoreException(e);
+		}
+		addRow(rowData);
+		return rowData;
 	}
 
 }

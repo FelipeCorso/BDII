@@ -14,12 +14,14 @@ import br.furb.jsondb.parser.CreateStatement;
 import br.furb.jsondb.parser.KeyDefinition;
 import br.furb.jsondb.parser.TableDefinition;
 import br.furb.jsondb.store.data.IndexData;
+import br.furb.jsondb.store.data.LastRowId;
 import br.furb.jsondb.store.metadata.ColumnMetadata;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
 import br.furb.jsondb.store.metadata.DatabaseMetadataProvider;
 import br.furb.jsondb.store.metadata.IndexMetadata;
 import br.furb.jsondb.store.metadata.TableMetadata;
 import br.furb.jsondb.store.utils.JsonUtils;
+import br.furb.jsondb.store.utils.LastRowIdUtils;
 
 public class TableCreator {
 
@@ -40,6 +42,8 @@ public class TableCreator {
 
 		TableMetadata tableMetadata = createTableMetadata(tableDefinition, pk,
 				indexMetadata);
+		
+		LastRowIdUtils.createLastRowId(tableDir, new LastRowId());
 
 		// adiciona o metadatos da tabela ao metadados do banco em memória.
 		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider
