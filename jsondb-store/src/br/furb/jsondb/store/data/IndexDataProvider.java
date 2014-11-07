@@ -32,7 +32,8 @@ public class IndexDataProvider {
 		return INSTANCES.get(database);
 	}
 
-	public IndexData getIndexData(String table, String index) throws StoreException {
+	public IndexData getIndexData(String table, String index)
+			throws StoreException {
 
 		if (!indexData.containsKey(table)) {
 			indexData.put(table, new HashMap<String, IndexData>());
@@ -42,18 +43,24 @@ public class IndexDataProvider {
 
 		if (!map.containsKey(index)) {
 
-			File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
+			File databaseDir = JsonDBStore.getInstance().getDatabaseDir(
+					database);
 			File tableDir = new File(databaseDir, table);
 
 			File indexDataFile = new File(tableDir, index + ".index");
 			try {
-				map.put(index, JsonUtils.parseJsonToObject(indexDataFile, IndexData.class));
+				map.put(index, JsonUtils.parseJsonToObject(indexDataFile,
+						IndexData.class));
 			} catch (IOException e) {
-				throw new StoreException( e);
+				throw new StoreException(e);
 			}
 		}
 
 		return map.get(index);
+	}
+
+	public static void reset() {
+		INSTANCES.clear();
 	}
 
 }

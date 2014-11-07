@@ -113,7 +113,7 @@ public class InsertCommand implements ICommand {
 
 		// verificar se foi informado valores para os campos da pk e campos not
 		// null
-		Set<String> primaryKey = tableMetadata.getPrimaryKey();
+		List<String> primaryKey = tableMetadata.getPrimaryKey();
 		List<String> notNullFields = new ArrayList<String>(primaryKey);
 		notNullFields
 				.addAll(TableMetadataUtils.getNotNullFields(tableMetadata));
@@ -125,6 +125,29 @@ public class InsertCommand implements ICommand {
 						"Column %s can't be null.", field));
 			}
 		}
+		
+		// verificar se ainda não existe registro com a chave informada
+		
+		try {
+			IndexData indexData = IndexDataProvider.getInstance(databaseMetadata.getName())
+							.getIndexData(tableMetadata.getName(), "PRIMARY");
+			
+			String[] keyValues = new String[primaryKey.size()];
+			
+			for (int i = 0; i < keyValues.length; i++) {
+				keyValues[i] = mapValues.get(primaryKey.get(i)).getBaseValue().toString();
+			}
+			
+			if(indexData.containsEntry(keyValues)){
+				return new Result(true, "Unique key violation");
+			}
+			
+		} catch (StoreException e1) {
+			e1.printStackTrace();
+		}
+
+		
+		
 
 		// já validou tudo, pode gravar no disco
 		int rowId;
@@ -172,7 +195,7 @@ public class InsertCommand implements ICommand {
 				for (String col : index.getColumns()) {
 					valuesIndex.add(mapValues.get(col).stringValue());
 				}
-
+				
 				indexData.addEntry(rowId,
 						valuesIndex.toArray(new String[valuesIndex.size()]));
 

@@ -2,7 +2,9 @@ package br.furb.jsondb.store;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import br.furb.jsondb.parser.ColumnDefinition;
@@ -33,7 +35,7 @@ public class TableCreator {
 		TableDefinition tableDefinition = (TableDefinition) statement
 				.getStructure();
 
-		Set<String> pk = getPrimaryKeyFields(tableDefinition);
+		List<String> pk = getPrimaryKeyFields(tableDefinition);
 
 		// 2º cria o arquivo de índice da pk da tabela
 		IndexMetadata indexMetadata = createPrimaryKeyIndex(tableDir, pk);
@@ -62,7 +64,7 @@ public class TableCreator {
 	}
 
 	private static TableMetadata createTableMetadata(
-			TableDefinition tableDefinition, Set<String> pk,
+			TableDefinition tableDefinition, List<String> pk,
 			IndexMetadata indexMetadata) {
 		TableMetadata tableMetadata = new TableMetadata();
 		tableMetadata.setPrimaryKey(pk);
@@ -84,9 +86,9 @@ public class TableCreator {
 		return tableMetadata;
 	}
 
-	private static Set<String> getPrimaryKeyFields(
+	private static List<String> getPrimaryKeyFields(
 			TableDefinition tableDefinition) {
-		Set<String> pk = new LinkedHashSet<String>();
+		List<String> pk = new ArrayList<String>();
 
 		for (ConstraintDefinition constraintDefinition : tableDefinition
 				.getFinalConstraints()) {
@@ -103,7 +105,7 @@ public class TableCreator {
 	}
 
 	private static IndexMetadata createPrimaryKeyIndex(File tableDir,
-			Set<String> pk) throws StoreException {
+			List<String> pk) throws StoreException {
 
 		IndexData index = new IndexData();
 		IndexMetadata metadata = new IndexMetadata();

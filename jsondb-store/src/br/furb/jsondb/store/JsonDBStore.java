@@ -15,7 +15,6 @@ import br.furb.jsondb.store.data.RowData;
 import br.furb.jsondb.store.data.TableDataProvider;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
 import br.furb.jsondb.store.metadata.DatabaseMetadataProvider;
-import br.furb.jsondb.store.metadata.TableMetadata;
 import br.furb.jsondb.store.utils.JsonUtils;
 import br.furb.jsondb.store.utils.LastRowIdUtils;
 
@@ -140,6 +139,8 @@ public class JsonDBStore {
 		lastRowId.setLastRowId(rowId);
 
 		LastRowIdUtils.saveLastRowId(tableDir, lastRowId);
+		
+		rowData.setRowId(rowId);
 		
 		try {
 			JsonUtils.write(rowData, RowData.class, new File(tableDir, rowId + ".dat"));

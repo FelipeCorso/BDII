@@ -9,15 +9,21 @@ import br.furb.jsondb.store.metadata.TableMetadata;
 
 public class TableDataProvider {
 
-	private static final TableDataProvider INSTANCE = new TableDataProvider();
+	private static TableDataProvider INSTANCE;
 
 	private Map<String, Map<String, TableData>> tablesData = new HashMap<String, Map<String, TableData>>();
 
 	public static TableDataProvider getInstance() {
+
+		if (INSTANCE == null) {
+			INSTANCE = new TableDataProvider();
+		}
+
 		return INSTANCE;
 	}
 
-	public TableData getTableData(String database, String table) throws StoreException {
+	public TableData getTableData(String database, String table)
+			throws StoreException {
 
 		if (!tablesData.containsKey(database)) {
 			tablesData.put(database, new HashMap<String, TableData>());
@@ -27,13 +33,19 @@ public class TableDataProvider {
 
 		if (!map.containsKey(table)) {
 
-			TableMetadata tableMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(database).getTable(table);
+			TableMetadata tableMetadata = DatabaseMetadataProvider
+					.getInstance().getDatabaseMetadata(database)
+					.getTable(table);
 			TableData tableData = new TableData(tableMetadata, database);
 
 			map.put(table, tableData);
 		}
 
 		return map.get(table);
+	}
+
+	public static void reset() {
+		INSTANCE = null;
 	}
 
 }

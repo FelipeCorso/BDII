@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class TableMetadata {
 
 	private String name;
 	private Map<String, ColumnMetadata> columns = new LinkedHashMap<String, ColumnMetadata>();
-	private Set<String> primaryKey;
+	private List<String> primaryKey;
 	private List<IndexMetadata> indexes = new ArrayList<IndexMetadata>();
 
 	public String getName() {
@@ -29,11 +28,11 @@ public class TableMetadata {
 		return columns;
 	}
 
-	public Set<String> getPrimaryKey() {
+	public List<String> getPrimaryKey() {
 		return primaryKey;
 	}
 
-	public void setPrimaryKey(Set<String> primaryKey) {
+	public void setPrimaryKey(List<String> primaryKey) {
 		this.primaryKey = primaryKey;
 	}
 
