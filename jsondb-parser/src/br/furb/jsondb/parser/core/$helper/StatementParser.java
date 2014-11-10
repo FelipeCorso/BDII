@@ -218,7 +218,9 @@ public class StatementParser {
 
 	/** Encerra reconhecimento de colunas no INSERT. **/
 	private void acaoSemantica11(Token token) {
-		this.statement = new InsertStatement(this.lastTable, this.idStack, null);
+		ArrayList<ColumnIdentifier> columns = new ArrayList<ColumnIdentifier>(this.idStack);
+		Collections.reverse(columns);
+		this.statement = new InsertStatement(this.lastTable, columns, null);
 		this.idStack.clear();
 	}
 
