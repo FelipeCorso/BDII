@@ -32,7 +32,7 @@ public class SQLParser {
 		try {
 			sintatico.parse(lexico, semantico);
 		} catch (SyntaticError | LexicalError e) {
-			throw new SQLParserException("Problem on parsing SQL command", e, command);
+			throw new SQLParserException("Problem parsing SQL command", e, command);
 		}
 		return semantico.getStatement();
 	}
