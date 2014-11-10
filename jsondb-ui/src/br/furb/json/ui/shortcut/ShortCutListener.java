@@ -4,13 +4,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import br.furb.json.ui.Principal;
-import br.furb.json.ui.button.CopyButton;
-import br.furb.json.ui.button.CutButton;
-import br.furb.json.ui.button.NewButton;
-import br.furb.json.ui.button.OpenButton;
-import br.furb.json.ui.button.PasteButton;
-import br.furb.json.ui.button.SaveButton;
-import br.furb.json.ui.button.TeamButton;
+import br.furb.json.ui.action.CopyAction;
+import br.furb.json.ui.action.CutAction;
+import br.furb.json.ui.action.NewAction;
+import br.furb.json.ui.action.OpenAction;
+import br.furb.json.ui.action.PasteAction;
+import br.furb.json.ui.action.SaveAction;
+import br.furb.json.ui.action.TeamAction;
 import br.furb.json.ui.status.EStatus;
 
 public class ShortCutListener implements KeyListener {
@@ -29,32 +29,32 @@ public class ShortCutListener implements KeyListener {
 		switch (event.getKeyCode()) {
 		case KeyEvent.VK_N:
 			if (isCtrlDown) {
-				new NewButton().executeAction(compUi);
+				NewAction.executeAction(compUi, compUi.getTreeMenu().getjTree(), compUi.getTreeMenu().getDataBaseNode());
 			}
 			break;
 		case KeyEvent.VK_A:
 			if (isCtrlDown) {
-				new OpenButton().executeAction(compUi);
+				OpenAction.executeAction(compUi, compUi.getTreeMenu().getjTree(), compUi.getTreeMenu().getDataBaseNode());
 			}
 			break;
 		case KeyEvent.VK_S:
 			if (isCtrlDown) {
-				new SaveButton().executeAction(compUi);
+				SaveAction.executeAction(compUi);
 			}
 			break;
 		case KeyEvent.VK_C:
 			if (isCtrlDown) {
-				new CopyButton().executeAction(compUi);
+				CopyAction.executeAction(compUi);
 			}
 			break;
 		case KeyEvent.VK_V:
 			if (isCtrlDown) {
-				new PasteButton().executeAction(compUi);
+				PasteAction.executeAction(compUi);
 			}
 			break;
 		case KeyEvent.VK_X:
 			if (isCtrlDown) {
-				new CutButton().executeAction(compUi);
+				CutAction.executeAction(compUi);
 			}
 			break;
 		// case KeyEvent.VK_F8:
@@ -64,17 +64,18 @@ public class ShortCutListener implements KeyListener {
 		// new BotaoGerarCodigo().executeAction(compUi);
 		// break;
 		case KeyEvent.VK_F1:
-			new TeamButton().executeAction(compUi);
+			TeamAction.executeAction(compUi);
 			break;
 		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent event) {
-		if (!textEditor.equalsIgnoreCase(compUi.getCommandPanel().getTextEditor().getText())) {
-			compUi.getCommandPanel().getLbStatus().setText(EStatus.MODIFICADO.toString());
+		// FIXME: COMANDO DEVE SER EXECUTADO NA ABA SELECIONADA
+		if (!textEditor.equalsIgnoreCase(compUi.getTabbedPanel().getCommandPanel().getTextEditor().getText())) {
+			compUi.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.MODIFICADO.toString());
 		} else {
-			compUi.getCommandPanel().getLbStatus().setText(EStatus.NAO_MODIFICADO.toString());
+			compUi.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.NAO_MODIFICADO.toString());
 		}
 
 	}

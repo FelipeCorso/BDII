@@ -2,19 +2,17 @@ package br.furb.jsondb.core.result;
 
 import java.util.List;
 
-import br.furb.jsondb.store.data.RowData;
-
 public class ResultSet extends Result implements IResultSet {
 
-	private List<RowData> rows;
+	private List<ResultRow> rows;
 
-	public ResultSet(List<RowData> rows, String... messages) {
-		super(false, messages);
+	public ResultSet(List<ResultRow> rows, String... messages) {
+		super(messages);
 		this.rows = rows;
 	}
 
 	@Override
-	public List<RowData> getRows() {
+	public List<ResultRow> getRows() {
 		return rows;
 	}
 }

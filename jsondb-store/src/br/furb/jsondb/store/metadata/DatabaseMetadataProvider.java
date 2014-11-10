@@ -10,11 +10,16 @@ import br.furb.jsondb.store.utils.JsonUtils;
 
 public class DatabaseMetadataProvider {
 
-	private static final DatabaseMetadataProvider INSTANCE = new DatabaseMetadataProvider();
+	private static DatabaseMetadataProvider INSTANCE;
 
 	private Map<String, DatabaseMetadata> databaseMetadatas = new HashMap<String, DatabaseMetadata>();
 
 	public static DatabaseMetadataProvider getInstance() {
+
+		if (INSTANCE == null) {
+			INSTANCE = new DatabaseMetadataProvider();
+		}
+
 		return INSTANCE;
 	}
 
@@ -64,5 +69,9 @@ public class DatabaseMetadataProvider {
 		File databaseDir = new File(jsonDbDir, database);
 
 		return databaseDir.exists();
+	}
+
+	public static void reset() {
+		INSTANCE = null;
 	}
 }

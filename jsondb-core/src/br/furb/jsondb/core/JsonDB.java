@@ -1,20 +1,19 @@
 package br.furb.jsondb.core;
 
-import java.util.Collection;
-import java.util.List;
-
 import br.furb.jsondb.core.command.CreateDatabaseCommand;
 import br.furb.jsondb.core.command.CreateTableCommand;
 import br.furb.jsondb.core.command.DropTableCommand;
+import br.furb.jsondb.core.command.InsertCommand;
 import br.furb.jsondb.core.command.SetDatabaseCommand;
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.parser.SQLParser;
 import br.furb.jsondb.parser.SQLParserException;
+import br.furb.jsondb.parser.TableDefinition;
 import br.furb.jsondb.parser.TableIdentifier;
 import br.furb.jsondb.parser.statement.CreateStatement;
 import br.furb.jsondb.parser.statement.DropStatement;
 import br.furb.jsondb.parser.statement.IStatement;
-import br.furb.jsondb.parser.statement.RawStatement;
+import br.furb.jsondb.parser.statement.InsertStatement;
 import br.furb.jsondb.parser.statement.SetDatabaseStatement;
 
 public class JsonDB {
@@ -38,9 +37,26 @@ public class JsonDB {
 		this.currentDatabase = currentDatabase;
 	}
 
-	public List<IResult> executeSQL(String sql) throws SQLParserException {
-		Collection<RawStatement> rawStatements = SQLParser.extractCommands(sql);
+	public IResult executeSQL(String sql) throws SQLParserException, SQLException {
+		//		Collection<RawStatement> rawStatements = SQLParser.extractCommands(sql);
 		IStatement statement = SQLParser.parse(sql);
+
+		if (statement instanceof CreateStatement) {
+
+			CreateStatement createStatement = (CreateStatement) statement;
+			if (createStatement.getStructure() instanceof TableDefinition) {
+				return createTable(createStatement);
+			} else {
+				return createDatabase(createStatement);
+			}
+		} else if (statement instanceof InsertStatement) {
+			return insert((InsertStatement) statement);
+		} else if (statement instanceof SetDatabaseStatement) {
+			return setDatabase((SetDatabaseStatement) statement);
+		} else if (statement instanceof DropStatement) {
+			return dropTable((DropStatement<TableIdentifier>) statement);
+		}
+
 		// TODO
 
 		// 04. JsonDb submete c�digo para o SqlParser
@@ -73,20 +89,24 @@ public class JsonDB {
 		return null;
 	}
 
-	private IResult createDatabase(CreateStatement statement) {
+	private IResult createDatabase(CreateStatement statement) throws SQLException {
 		return new CreateDatabaseCommand(statement).execute();
 	}
 
-	private IResult setDatabase(SetDatabaseStatement statement) {
+	private IResult setDatabase(SetDatabaseStatement statement) throws SQLException {
 		return new SetDatabaseCommand(statement).execute();
 	}
 
-	private IResult createTable(CreateStatement statement) {
+	private IResult createTable(CreateStatement statement) throws SQLException {
 		return new CreateTableCommand(statement).execute();
 	}
 
-	private IResult dropTable(DropStatement<TableIdentifier> statement) {
+	private IResult dropTable(DropStatement<TableIdentifier> statement) throws SQLException {
 		return new DropTableCommand(statement).execute();
+	}
+
+	private IResult insert(InsertStatement statement) throws SQLException {
+		return new InsertCommand(statement).execute();
 	}
 
 }

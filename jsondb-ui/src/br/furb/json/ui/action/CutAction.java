@@ -5,7 +5,7 @@ import br.furb.json.ui.status.EStatus;
 
 public class CutAction {
 	public static void executeAction(Principal principal) {
-		principal.getCommandPanel().getTextEditor().cut();
-		principal.getCommandPanel().getLbStatus().setText(EStatus.MODIFICADO.toString());
+		principal.getTabbedPanel().getCommandPanel().getTextEditor().cut();
+		principal.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.MODIFICADO.toString());
 	}
 }

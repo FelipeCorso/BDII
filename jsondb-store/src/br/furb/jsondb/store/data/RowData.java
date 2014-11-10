@@ -29,4 +29,9 @@ public class RowData {
 		this.rowId = rowId;
 	}
 
+	@Override
+	public String toString() {
+		return "RowData [rowId=" + rowId + ", columns=" + columns + "]";
+	}
+
 }

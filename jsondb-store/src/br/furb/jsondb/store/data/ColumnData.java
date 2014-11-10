@@ -30,4 +30,9 @@ public class ColumnData {
 		this.value = value;
 	}
 
+	@Override
+	public String toString() {
+		return "ColumnData [name=" + name + ", value=" + value + "]";
+	}
+
 }

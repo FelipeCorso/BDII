@@ -2,15 +2,12 @@ package br.furb.json.ui.panel.treeMenu;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.FileDialog;
+import java.awt.Component;
 import java.awt.Font;
-import java.awt.Frame;
-import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -21,8 +18,12 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import br.furb.json.ui.Principal;
-import br.furb.jsondb.store.metadata.DatabaseMetadata;
-import br.furb.jsondb.store.utils.JsonUtils;
+import br.furb.json.ui.action.NewAction;
+import br.furb.json.ui.action.OpenAction;
+
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
 
 public class TreeMenuPanel extends JPanel {
 
@@ -35,21 +36,26 @@ public class TreeMenuPanel extends JPanel {
 
 	private DefaultMutableTreeNode dataBaseNode;
 
+	private JTree jTree;
+
 	public TreeMenuPanel(Principal principal) {
 		setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
+		addKeyListener(principal.getKeyListener());
 
 		defineLookAndFeel();
 		setLayout(new BorderLayout(0, 0));
 
 		JPanel panelBotoes = new JPanel();
+		panelBotoes.addKeyListener(principal.getKeyListener());
 		add(panelBotoes, BorderLayout.NORTH);
-		panelBotoes.setLayout(new GridLayout(0, 2, 0, 0));
 
 		JScrollPane scrollPaneTree = new JScrollPane();
+		scrollPaneTree.addKeyListener(principal.getKeyListener());
 		add(scrollPaneTree, BorderLayout.CENTER);
 
 		dataBaseNode = new DefaultMutableTreeNode(DATA_BASE_STR);
-		JTree jTree = new JTree(new javax.swing.tree.DefaultTreeModel(dataBaseNode));
+		jTree = new JTree(new javax.swing.tree.DefaultTreeModel(dataBaseNode));
+		jTree.addKeyListener(principal.getKeyListener());
 		jTree.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -80,136 +86,71 @@ public class TreeMenuPanel extends JPanel {
 		});
 		scrollPaneTree.setViewportView(jTree);
 
-		JLabel lblAdd = new JLabel("Adicionar");
-		lblAdd.addMouseListener(new MouseAdapter() {
+		JLabel lblOpenDB = new JLabel("");
+		lblOpenDB.setAlignmentX(Component.CENTER_ALIGNMENT);
+		lblOpenDB.setToolTipText("Abrir Database [Ctrl+A]");
+		lblOpenDB.addKeyListener(principal.getKeyListener());
+		lblOpenDB.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				try {
-					String databaseDir = loadDataBaseDir(principal);
-
-					DatabaseMetadata database = JsonUtils.parseJsonToObject(new File(databaseDir), DatabaseMetadata.class);
-					principal.addDataBase(database);
-					lblAdd.toString();
-
-					createNodesDatabase(dataBaseNode, database);
-
-					((javax.swing.tree.DefaultTreeModel) jTree.getModel()).reload(sort(dataBaseNode));
-
-				} catch (IOException io) {
-					System.err.println("ERRO FATAL!\nNão foi possível realizar a leitura do arquivo!");
-					io.printStackTrace();
-				}
+				OpenAction.executeAction(principal, jTree, dataBaseNode);
 			}
 		});
+		panelBotoes.setLayout(new FormLayout(new ColumnSpec[] { ColumnSpec.decode("center:50px"), ColumnSpec.decode("center:50px"), ColumnSpec.decode("center:50px"), },
+				new RowSpec[] { RowSpec.decode("32px"), }));
 
-		lblAdd.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		lblAdd.setIcon(principal.getImageIcon("Add folder.png"));
-		panelBotoes.add(lblAdd);
+		JLabel lblNewDB = new JLabel("");
+		lblNewDB.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				NewAction.executeAction(principal, jTree, dataBaseNode);
+			}
+		});
+		lblNewDB.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		lblNewDB.setToolTipText("Nova Database [Ctrl+N]");
+		lblNewDB.setIcon(new ImageIcon(TreeMenuPanel.class.getResource("/Images/Add folder.png")));
+		lblNewDB.addKeyListener(principal.getKeyListener());
+		panelBotoes.add(lblNewDB, "1, 1, center, fill");
 
-		JLabel lblRemover = new JLabel("Remover");
-		lblRemover.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		lblRemover.setIcon(principal.getImageIcon("Remove folder.png"));
-		lblRemover.addMouseListener(new MouseAdapter() {
+		lblOpenDB.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		lblOpenDB.setIcon(new ImageIcon(TreeMenuPanel.class.getResource("/Images/openFile.png")));
+		panelBotoes.add(lblOpenDB, "2, 1, center, fill");
+
+		JLabel lblRemoveDB = new JLabel("");
+		lblRemoveDB.setAlignmentX(Component.CENTER_ALIGNMENT);
+		lblRemoveDB.setToolTipText("Remover Database [Del]");
+		lblRemoveDB.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		lblRemoveDB.setIcon(new ImageIcon(TreeMenuPanel.class.getResource("/Images/Remove Folder.png")));
+		lblRemoveDB.addKeyListener(principal.getKeyListener());
+		lblRemoveDB.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				TreePath selectionPath = jTree.getSelectionPath();
 
 				if (selectionPath != null) {
-					javax.swing.tree.DefaultMutableTreeNode dmt = (javax.swing.tree.DefaultMutableTreeNode) selectionPath.getLastPathComponent();
+					DefaultMutableTreeNode dmt = (DefaultMutableTreeNode) selectionPath.getLastPathComponent();
 
-					if (!dmt.getUserObject().toString().equalsIgnoreCase(DATA_BASE_STR)) {
+					if (!dmt.toString().equalsIgnoreCase(DATA_BASE_STR)) {
+						dmt = getDatabaseNode(dmt);
+
 						//nodeChanged
 						((javax.swing.tree.DefaultTreeModel) jTree.getModel()).removeNodeFromParent(dmt);
 						principal.getTabbedPanel().remove(dmt.toString());
+						principal.getDatabases().remove(dmt.toString());
 					}
 				}
 			}
+
+			private DefaultMutableTreeNode getDatabaseNode(DefaultMutableTreeNode dmt) {
+				if (!dmt.getParent().toString().equalsIgnoreCase(DATA_BASE_STR)) {
+					return getDatabaseNode((DefaultMutableTreeNode) dmt.getParent());
+				}
+				return dmt;
+			}
 		});
 
-		panelBotoes.add(lblRemover);
+		panelBotoes.add(lblRemoveDB, "3, 1, center, fill");
 
-	}
-
-	public DefaultMutableTreeNode sort(DefaultMutableTreeNode node) {
-		//sort alphabetically
-		for (int i = 0; i < node.getChildCount() - 1; i++) {
-			DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
-			String nt = child.getUserObject().toString();
-
-			for (int j = i + 1; j <= node.getChildCount() - 1; j++) {
-				DefaultMutableTreeNode prevNode = (DefaultMutableTreeNode) node.getChildAt(j);
-				String np = prevNode.getUserObject().toString();
-
-				System.out.println(nt + " " + np);
-				if (nt.compareToIgnoreCase(np) > 0) {
-					node.insert(child, j);
-					node.insert(prevNode, i);
-				}
-			}
-			if (child.getChildCount() > 0) {
-				sort(child);
-			}
-		}
-
-		return node;
-
-	}
-
-	private void createNodesDatabase(DefaultMutableTreeNode top, DatabaseMetadata database) {
-		DefaultMutableTreeNode databaseNode = new DefaultMutableTreeNode(database.getName());
-		top.add(databaseNode);
-
-		createNodesTable(databaseNode, database);
-		createNodesIndex(databaseNode, database);
-	}
-
-	private void createNodesTable(DefaultMutableTreeNode databaseNode, DatabaseMetadata database) {
-		DefaultMutableTreeNode tableNode = new DefaultMutableTreeNode("Tabelas");
-		databaseNode.add(tableNode);
-
-		for (String tableName : database.getTables().keySet()) {
-			DefaultMutableTreeNode table = new DefaultMutableTreeNode(tableName);
-			tableNode.add(table);
-		}
-
-	}
-
-	private void createNodesIndex(DefaultMutableTreeNode databaseNode, DatabaseMetadata database) {
-		DefaultMutableTreeNode indexNode = new DefaultMutableTreeNode("Índices");
-		databaseNode.add(indexNode);
-
-		//		for (String indexName : database.getIndex().keySet()) {
-		//			DefaultMutableTreeNode index = new DefaultMutableTreeNode(indexName);
-		//			indexNode.add(index);
-		//		}
-	}
-
-	private String loadDataBaseDir(Frame frame) {
-		String filePath = "";
-
-		FileDialog fileDialog = new FileDialog(frame, "Abrir", FileDialog.LOAD);
-		fileDialog.setDirectory("C:\\");
-		fileDialog.setVisible(true);
-
-		filePath = fileDialog.getDirectory() + fileDialog.getFile();
-
-		if (!filePath.equalsIgnoreCase("C:\\null")) {
-			// try {
-			// // 1º tenta ler depois seta o caminho do arquivo e as demais
-			// informações
-			// frame.getTextEditor().setText(textFileRead(filePath));
-			// frame.getLbFilePath().setText(filePath);
-			// frame.getKeyListener().setTextoEditor("");
-			// frame.getTextMsg().setText("");
-			// frame.getLbStatus().setText(EStatus.NAO_MODIFICADO.toString());
-			// frame.getKeyListener().setTextoEditor(frame.getTextEditor().getText());
-			// } catch (ClassNotFoundException | IOException e) {
-			// System.err.println("ERRO FATAL!\nNão foi possível realizar a leitura do arquivo!");
-			// e.printStackTrace();
-			// }
-			return filePath;
-		}
-		return "";
 	}
 
 	private static boolean useSystemLookAndFeel = true;
@@ -222,6 +163,14 @@ public class TreeMenuPanel extends JPanel {
 				System.err.println("Couldn't use system look and feel.");
 			}
 		}
+	}
+
+	public JTree getjTree() {
+		return jTree;
+	}
+
+	public DefaultMutableTreeNode getDataBaseNode() {
+		return dataBaseNode;
 	}
 
 }

@@ -1,6 +1,7 @@
 package br.furb.jsondb.core.command;
 
 import br.furb.jsondb.core.JsonDB;
+import br.furb.jsondb.core.SQLException;
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.core.result.Result;
 import br.furb.jsondb.core.util.JsonDBUtils;
@@ -20,27 +21,23 @@ public class DropTableCommand implements ICommand {
 	}
 
 	@Override
-	public IResult execute() {
-		IResult result = JsonDBUtils.validateHasCurrentDatabase();
-
-		if (result != null) {
-			return result;
-		}
+	public IResult execute() throws SQLException {
+		JsonDBUtils.validateHasCurrentDatabase();
 
 		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(JsonDB.getInstance().getCurrentDatabase());
 		String tableName = statement.getStructure().getIdentifier();
 
 		if (!databaseMetadata.hasTable(tableName)) {
-			result = new Result(true, String.format("Table %s not found", tableName));
-		} else {
-			try {
-				JsonDBStore.getInstance().dropTable(JsonDB.getInstance().getCurrentDatabase(), tableName);
-			} catch (StoreException e) {
-				result = new Result(true, "Was not possible to drop table", e.getMessage());
-			}
+			throw new SQLException(String.format("Table %s not found", tableName));
 		}
 
-		return result;
+		try {
+			JsonDBStore.getInstance().dropTable(JsonDB.getInstance().getCurrentDatabase(), tableName);
+		} catch (StoreException e) {
+			throw new SQLException("Was not possible to drop table");
+		}
+
+		return new Result("Table deleted with success");
 	}
 
 }

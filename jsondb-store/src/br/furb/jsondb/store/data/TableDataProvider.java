@@ -9,11 +9,16 @@ import br.furb.jsondb.store.metadata.TableMetadata;
 
 public class TableDataProvider {
 
-	private static final TableDataProvider INSTANCE = new TableDataProvider();
+	private static TableDataProvider INSTANCE;
 
 	private Map<String, Map<String, TableData>> tablesData = new HashMap<String, Map<String, TableData>>();
 
 	public static TableDataProvider getInstance() {
+
+		if (INSTANCE == null) {
+			INSTANCE = new TableDataProvider();
+		}
+
 		return INSTANCE;
 	}
 
@@ -34,6 +39,10 @@ public class TableDataProvider {
 		}
 
 		return map.get(table);
+	}
+
+	public static void reset() {
+		INSTANCE = null;
 	}
 
 }

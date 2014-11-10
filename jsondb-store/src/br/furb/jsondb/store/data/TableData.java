@@ -2,17 +2,18 @@ package br.furb.jsondb.store.data;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import br.furb.jsondb.store.JsonDBStore;
 import br.furb.jsondb.store.StoreException;
 import br.furb.jsondb.store.metadata.TableMetadata;
 import br.furb.jsondb.store.utils.JsonUtils;
+import br.furb.jsondb.store.utils.LastRowIdUtils;
 
 public class TableData {
 
-	private Map<Integer, RowData> rows = new HashMap<Integer, RowData>();
+	private Map<Integer, RowData> rows = new LinkedHashMap<Integer, RowData>();
 	private TableMetadata tableMetadata;
 	private String database;
 
@@ -25,17 +26,11 @@ public class TableData {
 		if (!rows.containsKey(id)) {
 			// Lê o registro e joga para a memória.
 
-			File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
+			File databaseDir = JsonDBStore.getInstance().getDatabaseDir(
+					database);
 			File tableDir = new File(databaseDir, tableMetadata.getName());
 
-			File rowDataFile = new File(tableDir, id + ".dat");
-			RowData rowData;
-			try {
-				rowData = JsonUtils.parseJsonToObject(rowDataFile, RowData.class);
-			} catch (IOException e) {
-				throw new StoreException(e);
-			}
-			addRow(rowData);
+			addRowData(tableDir, id);
 		}
 
 		return rows.get(id);
@@ -46,27 +41,34 @@ public class TableData {
 	}
 
 	public Map<Integer, RowData> getRows() throws StoreException {
-		//Lê cada registro que ainda não está na memória
+		// Lê cada registro que ainda não está na memória
 
-		for (int i = 0; i < tableMetadata.getLastRowId(); i++) {
+		File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
+		File tableDir = new File(databaseDir, tableMetadata.getName());
 
-			if (!rows.containsKey(i)) {
+		LastRowId lastRowId = LastRowIdUtils.getLastRowId(tableDir);
 
-				File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
-				File tableDir = new File(databaseDir, tableMetadata.getName());
+		for (int i = -1; i < lastRowId.getLastRowId(); i++) {
 
-				File rowDataFile = new File(tableDir, i + ".dat");
-				RowData rowData;
-				try {
-					rowData = JsonUtils.parseJsonToObject(rowDataFile, RowData.class);
-				} catch (IOException e) {
-					throw new StoreException(e);
-				}
-				addRow(rowData);
+			if (!rows.containsKey(i + 1)) {
+
+				addRowData(tableDir, i + 1);
 			}
 		}
 
 		return rows;
+	}
+
+	private RowData addRowData(File tableDir, int i) throws StoreException {
+		File rowDataFile = new File(tableDir, i + ".dat");
+		RowData rowData;
+		try {
+			rowData = JsonUtils.parseJsonToObject(rowDataFile, RowData.class);
+		} catch (IOException e) {
+			throw new StoreException(e);
+		}
+		addRow(rowData);
+		return rowData;
 	}
 
 }

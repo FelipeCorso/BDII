@@ -7,8 +7,6 @@ import java.util.Map;
 
 import br.furb.jsondb.store.JsonDBStore;
 import br.furb.jsondb.store.StoreException;
-import br.furb.jsondb.store.metadata.DatabaseMetadataProvider;
-import br.furb.jsondb.store.metadata.TableMetadata;
 import br.furb.jsondb.store.utils.JsonUtils;
 
 public class IndexDataProvider {
@@ -49,11 +47,15 @@ public class IndexDataProvider {
 			try {
 				map.put(index, JsonUtils.parseJsonToObject(indexDataFile, IndexData.class));
 			} catch (IOException e) {
-				throw new StoreException( e);
+				throw new StoreException(e);
 			}
 		}
 
 		return map.get(index);
+	}
+
+	public static void reset() {
+		INSTANCES.clear();
 	}
 
 }
