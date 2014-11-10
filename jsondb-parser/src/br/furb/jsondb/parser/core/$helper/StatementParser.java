@@ -530,7 +530,11 @@ public class StatementParser {
 	}
 
 	private static String cleanId(String lexeme) {
-		return lexeme.replaceAll("\'", "");
+		return fixCase(lexeme.replaceAll("\'", ""));
+	}
+
+	private static String fixCase(String id) {
+		return id == null ? null : id.toLowerCase();
 	}
 
 }
