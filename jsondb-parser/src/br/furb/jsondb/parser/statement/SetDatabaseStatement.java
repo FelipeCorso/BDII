@@ -9,6 +9,7 @@ public class SetDatabaseStatement implements IStatement {
 	private DatabaseIdentifier database;
 
 	public SetDatabaseStatement(DatabaseIdentifier database) {
+		this.database = database;
 	}
 
 	public final DatabaseIdentifier getDatabase() {
