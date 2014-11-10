@@ -29,7 +29,7 @@ public class ShortCutListener implements KeyListener {
 		switch (event.getKeyCode()) {
 		case KeyEvent.VK_N:
 			if (isCtrlDown) {
-				NewAction.executeAction(compUi);
+				NewAction.executeAction(compUi, compUi.getTreeMenu().getjTree(), compUi.getTreeMenu().getDataBaseNode());
 			}
 			break;
 		case KeyEvent.VK_A:

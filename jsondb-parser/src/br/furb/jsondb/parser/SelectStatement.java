@@ -1,5 +1,6 @@
 package br.furb.jsondb.parser;
 
+import java.util.Collections;
 import java.util.List;
 
 public class SelectStatement implements IStatement {
@@ -22,7 +23,7 @@ public class SelectStatement implements IStatement {
 	}
 
 	public final List<ColumnIdentifier> getColumns() {
-		return columns;
+		return columns == null ? Collections.emptyList() : columns;
 	}
 
 	public final void setColumns(List<ColumnIdentifier> columns) {

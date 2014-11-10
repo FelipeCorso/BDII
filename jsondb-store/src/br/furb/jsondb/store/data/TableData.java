@@ -2,7 +2,7 @@ package br.furb.jsondb.store.data;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import br.furb.jsondb.store.JsonDBStore;
@@ -13,7 +13,7 @@ import br.furb.jsondb.store.utils.LastRowIdUtils;
 
 public class TableData {
 
-	private Map<Integer, RowData> rows = new HashMap<Integer, RowData>();
+	private Map<Integer, RowData> rows = new LinkedHashMap<Integer, RowData>();
 	private TableMetadata tableMetadata;
 	private String database;
 

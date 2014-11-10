@@ -6,6 +6,6 @@ import br.furb.jsondb.store.data.RowData;
 
 public interface IResultSet extends IResult {
 
-	List<RowData> getRows();
+	List<ResultRow> getRows();
 
 }

@@ -6,5 +6,4 @@ public interface IResult {
 
 	List<String> getMessages();
 
-	boolean hasError();
 }

@@ -123,7 +123,7 @@ public class Principal extends JFrame {
 		mntmNew.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				NewAction.executeAction(Principal.this);
+				NewAction.executeAction(Principal.this, treeMenu.getjTree(), treeMenu.getDataBaseNode());
 			}
 		});
 		mnFile.add(mntmNew);

@@ -1,5 +1,6 @@
 package br.furb.jsondb.core.command;
 
+import br.furb.jsondb.core.SQLException;
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.core.result.Result;
 import br.furb.jsondb.parser.CreateStatement;
@@ -17,30 +18,28 @@ public class CreateDatabaseCommand implements ICommand {
 	}
 
 	@Override
-	public IResult execute() {
+	public IResult execute() throws SQLException {
 		String database = createStatement.getStructure().getIdentifier();
 
 		IResult result = null;
 
 		if (DatabaseMetadataProvider.getInstance().containsDatabase(database)) {
-			result = new Result(true, String.format("Database %s already exists", database));
-		} else {
+			throw new SQLException(String.format("Database %s already exists", database));
+		}
 
-			boolean success = false;
-			try {
-				success = JsonDBStore.getInstance().createDatabase(database);
+		boolean success = false;
+		try {
+			success = JsonDBStore.getInstance().createDatabase(database);
 
-				if (success) {
+			if (success) {
 
-					result = new Result(false, String.format("Database %s created with success", database));
-				} else {
-					result = new Result(true, "Was not possible to create database " + database);
-				}
-
-			} catch (StoreException e) {
-				result = new Result(true, "Was not possible to create database " + database, e.getMessage());
+				result = new Result(String.format("Database %s created with success", database));
+			} else {
+				throw new SQLException("Was not possible to create database " + database);
 			}
 
+		} catch (StoreException e) {
+			throw new SQLException("Was not possible to create database " + database, e);
 		}
 
 		return result;

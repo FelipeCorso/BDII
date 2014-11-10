@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({ CreateDatabaseCommandTest.class, //
 		CreateTableCommandTest.class, //
 		SetDatabaseCommandTest.class, // 
+		InsertCommandTest.class//
 })
 public class CoreAllTests {
 

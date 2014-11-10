@@ -6,10 +6,8 @@ import java.util.List;
 public class Result implements IResult {
 
 	private List<String> messages;
-	private boolean hasError;
 
-	public Result(boolean hasError, String... messages) {
-		this.hasError = hasError;
+	public Result( String... messages) {
 		this.messages = Arrays.asList(messages);
 	}
 
@@ -18,8 +16,4 @@ public class Result implements IResult {
 		return messages;
 	}
 
-	@Override
-	public boolean hasError() {
-		return hasError;
-	}
 }

@@ -18,6 +18,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import br.furb.json.ui.Principal;
+import br.furb.json.ui.action.NewAction;
 import br.furb.json.ui.action.OpenAction;
 
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -99,6 +100,12 @@ public class TreeMenuPanel extends JPanel {
 				new RowSpec[] { RowSpec.decode("32px"), }));
 
 		JLabel lblNewDB = new JLabel("");
+		lblNewDB.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				NewAction.executeAction(principal, jTree, dataBaseNode);
+			}
+		});
 		lblNewDB.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		lblNewDB.setToolTipText("Nova Database [Ctrl+N]");
 		lblNewDB.setIcon(new ImageIcon(TreeMenuPanel.class.getResource("/Images/Add folder.png")));

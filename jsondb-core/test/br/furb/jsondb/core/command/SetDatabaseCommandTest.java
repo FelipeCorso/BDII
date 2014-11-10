@@ -1,12 +1,11 @@
 package br.furb.jsondb.core.command;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
 import br.furb.jsondb.core.JsonDB;
+import br.furb.jsondb.core.SQLException;
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.parser.CreateStatement;
 import br.furb.jsondb.parser.DatabaseIdentifier;
@@ -19,15 +18,18 @@ public class SetDatabaseCommandTest extends BaseCommandTest {
 
 		SetDatabaseStatement statement = new SetDatabaseStatement(new DatabaseIdentifier("banco1"));
 		SetDatabaseCommand setDatabaseCommand = new SetDatabaseCommand(statement);
-		IResult result = setDatabaseCommand.execute();
+		try {
+			setDatabaseCommand.execute();
+			fail();
+		} catch (SQLException e) {
+			assertEquals("Database banco1 not found", e.getMessage());
 
-		assertTrue(result.hasError());
+		}
 
-		assertEquals("Database banco1 not found", result.getMessages().get(0));
 	}
 
 	@Test
-	public void testSetDabase02() {
+	public void testSetDabase02() throws SQLException {
 
 		// primeiro cria a base:
 
@@ -42,8 +44,6 @@ public class SetDatabaseCommandTest extends BaseCommandTest {
 		SetDatabaseStatement statement = new SetDatabaseStatement(new DatabaseIdentifier(database));
 		SetDatabaseCommand setDatabaseCommand = new SetDatabaseCommand(statement);
 		IResult result = setDatabaseCommand.execute();
-
-		assertFalse(result.hasError());
 
 		assertEquals("Current database is banco1", result.getMessages().get(0));
 
