@@ -13,8 +13,8 @@ import br.furb.jsondb.core.result.ResultRow;
 import br.furb.jsondb.core.result.ResultSet;
 import br.furb.jsondb.core.util.JsonDBUtils;
 import br.furb.jsondb.parser.ColumnIdentifier;
-import br.furb.jsondb.parser.SelectStatement;
 import br.furb.jsondb.parser.TableIdentifier;
+import br.furb.jsondb.parser.statement.SelectStatement;
 import br.furb.jsondb.store.StoreException;
 import br.furb.jsondb.store.data.ColumnData;
 import br.furb.jsondb.store.data.RowData;
@@ -35,7 +35,7 @@ public class SelectCommand implements ICommand {
 
 	@Override
 	public IResult execute() throws SQLException {
-		// validar se há um banco corrente
+		// validar se hï¿½ um banco corrente
 		JsonDBUtils.validateHasCurrentDatabase();
 
 		String database = JsonDB.getInstance().getCurrentDatabase();
@@ -43,12 +43,11 @@ public class SelectCommand implements ICommand {
 
 		// validar se as tabelas existem
 
-		 validateTables(databaseMetadata);
+		validateTables(databaseMetadata);
 
 		// validar se os campos existem
 
 		validateColumns(databaseMetadata);
-
 
 		// validar a clausula where
 		//TODO
@@ -67,7 +66,6 @@ public class SelectCommand implements ICommand {
 					TableData tableData = TableDataProvider.getInstance().getTableData(database, tableIdentifier.getIdentifier());
 
 					Map<Integer, RowData> rows = tableData.getRows();
-
 
 					for (RowData rowData : rows.values()) {
 
@@ -120,7 +118,7 @@ public class SelectCommand implements ICommand {
 			if (!table.isPresent()) {
 
 				if (selectStatement.getTables().size() > 1) {
-					// verificar se o campo é ambíguo
+					// verificar se o campo ï¿½ ambï¿½guo
 
 					boolean containsField = false;
 
@@ -130,7 +128,7 @@ public class SelectCommand implements ICommand {
 						if (columnsT.containsKey(columnName)) {
 
 							if (containsField) {
-								throw new SQLException( String.format("Column '%s' in field list is ambiguous", columnName));
+								throw new SQLException(String.format("Column '%s' in field list is ambiguous", columnName));
 							}
 
 							containsField = true;
@@ -156,17 +154,15 @@ public class SelectCommand implements ICommand {
 				TableMetadata tableMetadata = databaseMetadata.getTable(tableIdentifier.getIdentifier());
 
 				if (tableMetadata.getColumns().containsKey(columnName)) {
-					throw new SQLException( String.format("Unknown column '%s.%s' in 'field list'", tableIdentifier.getIdentifier(), columnName));
+					throw new SQLException(String.format("Unknown column '%s.%s' in 'field list'", tableIdentifier.getIdentifier(), columnName));
 				}
 			}
 		}
-
 
 	}
 
 	private void validateTables(DatabaseMetadata databaseMetadata) throws SQLException {
 		List<TableIdentifier> tables = selectStatement.getTables();
-
 
 		for (TableIdentifier tableIdentifier : tables) {
 			if (!databaseMetadata.hasTable(tableIdentifier.getIdentifier())) {

@@ -21,13 +21,13 @@ import br.furb.jsondb.parser.ConstraintKind;
 import br.furb.jsondb.parser.DataType;
 import br.furb.jsondb.parser.KeyDefinition;
 import br.furb.jsondb.parser.NumberValue;
-import br.furb.jsondb.parser.SelectStatement;
 import br.furb.jsondb.parser.StringValue;
 import br.furb.jsondb.parser.TableDefinition;
 import br.furb.jsondb.parser.TableIdentifier;
 import br.furb.jsondb.parser.Value;
 import br.furb.jsondb.parser.statement.CreateStatement;
 import br.furb.jsondb.parser.statement.InsertStatement;
+import br.furb.jsondb.parser.statement.SelectStatement;
 
 public class SelectCommandTest extends BaseCommandTest {
 
