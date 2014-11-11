@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
+import java.io.StringWriter;
 
 import org.junit.Test;
 
@@ -34,7 +35,9 @@ public class DatabaseMetadataJsonParserTest {
 
 		metadata.addTable(table);
 
-		// TODO validar
+		StringWriter stringWriter = new StringWriter();
+		JsonUtils.parseObjectToJson(stringWriter, metadata, DatabaseMetadata.class);
+		System.out.println(stringWriter.toString());
 	}
 
 	@Test
