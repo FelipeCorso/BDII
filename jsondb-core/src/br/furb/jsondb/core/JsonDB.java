@@ -47,9 +47,8 @@ public class JsonDB {
 			CreateStatement createStatement = (CreateStatement) statement;
 			if (createStatement.getStructure() instanceof TableDefinition) {
 				return createTable(createStatement);
-			} else {
-				return createDatabase(createStatement);
 			}
+			return createDatabase(createStatement);
 		} else if (statement instanceof InsertStatement) {
 			return insert((InsertStatement) statement);
 		} else if (statement instanceof SetDatabaseStatement) {

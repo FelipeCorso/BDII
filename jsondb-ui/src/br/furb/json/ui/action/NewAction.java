@@ -11,12 +11,13 @@ import br.furb.json.ui.dialog.Dialog;
 import br.furb.json.ui.panel.treeMenu.ManagerTreeMenu;
 import br.furb.json.ui.status.EStatus;
 import br.furb.jsondb.parser.SQLParserException;
+import br.furb.jsondb.sql.SQLException;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
 import br.furb.jsondb.store.utils.JsonUtils;
 
 public class NewAction {
-	public static void executeAction(Principal principal, JTree jTree, DefaultMutableTreeNode dataBaseNode) {
 
+	public static void executeAction(Principal principal, JTree jTree, DefaultMutableTreeNode dataBaseNode) {
 		try {
 			String databaseDir = Dialog.getInstance().createDatabaseDir(principal);
 
@@ -34,10 +35,9 @@ public class NewAction {
 				principal.getTabbedPanel().getCommandPanel().getLbFilePath().setText("");
 				principal.getKeyListener().setTextoEditor("");
 				principal.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.NAO_MODIFICADO.toString());
-
 			}
-		} catch (IOException | SQLParserException e) {
-			System.err.println("ERRO FATAL!\nNão foi possível realizar a criação do arquivo!");
+		} catch (IOException | SQLParserException | SQLException e) {
+			System.err.println("NÃ£o foi possÃ­vel realizar a criaÃ§Ã£o do arquivo: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}

@@ -9,16 +9,18 @@ import br.furb.json.ui.Principal;
 import br.furb.json.ui.fileFilter.FileFilter;
 import br.furb.jsondb.core.JsonDB;
 import br.furb.jsondb.parser.SQLParserException;
+import br.furb.jsondb.sql.SQLException;
 
 public class Dialog extends JFileChooser {
+
 	private static final String CREATE_FOLDER_DB = "Crie uma pasta para a nova database";
 	private static final long serialVersionUID = 1213370325572949237L;
-	private static final String CREATE_ERROR = "Este diretório já contém um arquivo de meta dados!";
+	private static final String CREATE_ERROR = "Este diretï¿½rio jï¿½ contï¿½m um arquivo de meta dados!";
 	private static final String CREATE_DATABASE = "CREATE DATABASE %s;";
 	private static Dialog intance = new Dialog();
 
 	private Dialog() {
-		super("C://");
+		super("C://"); // FIXME: informar programaticamente o root (existe algum modo simples pelo Java)
 		setFileFilter(FileFilter.getFileFilter());
 		setAcceptAllFileFilterUsed(false);
 		setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -42,7 +44,7 @@ public class Dialog extends JFileChooser {
 		return null;
 	}
 
-	public String createDatabaseDir(Principal principal) throws IOException, SQLParserException {
+	public String createDatabaseDir(Principal principal) throws IOException, SQLParserException, SQLException {
 		setDialogType(JFileChooser.SAVE_DIALOG);
 		setDialogTitle(CREATE_FOLDER_DB);
 		showOpenDialog(principal);
@@ -53,9 +55,8 @@ public class Dialog extends JFileChooser {
 			File metadata = getMetadataFile(selectedFile);
 			if (metadata != null) {
 				throw new IOException(CREATE_ERROR);
-			} else {
-				JsonDB.getInstance().executeSQL(String.format(CREATE_DATABASE, selectedFile.getName()));
 			}
+			JsonDB.getInstance().executeSQL(String.format(CREATE_DATABASE, selectedFile.getName()));
 		}
 
 		return null;

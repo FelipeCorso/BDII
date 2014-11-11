@@ -13,6 +13,7 @@ import br.furb.jsondb.store.metadata.DatabaseMetadata;
 import br.furb.jsondb.store.utils.JsonUtils;
 
 public class OpenAction {
+
 	public static void executeAction(Principal principal, JTree jTree, DefaultMutableTreeNode dataBaseNode) {
 		try {
 			String databaseDir = Dialog.getInstance().loadDatabaseDir(principal);
@@ -27,7 +28,7 @@ public class OpenAction {
 				((javax.swing.tree.DefaultTreeModel) jTree.getModel()).reload(ManagerTreeMenu.sort(dataBaseNode));
 			}
 		} catch (IOException e) {
-			System.err.println("ERRO FATAL!\nNão foi possível realizar a leitura do arquivo!");
+			System.err.println("NÃ£o foi possÃ­vel realizar a leitura do arquivo: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}

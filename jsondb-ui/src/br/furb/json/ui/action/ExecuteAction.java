@@ -1,25 +1,23 @@
 package br.furb.json.ui.action;
 
-import java.util.List;
-
 import br.furb.json.ui.Principal;
 import br.furb.jsondb.core.JsonDB;
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.parser.SQLParserException;
+import br.furb.jsondb.sql.SQLException;
 
 public class ExecuteAction {
+
 	public static void executeAction(Principal principal) {
 		try {
-			List<IResult> result = JsonDB.getInstance().executeSQL(principal.getTabbedPanel().getCommandPanel().getTextEditor().getText());
-
-			for (IResult iResult : result) {
-				for (String message : iResult.getMessages()) {
-					principal.getTabbedPanel().getCommandPanel().getTextMsg().append(message);
-				}
-			}
+			IResult result = JsonDB.getInstance().executeSQL(principal.getTabbedPanel().getCommandPanel().getTextEditor().getText());
+			result.getMessages().forEach(message -> principal.getTabbedPanel().getCommandPanel().getTextMsg().append(message));
 
 		} catch (SQLParserException e) {
-			System.err.println("ERRO FATAL!\nN�o foi poss�vel executar o comando! Por favor, verifique a sintaxe.");
+			System.err.println("Não foi possível executar o comando: " + e.getMessage());
+			e.printStackTrace();
+		} catch (SQLException e) {
+			System.err.println("Não foi possível executar o comando: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}

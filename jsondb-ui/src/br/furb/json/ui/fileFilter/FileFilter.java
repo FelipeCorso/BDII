@@ -11,7 +11,7 @@ public class FileFilter implements FilenameFilter {
 
 	@Override
 	public boolean accept(File dir, String name) {
-		return name.endsWith(EXT_METADATA);
+		return name.toUpperCase().endsWith(EXT_METADATA);
 	}
 
 	public static FileNameExtensionFilter getFileFilter() {

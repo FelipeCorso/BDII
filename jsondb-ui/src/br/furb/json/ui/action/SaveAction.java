@@ -9,13 +9,14 @@ import br.furb.json.ui.Principal;
 import br.furb.json.ui.status.EStatus;
 
 public class SaveAction {
+
 	public static void executeAction(Principal principal) {
 		if (principal.getTabbedPanel().getCommandPanel().getLbStatus().getText().equalsIgnoreCase(EStatus.MODIFICADO.toString())) {
 			String absolutePath = principal.getTabbedPanel().getCommandPanel().getLbFilePath().getText();
 
 			if (absolutePath.isEmpty()) {
 				// FIXME AJUSTAR
-				//				Dialog dialog = new Dialog(principal, "Informe o diretório e o nome do arquivo", FileDialog.SAVE);
+				//				Dialog dialog = new Dialog(principal, "Informe o diretï¿½rio e o nome do arquivo", FileDialog.SAVE);
 				//
 				//				dialog.abrirFrame();
 				//				absolutePath = dialog.getAbsolutePath();
@@ -29,7 +30,7 @@ public class SaveAction {
 					principal.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.NAO_MODIFICADO.toString());
 				}
 			} catch (IOException e) {
-				System.err.println("ERRO FATAL!\nNão foi possível salvar o arquivo!");
+				System.err.println("ERRO FATAL!\nNï¿½o foi possï¿½vel salvar o arquivo!");
 				e.printStackTrace();
 			}
 		}
