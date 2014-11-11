@@ -1,6 +1,5 @@
 package br.furb.jsondb.store.metadata;
 
-import br.furb.jsondb.parser.ConstraintKind;
 import br.furb.jsondb.parser.DataType;
 
 public class ColumnMetadata {
@@ -9,7 +8,7 @@ public class ColumnMetadata {
 	private DataType type;
 	private int lenght;
 	private int precision;
-	private ConstraintKind constraint;
+	private String constraint;
 
 	public ColumnMetadata() {
 		super();
@@ -64,11 +63,11 @@ public class ColumnMetadata {
 		this.precision = precision;
 	}
 
-	public ConstraintKind getConstraint() {
+	public String getConstraint() {
 		return constraint;
 	}
 
-	public void setConstraint(ConstraintKind constraint) {
+	public void setConstraint(String constraint) {
 		this.constraint = constraint;
 	}
 

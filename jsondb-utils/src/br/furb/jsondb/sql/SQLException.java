@@ -1,4 +1,4 @@
-package br.furb.jsondb.core;
+package br.furb.jsondb.sql;
 
 public class SQLException extends Exception {
 

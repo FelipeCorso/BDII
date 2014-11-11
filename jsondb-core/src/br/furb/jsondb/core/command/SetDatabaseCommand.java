@@ -1,10 +1,10 @@
 package br.furb.jsondb.core.command;
 
 import br.furb.jsondb.core.JsonDB;
-import br.furb.jsondb.core.SQLException;
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.core.result.Result;
 import br.furb.jsondb.parser.statement.SetDatabaseStatement;
+import br.furb.jsondb.sql.SQLException;
 import br.furb.jsondb.store.metadata.DatabaseMetadataProvider;
 
 public class SetDatabaseCommand implements ICommand {

@@ -14,32 +14,33 @@ import br.furb.jsondb.parser.ConstraintKind;
 import br.furb.jsondb.parser.KeyDefinition;
 import br.furb.jsondb.parser.TableDefinition;
 import br.furb.jsondb.parser.statement.CreateStatement;
+import br.furb.jsondb.sql.SQLException;
 import br.furb.jsondb.store.data.IndexData;
 import br.furb.jsondb.store.data.LastRowId;
 import br.furb.jsondb.store.metadata.ColumnMetadata;
+import br.furb.jsondb.store.metadata.ConstraintMetadata;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
 import br.furb.jsondb.store.metadata.DatabaseMetadataProvider;
 import br.furb.jsondb.store.metadata.IndexMetadata;
 import br.furb.jsondb.store.metadata.TableMetadata;
+import br.furb.jsondb.store.utils.ConstraintNameGenerator;
 import br.furb.jsondb.store.utils.JsonUtils;
 import br.furb.jsondb.store.utils.LastRowIdUtils;
 
 public class TableCreator {
 
-	public static void createTable(String database, CreateStatement statement) throws StoreException {
+	public static void createTable(String database, CreateStatement statement, List<String> pk) throws StoreException, SQLException {
 		// cria uma pasta para a tabela
 		File tableDir = createDiretory(database, statement);
 
 		TableDefinition tableDefinition = (TableDefinition) statement.getStructure();
 
-		List<String> pk = getPrimaryKeyFields(tableDefinition);
-
-		// cria o arquivo de �ndice da pk da tabela
+		// cria o arquivo de índice da pk da tabela
 		IndexMetadata indexMetadata = createPrimaryKeyIndex(tableDir, pk);
 
-		// 3� cria o metadados da tabela
+		//  cria o metadados da tabela
 
-		TableMetadata tableMetadata = createTableMetadata(tableDefinition, pk, indexMetadata);
+		TableMetadata tableMetadata = createTableMetadata(tableDefinition, pk, indexMetadata, database);
 
 		LastRowIdUtils.createLastRowId(tableDir, new LastRowId());
 
@@ -56,7 +57,7 @@ public class TableCreator {
 		}
 	}
 
-	private static TableMetadata createTableMetadata(TableDefinition tableDefinition, List<String> pk, IndexMetadata indexMetadata) {
+	private static TableMetadata createTableMetadata(TableDefinition tableDefinition, List<String> pk, IndexMetadata indexMetadata, String database) throws SQLException {
 		TableMetadata tableMetadata = new TableMetadata();
 		tableMetadata.setPrimaryKey(pk);
 		tableMetadata.setName(tableDefinition.getIdentifier());
@@ -67,6 +68,11 @@ public class TableCreator {
 			int size = columnType.getSize().isPresent() ? columnType.getSize().get() : 0;
 			ColumnMetadata fieldMetadata = new ColumnMetadata(column.getName(), columnType.getDataType(), size, precision);
 
+			Optional<ConstraintDefinition> constraint = column.getConstraint();
+			if (constraint.isPresent()) {
+				addConstraint(tableDefinition, database, column, fieldMetadata, constraint);
+			}
+
 			tableMetadata.addColumn(fieldMetadata);
 		}
 
@@ -74,37 +80,28 @@ public class TableCreator {
 		return tableMetadata;
 	}
 
-	private static List<String> getPrimaryKeyFields(TableDefinition tableDefinition) throws StoreException {
-		List<String> pk = new ArrayList<String>();
+	private static void addConstraint(TableDefinition tableDefinition, String database, ColumnDefinition column, ColumnMetadata fieldMetadata,
+			Optional<ConstraintDefinition> constraint) throws SQLException {
+		Optional<String> name = constraint.get().getName();
+		String cName = null;
+		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(database);
 
-		List<ColumnDefinition> columns = tableDefinition.getColumns();
-
-		for (ColumnDefinition columnDefinition : columns) {
-
-			Optional<ConstraintDefinition> constraint = columnDefinition.getConstraint();
-			if (constraint.isPresent()) {
-				if (constraint.get().getKind() == ConstraintKind.PRIMARY_KEY) {
-					pk.add(columnDefinition.getName());
-				}
-			}
-
+		if (!name.isPresent()) {
+			cName = ConstraintNameGenerator.generateConstraintName(
+			/**/databaseMetadata,
+			/**/tableDefinition.getIdentifier(),
+			/**/constraint.get(), column.getName());
+		} else {
+			cName = name.get();
 		}
 
-		for (ConstraintDefinition constraintDefinition : tableDefinition.getFinalConstraints()) {
-			if (constraintDefinition.getKind() == ConstraintKind.PRIMARY_KEY) {
-
-				if (pk.size() > 0) {
-					throw new StoreException("Primary Key was defined more than once.");
-				}
-
-				KeyDefinition keyDefinition = (KeyDefinition) constraintDefinition;
-
-				for (ColumnIdentifier column : keyDefinition.getColumns()) {
-					pk.add(column.getColumnName());
-				}
-			}
+		if (databaseMetadata.getConstraint(cName) != null) {
+			throw new SQLException(String.format("Duplicate constraint '%s'", cName));
 		}
-		return pk;
+
+		databaseMetadata.addConstraint(new ConstraintMetadata(cName, tableDefinition.getIdentifier(), column.getName(), constraint.get().getKind()));
+
+		fieldMetadata.setConstraint(cName);
 	}
 
 	private static IndexMetadata createPrimaryKeyIndex(File tableDir, List<String> pk) throws StoreException {

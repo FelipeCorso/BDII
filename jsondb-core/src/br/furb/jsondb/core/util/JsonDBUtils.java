@@ -1,7 +1,7 @@
 package br.furb.jsondb.core.util;
 
 import br.furb.jsondb.core.JsonDB;
-import br.furb.jsondb.core.SQLException;
+import br.furb.jsondb.sql.SQLException;
 
 public class JsonDBUtils {
 

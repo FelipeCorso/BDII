@@ -15,6 +15,7 @@ import br.furb.jsondb.parser.statement.DropStatement;
 import br.furb.jsondb.parser.statement.IStatement;
 import br.furb.jsondb.parser.statement.InsertStatement;
 import br.furb.jsondb.parser.statement.SetDatabaseStatement;
+import br.furb.jsondb.sql.SQLException;
 
 public class JsonDB {
 

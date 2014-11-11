@@ -9,7 +9,6 @@ import java.util.Map;
 import org.junit.Test;
 
 import br.furb.jsondb.core.JsonDB;
-import br.furb.jsondb.core.SQLException;
 import br.furb.jsondb.parser.ColumnDefinition;
 import br.furb.jsondb.parser.ColumnType;
 import br.furb.jsondb.parser.ConstraintKind;
@@ -19,6 +18,7 @@ import br.furb.jsondb.parser.SQLParserException;
 import br.furb.jsondb.parser.TableDefinition;
 import br.furb.jsondb.parser.TableIdentifier;
 import br.furb.jsondb.parser.statement.CreateStatement;
+import br.furb.jsondb.sql.SQLException;
 import br.furb.jsondb.store.JsonDBStore;
 import br.furb.jsondb.store.metadata.ColumnMetadata;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;

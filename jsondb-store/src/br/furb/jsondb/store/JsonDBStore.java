@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils;
 import br.furb.jsondb.parser.ColumnIdentifier;
 import br.furb.jsondb.parser.statement.CreateStatement;
 import br.furb.jsondb.parser.statement.InsertStatement;
+import br.furb.jsondb.sql.SQLException;
 import br.furb.jsondb.store.data.ColumnData;
 import br.furb.jsondb.store.data.LastRowId;
 import br.furb.jsondb.store.data.RowData;
@@ -94,10 +95,10 @@ public class JsonDBStore {
 	 * @throws StoreException
 	 * @throws SQLException 
 	 */
-	public void createTable(String database, CreateStatement statement)
-			throws StoreException {
+	public void createTable(String database, CreateStatement statement,  List<String> pk)
+			throws StoreException, SQLException {
 
-		TableCreator.createTable(database, statement);
+		TableCreator.createTable(database, statement, pk);
 	}
 
 	public void dropTable(String database, String table) throws StoreException {

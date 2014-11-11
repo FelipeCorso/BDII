@@ -10,7 +10,6 @@ import java.util.List;
 import org.junit.Test;
 
 import br.furb.jsondb.core.JsonDB;
-import br.furb.jsondb.core.SQLException;
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.core.result.IResultSet;
 import br.furb.jsondb.core.result.ResultRow;
@@ -28,6 +27,7 @@ import br.furb.jsondb.parser.Value;
 import br.furb.jsondb.parser.statement.CreateStatement;
 import br.furb.jsondb.parser.statement.InsertStatement;
 import br.furb.jsondb.parser.statement.SelectStatement;
+import br.furb.jsondb.sql.SQLException;
 
 public class SelectCommandTest extends BaseCommandTest {
 

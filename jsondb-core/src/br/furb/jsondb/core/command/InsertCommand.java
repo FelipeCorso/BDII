@@ -11,7 +11,6 @@ import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
 
 import br.furb.jsondb.core.JsonDB;
-import br.furb.jsondb.core.SQLException;
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.core.result.Result;
 import br.furb.jsondb.core.util.JsonDBUtils;
@@ -22,6 +21,7 @@ import br.furb.jsondb.parser.NumberValue;
 import br.furb.jsondb.parser.StringValue;
 import br.furb.jsondb.parser.TableIdentifier;
 import br.furb.jsondb.parser.Value;
+import br.furb.jsondb.sql.SQLException;
 import br.furb.jsondb.store.JsonDBStore;
 import br.furb.jsondb.store.StoreException;
 import br.furb.jsondb.store.data.IndexData;
@@ -101,7 +101,7 @@ public class InsertCommand implements ICommand {
 		// null
 		List<String> primaryKey = tableMetadata.getPrimaryKey();
 		List<String> notNullFields = new ArrayList<String>(primaryKey);
-		notNullFields.addAll(TableMetadataUtils.getNotNullFields(tableMetadata));
+		notNullFields.addAll(TableMetadataUtils.getNotNullFields(tableMetadata, databaseMetadata));
 
 		for (String field : notNullFields) {
 			if (!columnNames.contains(field) || values.get(columnNames.indexOf(field)).getBaseValue() == Value.NULL) {

@@ -9,7 +9,6 @@ import java.util.Map;
 import org.junit.Test;
 
 import br.furb.jsondb.core.JsonDB;
-import br.furb.jsondb.core.SQLException;
 import br.furb.jsondb.parser.ColumnIdentifier;
 import br.furb.jsondb.parser.NumberValue;
 import br.furb.jsondb.parser.SQLParserException;
@@ -17,6 +16,7 @@ import br.furb.jsondb.parser.StringValue;
 import br.furb.jsondb.parser.TableIdentifier;
 import br.furb.jsondb.parser.Value;
 import br.furb.jsondb.parser.statement.InsertStatement;
+import br.furb.jsondb.sql.SQLException;
 import br.furb.jsondb.store.data.RowData;
 import br.furb.jsondb.store.data.TableData;
 import br.furb.jsondb.store.metadata.DatabaseMetadataProvider;

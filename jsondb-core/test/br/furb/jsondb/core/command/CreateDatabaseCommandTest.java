@@ -8,10 +8,10 @@ import java.io.File;
 
 import org.junit.Test;
 
-import br.furb.jsondb.core.SQLException;
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.parser.DatabaseIdentifier;
 import br.furb.jsondb.parser.statement.CreateStatement;
+import br.furb.jsondb.sql.SQLException;
 import br.furb.jsondb.store.JsonDBStore;
 
 public class CreateDatabaseCommandTest extends BaseCommandTest {

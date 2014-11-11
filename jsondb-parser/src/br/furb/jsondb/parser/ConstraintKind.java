@@ -4,24 +4,31 @@ import java.util.Optional;
 
 public enum ConstraintKind {
 
-	NULL, //
-	NOT_NULL("NOT NULL"), //
-	PRIMARY_KEY("PRIMARY KEY"), //
-	FOREIGN_KEY("FOREIGN KEY");
+	NULL("n"), //
+	NOT_NULL("nn", "NOT NULL"), //
+	PRIMARY_KEY("pk", "PRIMARY KEY"), //
+	FOREIGN_KEY("fk", "FOREIGN KEY");
 
 	private final Optional<String> representation;
+	private String shortName;
 
-	private ConstraintKind() {
+	private ConstraintKind(String shortName) {
+		this.shortName = shortName;
 		representation = Optional.empty();
 	}
 
-	private ConstraintKind(String representation) {
+	private ConstraintKind(String shortName, String representation) {
+		this.shortName = shortName;
 		this.representation = Optional.ofNullable(representation);
 	}
 
 	@Override
 	public String toString() {
 		return representation.orElse(name());
+	}
+
+	public String getShortName() {
+		return shortName;
 	}
 
 }
