@@ -20,7 +20,7 @@ import br.furb.jsondb.store.utils.LastRowIdUtils;
 
 public class JsonDBStore {
 
-	private static JsonDBStore instance = new JsonDBStore();
+	private static JsonDBStore instance;
 
 	private File jsonDBDir;
 
@@ -29,6 +29,9 @@ public class JsonDBStore {
 	}
 
 	public static JsonDBStore getInstance() {
+		if (instance == null) {
+			instance = new JsonDBStore();
+		}
 		return instance;
 	}
 
@@ -38,7 +41,8 @@ public class JsonDBStore {
 			if (!jsonDBDir.exists()) {
 				boolean mkdir = jsonDBDir.mkdir();
 				if (!mkdir) {
-					throw new IllegalStateException("Was not possible to create jsondb directory.");
+					throw new IllegalStateException(
+							"Was not possible to create jsondb directory.");
 				}
 			}
 		}
@@ -88,15 +92,18 @@ public class JsonDBStore {
 	 * @param statement
 	 * 
 	 * @throws StoreException
+	 * @throws SQLException 
 	 */
-	public void createTable(String database, CreateStatement statement) throws StoreException {
+	public void createTable(String database, CreateStatement statement)
+			throws StoreException {
 
 		TableCreator.createTable(database, statement);
 	}
 
 	public void dropTable(String database, String table) throws StoreException {
 		// remove a tabela do metadados
-		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(database);
+		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider
+				.getInstance().getDatabaseMetadata(database);
 		databaseMetadata.removeTable(table);
 
 		// remove o diret�rio da tabela e todos os seus arquivos;
@@ -113,7 +120,8 @@ public class JsonDBStore {
 		// FIXME atualizar o metadados em disco neste momento???
 	}
 
-	public int insertData(String database, InsertStatement statement) throws StoreException {
+	public int insertData(String database, InsertStatement statement)
+			throws StoreException {
 		RowData rowData = new RowData();
 
 		List<ColumnIdentifier> columns = statement.getColumns();
@@ -140,13 +148,19 @@ public class JsonDBStore {
 		rowData.setRowId(rowId);
 
 		try {
-			JsonUtils.write(rowData, RowData.class, new File(tableDir, rowId + ".dat"));
+			JsonUtils.write(rowData, RowData.class, new File(tableDir, rowId
+					+ ".dat"));
 		} catch (IOException e) {
 			throw new StoreException(e);
 		}
 
-		TableDataProvider.getInstance().getTableData(database, tableName).addRow(rowData);
+		TableDataProvider.getInstance().getTableData(database, tableName)
+				.addRow(rowData);
 
 		return rowId;
+	}
+
+	public static void reset() {
+		instance = null;
 	}
 }
