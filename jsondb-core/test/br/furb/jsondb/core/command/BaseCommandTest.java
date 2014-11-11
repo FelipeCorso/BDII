@@ -40,6 +40,7 @@ public abstract class BaseCommandTest {
 		DatabaseMetadataProvider.reset();
 		TableDataProvider.reset();
 		IndexDataProvider.reset();
+		JsonDBStore.reset();
 	}
 
 	protected void createDatabase(String database) throws SQLException {
@@ -47,6 +48,15 @@ public abstract class BaseCommandTest {
 		CreateDatabaseCommand command = new CreateDatabaseCommand(createStatement);
 
 		System.out.println(JsonDBStore.getInstance().getDatabaseDir(database));
-		command.execute();
+		try{
+			command.execute();
+		}catch(SQLException e){
+			try {
+				after();
+			} catch (IOException e1) {
+			}
+			command.execute();
+		}
+		
 	}
 }

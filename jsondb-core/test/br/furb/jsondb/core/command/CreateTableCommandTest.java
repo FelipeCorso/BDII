@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import br.furb.jsondb.core.JsonDB;
 import br.furb.jsondb.core.SQLException;
-import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.parser.ColumnDefinition;
 import br.furb.jsondb.parser.ColumnType;
 import br.furb.jsondb.parser.ConstraintKind;
@@ -30,8 +29,8 @@ public class CreateTableCommandTest extends BaseCommandTest {
 
 	@Test
 	public void testCreatTable01() throws SQLException {
-		createDatabase("baseTeste");
-		JsonDB.getInstance().setCurrentDatabase("baseTeste");
+		createDatabase("baseteste");
+		JsonDB.getInstance().setCurrentDatabase("baseteste");
 
 		TableDefinition tableDefinition = new TableDefinition(new TableIdentifier("Pessoa"));
 		ColumnDefinition cpfCol = new ColumnDefinition("Cpf");
@@ -53,10 +52,9 @@ public class CreateTableCommandTest extends BaseCommandTest {
 
 		CreateTableCommand command = new CreateTableCommand(new CreateStatement(tableDefinition));
 
-		IResult result = command.execute();
+		command.execute();
 
-		//valida��es
-
+		//validações
 		File databaseDir = JsonDBStore.getInstance().getDatabaseDir("baseTeste");
 
 		File tableDir = new File(databaseDir, "Pessoa");
@@ -74,18 +72,18 @@ public class CreateTableCommandTest extends BaseCommandTest {
 
 	@Test
 	public void testCreateTable02() throws SQLParserException, SQLException {
-		createDatabase("baseTeste");
+		createDatabase("baseteste");
 		JsonDB.getInstance().executeSQL("SET DATABASE baseTeste;");
-		IResult result = JsonDB.getInstance().executeSQL("CREATE TABLE Pessoa(Codigo NUMBER(3) PRIMARY KEY, nome VARCHAR(45));");
+		JsonDB.getInstance().executeSQL("CREATE TABLE Pessoa(Codigo NUMBER(3) PRIMARY KEY, nome VARCHAR(45));");
 
 		File databaseDir = JsonDBStore.getInstance().getDatabaseDir("baseTeste");
 
-		File tableDir = new File(databaseDir, "Pessoa");
+		File tableDir = new File(databaseDir, "pessoa");
 
 		assertTrue(tableDir.exists());
 
-		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata("baseTeste");
-		TableMetadata tableMetadata = databaseMetadata.getTable("Pessoa");
+		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata("baseteste");
+		TableMetadata tableMetadata = databaseMetadata.getTable("pessoa");
 
 		Map<String, ColumnMetadata> columns = tableMetadata.getColumns();
 
