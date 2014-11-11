@@ -21,6 +21,9 @@ public class NewAction {
 		DatabaseMetadata database;
 		try {
 			String databaseDir = Dialog.getInstance().createDatabaseDir(principal);
+			if (databaseDir == null) {
+				return;
+			}
 			dataBaseNode = principal.getTreeMenu().getDataBaseNode();
 			database = JsonUtils.parseJsonToObject(new File(databaseDir), DatabaseMetadata.class);
 		} catch (IOException | SQLParserException | SQLException e) {

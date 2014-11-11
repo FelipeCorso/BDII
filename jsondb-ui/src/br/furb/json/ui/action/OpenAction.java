@@ -16,6 +16,9 @@ public class OpenAction {
 	public static void executeAction(Principal principal) {
 		try {
 			String databaseDir = Dialog.getInstance().loadDatabaseDir(principal);
+			if (databaseDir == null) {
+				return;
+			}
 
 			DatabaseMetadata database = JsonUtils.parseJsonToObject(new File(databaseDir), DatabaseMetadata.class);
 
