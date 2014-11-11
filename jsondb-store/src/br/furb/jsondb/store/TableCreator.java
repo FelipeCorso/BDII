@@ -31,12 +31,14 @@ public class TableCreator {
 
 		TableDefinition tableDefinition = (TableDefinition) statement.getStructure();
 
-		// cria o arquivo de índice da pk da tabela
-		IndexMetadata indexMetadata = createPrimaryKeyIndex(tableDir, pk);
-
 		// cria o metadados da tabela
+		TableMetadata tableMetadata = createTableMetadata(tableDefinition, pk, database);
 
-		TableMetadata tableMetadata = createTableMetadata(tableDefinition, pk, indexMetadata, database);
+		// cria o arquivo de índice da pk da tabela
+		if (!pk.isEmpty()) {
+			IndexMetadata pkIndexMetadata = createPrimaryKeyIndex(tableDir, pk);
+			tableMetadata.addIndexMetadata(pkIndexMetadata);
+		}
 
 		LastRowIdUtils.createLastRowId(tableDir, new LastRowId());
 
@@ -53,7 +55,7 @@ public class TableCreator {
 		}
 	}
 
-	private static TableMetadata createTableMetadata(TableDefinition tableDefinition, List<String> pk, IndexMetadata indexMetadata, String database) throws SQLException {
+	private static TableMetadata createTableMetadata(TableDefinition tableDefinition, List<String> pk, String database) throws SQLException {
 		TableMetadata tableMetadata = new TableMetadata();
 		tableMetadata.setPrimaryKey(pk);
 		tableMetadata.setName(tableDefinition.getIdentifier());
@@ -76,7 +78,6 @@ public class TableCreator {
 			addFinalConstraint(database, tableDefinition, constraintDefinition);
 		}
 
-		tableMetadata.addIndexMetadata(indexMetadata);
 		return tableMetadata;
 	}
 
