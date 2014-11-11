@@ -27,6 +27,7 @@ import br.furb.json.ui.Principal;
 import br.furb.json.ui.action.ExecuteAction;
 import br.furb.json.ui.shortcut.NumberedBorder;
 import br.furb.json.ui.status.EStatus;
+import br.furb.jsondb.utils.StringUtils;
 
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
@@ -38,7 +39,6 @@ public class CommandPanel extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = -3187283892481573406L;
-	private static final String STR_VAZIA = "";
 	private final JTextArea textEditor;
 	private final JTextArea textMsg;
 
@@ -55,7 +55,7 @@ public class CommandPanel extends JPanel {
 	/**
 	 * Create the frame.
 	 */
-	public CommandPanel(Principal principal) {
+	public CommandPanel(final Principal principal) {
 		addKeyListener(principal.getKeyListener());
 
 		setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -84,7 +84,7 @@ public class CommandPanel extends JPanel {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				ExecuteAction.executeAction(principal);
+				principal.doSafely(ExecuteAction::executeAction);
 			}
 
 		});
@@ -94,7 +94,7 @@ public class CommandPanel extends JPanel {
 		label.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				textEditor.setText(STR_VAZIA);
+				textEditor.setText(StringUtils.EMPTY_STR);
 			}
 		});
 		label.setIcon(new ImageIcon(CommandPanel.class.getResource("/Images/eraser.png")));

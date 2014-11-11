@@ -4,9 +4,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 import javax.swing.BoxLayout;
 import javax.swing.JList;
@@ -83,6 +80,10 @@ public class UIUtils {
 		UIManager.setLookAndFeel(lf.getLookAndFeelClassName());
 	}
 
+	public static void showMessage(Component parent, String message, String title, int dialogType) {
+		JOptionPane.showMessageDialog(parent, message, title, dialogType);
+	}
+	
 	public static void showError(Component parent, Throwable t) {
 		JOptionPane.showMessageDialog(parent, generateMessage(t), "Erro", JOptionPane.ERROR_MESSAGE);
 	}
@@ -90,21 +91,10 @@ public class UIUtils {
 	private static JPanel generateMessage(Throwable t) {
 		StringBuilder sb = new StringBuilder();
 		String msg = t.getMessage();
-		if (StringUtils.isEmpty(msg)) {
-			sb.append("Erro inesperado: " + t.toString());
-		} else {
-			sb.append(Character.toUpperCase(msg.charAt(0))).append(msg.substring(1));
-		}
-		sb.append(".\n\n");
+		sb.append("Erro inesperado: ");
+		sb.append(StringUtils.isEmpty(msg) ? t : msg);
+		sb.append("\n\n");
 		sb.append("Stack trace: ");
-
-		try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
-			t.printStackTrace(pw);
-			pw.flush();
-			sb.append(sw.toString());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
 		JTextArea msgField = new JTextArea(sb.toString());
 		msgField.setEditable(false);
