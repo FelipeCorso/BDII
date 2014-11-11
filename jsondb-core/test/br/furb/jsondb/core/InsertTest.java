@@ -15,15 +15,32 @@ public class InsertTest extends BaseJsonDBTest {
 
 	@Before
 	public void before() throws SQLParserException, SQLException {
-		JsonDB.getInstance().executeSQL(
+		executeSQL(
 		/**/"CREATE TABLE aluno("
 		/**/+ "codigo NUMBER(4), "
 		/**/+ "nome VARCHAR(30), "
-		/**/+ "sexo CHAR(1), "
+		/**/+ "sexo CHAR(1) NOT NULL, "
 		/**/+ "dataNasc DATE, "
 		/**/+ "mediaNotas NUMBER(2,1),"
 		/**/+ " constraint pk_aluno PRIMARY KEY (codigo) ) ;");
+
+		executeSQL(
+		/**/"CREATE TABLE livro("
+		/**/+ "titulo VARCHAR(40),"
+		/**/+ "autor VARCHAR(40));");
 	}
+	
+	@Override
+	public void after() throws IOException {
+		try {
+			executeSQL("DROP TABLE aluno;");
+			executeSQL("DROP TABLE livro;");
+		} catch (SQLParserException | SQLException e) {
+			throw new RuntimeException(e);
+		}
+		super.after();
+	}
+
 
 	/**
 	 * Testa o comando insert com colunas
@@ -88,6 +105,25 @@ public class InsertTest extends BaseJsonDBTest {
 	}
 
 	/**
+	 * Testa o comando insert em tabela sem pk
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testInsert05() throws Exception {
+
+		String sql = "INSERT INTO livro VALUES(\"abc\", \"fulano de tal\");";
+		executeSQL(sql);
+
+		sql = "INSERT INTO livro VALUES(\"def\", \"ciclano de tal\");";
+		executeSQL(sql);
+
+		sql = "INSERT INTO livro VALUES(\"abc\", \"fulano de tal\");";
+		executeSQL(sql);
+		
+	}
+	
+	/**
 	 * Testa o comando insert com coluna inexistente na tabela
 	 * 
 	 * @throws Exception
@@ -132,6 +168,18 @@ public class InsertTest extends BaseJsonDBTest {
 			fail();
 		} catch (SQLException e) {
 			assertEquals("Column 'codigo' can't be null.", e.getMessage());
+		}
+	}
+
+	@Test
+	public void testNotNullValidation() throws Exception {
+		String sql = "INSERT INTO aluno ( codigo, nome ) VALUES( 1234, \"João\");";
+
+		try {
+			executeSQL(sql);
+			fail();
+		} catch (SQLException e) {
+			assertEquals("Column 'sexo' can't be null.", e.getMessage());
 		}
 	}
 
@@ -343,14 +391,5 @@ public class InsertTest extends BaseJsonDBTest {
 		JsonDB.getInstance().executeSQL(sql);
 	}
 
-	@Override
-	public void after() throws IOException {
-		try {
-			JsonDB.getInstance().executeSQL("DROP TABLE aluno;");
-		} catch (SQLParserException | SQLException e) {
-			throw new RuntimeException(e);
-		}
-		super.after();
-	}
-
+	
 }
