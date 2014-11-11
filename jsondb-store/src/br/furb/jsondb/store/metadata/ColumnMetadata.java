@@ -6,7 +6,7 @@ public class ColumnMetadata {
 
 	private String name;
 	private DataType type;
-	private int lenght;
+	private int length;
 	private int precision;
 	private String constraint;
 
@@ -22,7 +22,7 @@ public class ColumnMetadata {
 		super();
 		this.name = name;
 		this.type = type;
-		this.lenght = lenght;
+		this.length = lenght;
 		this.precision = precision;
 	}
 
@@ -42,17 +42,17 @@ public class ColumnMetadata {
 		this.type = type;
 	}
 
-	public int getLenght() {
-		return lenght;
+	public int getLength() {
+		return length;
 	}
 
-	public void setLenght(int lenght) {
-		this.lenght = lenght;
+	public void setLength(int length) {
+		this.length = length;
 	}
 
 	@Override
 	public String toString() {
-		return "ColumnMetadata [name=" + name + ", type=" + type + ", lenght=" + lenght + "]";
+		return "ColumnMetadata [name=" + name + ", type=" + type + ", length=" + length + "]";
 	}
 
 	public int getPrecision() {

@@ -5,6 +5,11 @@ import br.furb.jsondb.store.metadata.DatabaseMetadata;
 
 public class ConstraintNameGenerator {
 
+	public static String generateConstraintName(DatabaseMetadata databaseMetadata, String table, ConstraintDefinition constraintDefinition) {
+		return generateConstraintName(databaseMetadata, table, constraintDefinition, null);
+
+	}
+
 	public static String generateConstraintName(DatabaseMetadata databaseMetadata, String table, ConstraintDefinition constraintDefinition, String column) {
 
 		StringBuilder sb = new StringBuilder();
@@ -15,10 +20,9 @@ public class ConstraintNameGenerator {
 			sb.append(column);
 			sb.append('_');
 		}
-		
-		
+
 		int id = 0;
-		while(databaseMetadata.getConstraint(sb.toString() + id) != null){
+		while (databaseMetadata.getConstraint(sb.toString() + id) != null) {
 			id++;
 		}
 

@@ -71,8 +71,9 @@ public class CreateTableTest extends BaseJsonDBTest {
 		/**/"col_2 NUMBER(10)," +
 		/**/"col_3 VARCHAR (50) NOT NULL," +
 		/**/"col_5 CHAR (1) ," +
-		/**/"constraint c2 PRIMARY KEY (col_2, col_5)" +
+		/**/"constraint tabela5_pk PRIMARY KEY (col_2, col_5)" +
 		/**/");");
 	}
+
 
 }

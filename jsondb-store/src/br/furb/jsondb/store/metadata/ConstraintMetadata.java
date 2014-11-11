@@ -9,7 +9,12 @@ public class ConstraintMetadata {
 	private String column;
 	private ConstraintKind kind;
 
-	public ConstraintMetadata(String name, String table, String column, ConstraintKind kind) {
+	public ConstraintMetadata(String name, String table, ConstraintKind kind) {
+		this(name, table, kind, null);
+	}
+
+	public ConstraintMetadata(String name, String table, ConstraintKind kind,
+			String column) {
 		super();
 		this.name = name;
 		this.table = table;
@@ -35,8 +40,8 @@ public class ConstraintMetadata {
 
 	@Override
 	public String toString() {
-		return "ConstraintMetadata [name=" + name + ", table=" + table + ", column=" + column + ", kind=" + kind + "]";
+		return "ConstraintMetadata [name=" + name + ", table=" + table
+				+ ", column=" + column + ", kind=" + kind + "]";
 	}
 
-	
 }

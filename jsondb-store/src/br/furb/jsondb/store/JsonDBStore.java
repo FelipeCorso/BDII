@@ -3,17 +3,19 @@ package br.furb.jsondb.store;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
 
-import br.furb.jsondb.parser.ColumnIdentifier;
+import br.furb.jsondb.parser.Value;
 import br.furb.jsondb.parser.statement.CreateStatement;
-import br.furb.jsondb.parser.statement.InsertStatement;
 import br.furb.jsondb.sql.SQLException;
 import br.furb.jsondb.store.data.ColumnData;
 import br.furb.jsondb.store.data.LastRowId;
 import br.furb.jsondb.store.data.RowData;
 import br.furb.jsondb.store.data.TableDataProvider;
+import br.furb.jsondb.store.metadata.ConstraintMetadata;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
 import br.furb.jsondb.store.metadata.DatabaseMetadataProvider;
 import br.furb.jsondb.store.utils.JsonUtils;
@@ -104,6 +106,17 @@ public class JsonDBStore {
 		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(database);
 		databaseMetadata.removeTable(table);
 
+		Map<String, ConstraintMetadata> constraints = databaseMetadata.getConstraints();
+
+
+		for (String constraint : constraints.keySet()) {
+
+			if (constraints.get(constraint).getTable().equals(table)) {
+				constraints.remove(constraint);
+			}
+
+		}
+
 		// remove o diretório da tabela e todos os seus arquivos;
 		File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
 
@@ -115,25 +128,26 @@ public class JsonDBStore {
 			throw new StoreException(e.getMessage(), e);
 		}
 
-		// FIXME atualizar o metadados em disco neste momento???
+		try {
+			JsonUtils.write(databaseMetadata, DatabaseMetadata.class, new File(databaseDir, "database.metadata"));
+		} catch (IOException e) {
+			throw new StoreException("Was not possible to write database metadata.", e);
+		}
 	}
 
-	public int insertData(String database, InsertStatement statement) throws StoreException {
+	public int insertData(String database, String table, Map<String, Value<?>> mapValues) throws StoreException {
 		RowData rowData = new RowData();
 
-		List<ColumnIdentifier> columns = statement.getColumns();
-
-		for (int i = 0; i < columns.size(); i++) {
+		for (Entry<String, Value<?>> entry : mapValues.entrySet()) {
 			ColumnData columnData = new ColumnData();
-			columnData.setName(columns.get(i).getColumnName());
-			columnData.setValue(statement.getValues().get(i).getBaseValue());
+			columnData.setName(entry.getKey());
+			columnData.setValue(entry.getValue().getBaseValue());
 			rowData.addColumn(columnData);
 		}
 
-		String tableName = statement.getTable().getIdentifier();
 
 		File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
-		File tableDir = new File(databaseDir, tableName);
+		File tableDir = new File(databaseDir, table);
 
 		LastRowId lastRowId = LastRowIdUtils.getLastRowId(tableDir);
 
@@ -150,7 +164,7 @@ public class JsonDBStore {
 			throw new StoreException(e);
 		}
 
-		TableDataProvider.getInstance().getTableData(database, tableName).addRow(rowData);
+		TableDataProvider.getInstance().getTableData(database, table).addRow(rowData);
 
 		return rowId;
 	}
