@@ -20,4 +20,8 @@ public class SetDatabaseStatement implements IStatement {
 		this.database = Objects.requireNonNull(database, "database cannot be null");
 	}
 
+	@Override
+	public String toString() {
+		return "SET DATABASE ".concat(String.valueOf(getDatabase()));
+	}
 }
