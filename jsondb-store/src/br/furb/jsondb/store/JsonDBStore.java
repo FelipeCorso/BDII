@@ -2,6 +2,7 @@ package br.furb.jsondb.store;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -108,9 +109,8 @@ public class JsonDBStore {
 
 		Map<String, ConstraintMetadata> constraints = databaseMetadata.getConstraints();
 
-
-		for (String constraint : constraints.keySet()) {
-
+		List<String> list = new ArrayList<String>(constraints.keySet());
+		for (String constraint : list) {
 			if (constraints.get(constraint).getTable().equals(table)) {
 				constraints.remove(constraint);
 			}
@@ -125,7 +125,21 @@ public class JsonDBStore {
 		try {
 			FileUtils.deleteDirectory(tableDir);
 		} catch (IOException e) {
-			throw new StoreException(e.getMessage(), e);
+
+			//tenta de novo 
+
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e1) {
+			}
+
+			try {
+				FileUtils.deleteDirectory(tableDir);
+			} catch (IOException e2) {
+				e.printStackTrace();
+				throw new StoreException(e.getMessage(), e);
+			}
+
 		}
 
 		try {
@@ -144,7 +158,6 @@ public class JsonDBStore {
 			columnData.setValue(entry.getValue().getBaseValue());
 			rowData.addColumn(columnData);
 		}
-
 
 		File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
 		File tableDir = new File(databaseDir, table);

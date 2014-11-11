@@ -24,7 +24,7 @@ import com.google.gson.stream.JsonWriter;
 public final class JsonUtils {
 
 	/**
-	 * Tamanho padrão para identação de json
+	 * Tamanho padrï¿½o para identaï¿½ï¿½o de json
 	 */
 //	private static final String DEFAULT_INDENT = "    ";
 	private static final String DEFAULT_INDENT = "";
@@ -53,9 +53,13 @@ public final class JsonUtils {
 
 	public static <T> T parseJsonToObject(File file, Class<T> type) throws IOException {
 		FileReader reader = new FileReader(file);
-		T object = parseJsonToObject(reader, type);
-		reader.close();
-		return object;
+		try{
+			T object = parseJsonToObject(reader, type);
+			return object;
+			
+		}finally{
+			reader.close();
+		}
 	}
 
 	public static <T> void parseObjectToJson(Writer writer, T objectToJson, Class<T> type) {
