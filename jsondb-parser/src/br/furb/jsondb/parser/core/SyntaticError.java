@@ -17,8 +17,8 @@ public class SyntaticError extends AnalysisError {
 
 	public static String geraMensagem(int lastState, Token token) {
 		if (token.isFimProg()) {
-			return "Erro na linha %d - encontrado fim de programa, " + ParserConstants.PARSER_ERROR[lastState];
+			return "Erro - encontrado fim de programa, " + ParserConstants.PARSER_ERROR[lastState];
 		}
-		return "Erro na linha %d - encontrado " + token.getClassificacao() + ", " + ParserConstants.PARSER_ERROR[lastState];
+		return "Erro - encontrado " + token.getClassificacao() + ", " + ParserConstants.PARSER_ERROR[lastState];
 	}
 }
