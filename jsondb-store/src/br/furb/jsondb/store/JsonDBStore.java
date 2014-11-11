@@ -42,8 +42,7 @@ public class JsonDBStore {
 			if (!jsonDBDir.exists()) {
 				boolean mkdir = jsonDBDir.mkdir();
 				if (!mkdir) {
-					throw new IllegalStateException(
-							"Was not possible to create jsondb directory.");
+					throw new IllegalStateException("Was not possible to create jsondb directory.");
 				}
 			}
 		}
@@ -80,34 +79,32 @@ public class JsonDBStore {
 	}
 
 	/**
-	 * Cria uma nova tabela na base de dados. A cria��o da tabela envolve:
+	 * Cria uma nova tabela na base de dados. A criação da tabela envolve:
 	 * 
 	 * <ol>
-	 * <li>cria��o do diret�rio da tabela
-	 * <li>cria��o de um arquivo de �ndice para cada campo da chave da tabela
-	 * <li>cria��o de um arquivo para os dados da tabela
-	 * <li>cria��o do metadados da tabela e inser��o do mesmo no metadados do
+	 * <li>criação do diretório da tabela
+	 * <li>criação de um arquivo de índice para cada campo da chave da tabela
+	 * <li>criação de um arquivo para os dados da tabela
+	 * <li>criação do metadados da tabela e inserção do mesmo no metadados do
 	 * banco.
 	 * </ol>
 	 * 
 	 * @param statement
 	 * 
 	 * @throws StoreException
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
-	public void createTable(String database, CreateStatement statement,  List<String> pk)
-			throws StoreException, SQLException {
+	public void createTable(String database, CreateStatement statement, List<String> pk) throws StoreException, SQLException {
 
 		TableCreator.createTable(database, statement, pk);
 	}
 
 	public void dropTable(String database, String table) throws StoreException {
 		// remove a tabela do metadados
-		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider
-				.getInstance().getDatabaseMetadata(database);
+		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(database);
 		databaseMetadata.removeTable(table);
 
-		// remove o diret�rio da tabela e todos os seus arquivos;
+		// remove o diretório da tabela e todos os seus arquivos;
 		File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
 
 		File tableDir = new File(databaseDir, table);
@@ -121,8 +118,7 @@ public class JsonDBStore {
 		// FIXME atualizar o metadados em disco neste momento???
 	}
 
-	public int insertData(String database, InsertStatement statement)
-			throws StoreException {
+	public int insertData(String database, InsertStatement statement) throws StoreException {
 		RowData rowData = new RowData();
 
 		List<ColumnIdentifier> columns = statement.getColumns();
@@ -149,14 +145,12 @@ public class JsonDBStore {
 		rowData.setRowId(rowId);
 
 		try {
-			JsonUtils.write(rowData, RowData.class, new File(tableDir, rowId
-					+ ".dat"));
+			JsonUtils.write(rowData, RowData.class, new File(tableDir, rowId + ".dat"));
 		} catch (IOException e) {
 			throw new StoreException(e);
 		}
 
-		TableDataProvider.getInstance().getTableData(database, tableName)
-				.addRow(rowData);
+		TableDataProvider.getInstance().getTableData(database, tableName).addRow(rowData);
 
 		return rowId;
 	}

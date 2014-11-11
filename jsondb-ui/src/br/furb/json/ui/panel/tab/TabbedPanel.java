@@ -28,8 +28,7 @@ public class TabbedPanel extends JTabbedPane {
 	}
 
 	/**
-	 * Caso o usu·rio tenha selecionado uma base. … criada uma aba, para
-	 * realizar os selects.
+	 * Caso o usu√°rio tenha selecionado uma base √© criada uma aba, para executar os comandos.
 	 */
 	public void createTabDataBase(String dataBaseName) {
 		commandPanel = new CommandPanel(principal);
