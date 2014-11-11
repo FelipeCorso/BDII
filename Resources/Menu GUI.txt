@@ -1,0 +1,38 @@
+Arquivo:
+	Novo script
+		Limpa o documento atual e cria um novo. Questiona caso haja alterações não salvas
+	Abrir script
+		Carrega um script SQL, sem base definida
+	Salvar script
+		Salva o script aberto em um arquivo SQL. Caso seja a primeira vez que o usuário salva, pede um caminho pra salvar
+	Salvar script como...
+		Salva uma cópia do script aberto no caminho que o usuário informar
+	Alterar diretório de trabalho
+		Exibe o diretório de trabalho atual e permite que o usuário altere
+	Sair
+		Questiona se o usuário deseja salvar os scripts modificados e fecha o aplicativo
+
+Editar:
+	Copiar
+		Copia o texto selecionado
+	Recortar
+		Copia e remove o texto selecionado
+	Colar
+		Insere o texto da área de transferência após o cursor ou substitui a seleção, caso exista alguma
+	
+Banco:
+	Novo script sem contexto
+		Cria um novo script sem base definida. O usuário deve definir a base a ser utilizado via código
+	Novo script para a base
+		Cria um novo script e executa um "SET DATABASE" para a base selecionada
+	Nova base
+		Cria uma nova base de dados
+	Excluir base
+		Remove a base de dados selecionada
+
+Ajuda
+	Documentação
+		Exibe a [possível] documentação em uma nova janela modal não bloqueante
+	Sobre
+		Exibe os membros da equipe e informações do trabalho
+	
