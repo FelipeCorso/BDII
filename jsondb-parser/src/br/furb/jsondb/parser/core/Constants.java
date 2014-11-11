@@ -43,9 +43,10 @@ public interface Constants extends ScannerConstants, ParserConstants {
 	int t_WHERE = 37;
 	int t_AND = 38;
 	int t_OR = 39;
-	int t_DROP = 40;
-	int t_DESCRIBE = 41;
-	int t_SET = 42;
-	int t_INDEX = 43;
+    int t_ON = 40;
+    int t_DROP = 41;
+    int t_DESCRIBE = 42;
+    int t_SET = 43;
+    int t_INDEX = 44;
 
 }

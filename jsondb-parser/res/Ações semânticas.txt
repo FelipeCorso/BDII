@@ -1,4 +1,4 @@
-﻿Acoes semanticas
+Acoes semanticas
 
 #Acao	Descricao
 01		Declaracao de NUMBER
@@ -48,16 +48,17 @@
 53		Encerra reconhecimento do tipo
 
 55		Encerra reconhecimento da restricao
-56		Encerra reconhecimento de condições WHERE
+56		Encerra reconhecimento de condicoes WHERE
+57		Encerra reconhecimento de CREATE INDEX
 
 --		-----
 
-61		Nome de tabela a ser removida (DROP)
+61		Nome de tabela a ser removida (DROP TABLE)
 
 63		Nome de tabela a ser descrita (DESCRIBE)
 
 65		Nome de base a ser usada (SET DATABASE)
-66		CREATE INDEX
-67		DROP INDEX
+
+67		Nome de indice a ser removido (DROP INDEX)
 
 99		Finaliza reconhecimento de sentenca

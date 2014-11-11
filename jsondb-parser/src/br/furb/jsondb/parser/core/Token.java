@@ -2,9 +2,10 @@ package br.furb.jsondb.parser.core;
 
 public class Token {
 
+	// Extraído com regex da classe Constants
 	private static String[] TOKEN_NAMES = { "<vazio>", "fim de programa", "identificador", "numero", "literal", "data", ";", "(", ")", ",", "*", ".", "=", ">", "<", ">=", "<=",
-			"<>", "CREATE", "DATABASE", "TABLE", "NUMBER", "VARCHAR", "DATE", "CHAR", "CONSTRAINT", "NULL", "NOT", "PRIMARY", "KEY", "REFERENCES", "FOREIGN", "INSERT", "INTO",
-			"VALUES", "SELECT", "FROM", "WHERE", "AND", "OR", "DROP", "DESCRIBE", "SET", "INDEX" };
+			"<>", "CREATE", "DATABASE", "TABLE", "NUMBER", "VARCHAR", "DATE", "CHAR", "CONSTRA= 25;", "NULL", "NOT", "PRIMARY", "KEY", "REFERENCES", "FOREIGN", "INSERT", "INTO",
+			"VALUES", "SELECT", "FROM", "WHERE", "AND", "OR", "ON", "DROP", "DESCRIBE", "SET", "INDEX" };
 
 	private int id;
 	private String lexeme;

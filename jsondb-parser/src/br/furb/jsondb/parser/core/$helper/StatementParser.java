@@ -175,6 +175,9 @@ public class StatementParser {
 		case 56:
 			acaoSemantica56(token);
 			break;
+		case 57:
+			acaoSemantica57(token);
+			break;
 		case 61:
 			acaoSemantica61(token);
 			break;
@@ -184,9 +187,6 @@ public class StatementParser {
 		case 65:
 			acaoSemantica65(token);
 			break;
-		case 66:
-			acaoSemantica66(token);
-			break;
 		case 67:
 			acaoSemantica67(token);
 			break;
@@ -194,7 +194,7 @@ public class StatementParser {
 			acaoSemantica99(token);
 			break;
 		default:
-			throw new IllegalArgumentException("ação semântica não suportada: " + action);
+			throw new IllegalArgumentException("unsupported semantic action: " + action);
 		}
 	}
 
@@ -563,6 +563,13 @@ public class StatementParser {
 		WhereClause whereClause = new WhereClause(this.conditions.get(0));
 		((SelectStatement) this.statement).setWhereClause(whereClause);
 	}
+	
+	/** Encerra reconhecimento de CREATE INDEX. **/
+	private void acaoSemantica57(Token token) {
+		ColumnIdentifier column = new ColumnIdentifier(this.lastTable, this.idStack.pop().getColumnName());
+		Index index = new Index(this.idStack.pop().getColumnName(), column);
+		this.statement = new CreateStatement(index);
+	}
 
 	/** Nome de tabela a ser removida (DROP). **/
 	private void acaoSemantica61(Token token) {
@@ -579,14 +586,9 @@ public class StatementParser {
 		statement = new SetDatabaseStatement(database);
 	}
 
-	/** CREATE INDEX. **/
-	private void acaoSemantica66(Token token) {
-	}
-
-	/** DROP INDEX. **/
+	/** Nome de índice a ser removido (DROP INDEX). **/
 	private void acaoSemantica67(Token token) {
-		ColumnIdentifier lastColumn = this.idStack.pop();
-		Index index = new Index(new ColumnIdentifier(lastTable, lastColumn.getColumnName()));
+		Index index = new Index(cleanId(token.getLexeme()), new ColumnIdentifier(lastTable, cleanId(token.getLexeme())));
 		this.statement = new DropStatement<IStructure>(index);
 	}
 

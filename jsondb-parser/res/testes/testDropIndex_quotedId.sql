@@ -1,1 +1,1 @@
-DROP INDEX 'nomeIndice';
+DROP INDEX 'novo_indice';

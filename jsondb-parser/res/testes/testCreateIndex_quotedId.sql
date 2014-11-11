@@ -1,1 +1,1 @@
-CREATE INDEX 'tabela'('campo');
+CREATE INDEX 'novo_indice' ON 'tabela'('campo');

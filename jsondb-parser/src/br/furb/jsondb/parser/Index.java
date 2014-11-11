@@ -1,25 +1,21 @@
 package br.furb.jsondb.parser;
 
-/**
- * @deprecated A estrutura gramática será alterada
- * @author william.seefeld
- *
- */
-@Deprecated
+import java.util.Objects;
+
 public class Index implements IStructure {
 
+	private String identifier;
 	private ColumnIdentifier tableColumn;
 
-	public Index(ColumnIdentifier identifier) {
-		if (identifier.getTable() == null) {
-			throw new IllegalArgumentException("é necessário informar a tabela");
-		}
-		this.tableColumn = identifier;
+	public Index(String identifier, ColumnIdentifier tableColumn) {
+		this.identifier = Objects.requireNonNull(identifier, "an identifier must be provided");
+		this.tableColumn = Objects.requireNonNull(tableColumn, "a qualified column must be provided");
+		Objects.requireNonNull(tableColumn.getTable(), "a table must be provided");
 	}
 
 	@Override
 	public String getIdentifier() {
-		return tableColumn.toString();
+		return identifier;
 	}
 
 	public ColumnIdentifier getTableColumn() {
@@ -28,7 +24,15 @@ public class Index implements IStructure {
 
 	@Override
 	public String toString() {
-		return getIdentifier();
+		String indexPart;
+		if (getTableColumn().getTable().isPresent()) {
+			String table = getTableColumn().getTable().get().toString();
+			String column = getTableColumn().getColumnName();
+			indexPart = " ON ".concat(table.concat("('").concat(column).concat("')"));
+		} else {
+			indexPart = "";
+		}
+		return "INDEX '".concat(getIdentifier()).concat("'").concat(indexPart);
 	}
 
 }

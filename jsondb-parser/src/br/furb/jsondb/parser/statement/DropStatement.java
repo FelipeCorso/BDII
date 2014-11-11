@@ -13,5 +13,10 @@ public class DropStatement<T extends IStructure> implements IStatement {
 	public final T getStructure() {
 		return structure;
 	}
+	
+	@Override
+	public String toString() {
+		return "DROP ".concat(getStructure().toString());
+	}
 
 }

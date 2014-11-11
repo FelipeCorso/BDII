@@ -65,6 +65,7 @@ FROM = id: "FROM"
 WHERE = id: "WHERE"
 AND = id: "AND"
 OR = id: "OR"
+ON = id: "ON"
 DROP = id: "DROP"
 DESCRIBE = id: "DESCRIBE"
 SET = id: "SET"
@@ -111,7 +112,6 @@ INDEX = id: "INDEX"
 <op_logico>
 <eliminar>
 <descrever>
-<index>
 <setar_banco>
 <eliminar_estrutura>
 
@@ -119,7 +119,7 @@ INDEX = id: "INDEX"
 <sentenca> ::= <acao> ";" #99;
 <acao> ::= <criar> | <incluir> | <selecionar> | <eliminar> | <descrever> | <setar_banco>;
 <criar> ::= CREATE <criar_estrutura>;
-<criar_estrutura> ::= DATABASE id #51 | TABLE id #52 "(" <lista_atributos> ")" | INDEX #66 <index>;
+<criar_estrutura> ::= DATABASE id #51 | TABLE id #52 "(" <lista_atributos> ")" | INDEX id #12 ON id #13 "(" id #12 ")" #57 ;
 <lista_atributos> ::= <atributo> <lista_atributos_rec>;
 <lista_atributos_rec> ::= "," <lista_atributos_rec_dec> | î;
 <lista_atributos_rec_dec> ::= <atributo> <lista_atributos_rec> | <lista_restricoes_finais>;
@@ -152,7 +152,6 @@ INDEX = id: "INDEX"
 <op_relacional> ::= "=" | ">" | "<" | ">=" | "<=" | "<>";
 <op_logico> ::= AND | OR;
 <eliminar> ::= DROP <eliminar_estrutura>;
-<eliminar_estrutura> ::= TABLE id #61 | INDEX <index> #67;
+<eliminar_estrutura> ::= TABLE id #61 | INDEX id #67;
 <descrever> ::= DESCRIBE id #63;
 <setar_banco> ::= SET DATABASE id #65;
-<index> ::= id #13 "(" id #12 ")";

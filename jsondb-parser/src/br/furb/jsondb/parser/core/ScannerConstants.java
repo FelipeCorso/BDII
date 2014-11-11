@@ -724,13 +724,13 @@ public interface ScannerConstants
     int[] TOKEN_STATE = {-1,  0, -1, -1,  7,  8, 10,  9, 11,  3,  6, 14, 12, 13,  2, -1,  4, -1, -1, -1, -1,  3, 16, 17, 15,  2,  3, -1,  3, -1, -1, -1, -1, -1, -1,  5 };
 
     int[] SPECIAL_CASES_INDEXES =
-        { 0, 0, 0, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26 };
+        { 0, 0, 0, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27 };
 
     String[] SPECIAL_CASES_KEYS =
-        {  "AND", "CHAR", "CONSTRAINT", "CREATE", "DATABASE", "DATE", "DESCRIBE", "DROP", "FOREIGN", "FROM", "INDEX", "INSERT", "INTO", "KEY", "NOT", "NULL", "NUMBER", "OR", "PRIMARY", "REFERENCES", "SELECT", "SET", "TABLE", "VALUES", "VARCHAR", "WHERE" };
+        {  "AND", "CHAR", "CONSTRAINT", "CREATE", "DATABASE", "DATE", "DESCRIBE", "DROP", "FOREIGN", "FROM", "INDEX", "INSERT", "INTO", "KEY", "NOT", "NULL", "NUMBER", "ON", "OR", "PRIMARY", "REFERENCES", "SELECT", "SET", "TABLE", "VALUES", "VARCHAR", "WHERE" };
 
     int[] SPECIAL_CASES_VALUES =
-        {  38, 24, 25, 18, 19, 23, 41, 40, 31, 36, 43, 32, 33, 29, 27, 26, 21, 39, 28, 30, 35, 42, 20, 34, 22, 37 };
+        {  38, 24, 25, 18, 19, 23, 42, 41, 31, 36, 44, 32, 33, 29, 27, 26, 21, 40, 39, 28, 30, 35, 43, 20, 34, 22, 37 };
 
     String[] SCANNER_ERROR =
     {
