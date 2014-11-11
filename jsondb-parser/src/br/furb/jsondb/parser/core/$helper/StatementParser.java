@@ -36,6 +36,7 @@ import br.furb.jsondb.parser.conditions.RelationalCondition;
 import br.furb.jsondb.parser.conditions.RelationalOperator;
 import br.furb.jsondb.parser.core.Token;
 import br.furb.jsondb.parser.statement.CreateStatement;
+import br.furb.jsondb.parser.statement.DescribeStatement;
 import br.furb.jsondb.parser.statement.DropStatement;
 import br.furb.jsondb.parser.statement.IStatement;
 import br.furb.jsondb.parser.statement.InsertStatement;
@@ -578,6 +579,7 @@ public class StatementParser {
 
 	/** Nome de tabela a ser descrita (DESCRIBE). **/
 	private void acaoSemantica63(Token token) {
+		this.statement = new DescribeStatement(tableFromId(token.getLexeme()));
 	}
 
 	/** Nome de base a ser usada (SET DATABASE). **/
