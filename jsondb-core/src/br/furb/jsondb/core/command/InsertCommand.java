@@ -108,21 +108,24 @@ public class InsertCommand implements ICommand {
 
 		// verificar se ainda não existe registro com a chave informada
 
-		try {
-			IndexData indexData = IndexDataProvider.getInstance(databaseMetadata.getName()).getIndexData(tableMetadata.getName(), "PRIMARY");
+		if (!tableMetadata.getPrimaryKey().isEmpty()) {
 
-			String[] keyValues = new String[primaryKey.size()];
+			try {
+				IndexData indexData = IndexDataProvider.getInstance(databaseMetadata.getName()).getIndexData(tableMetadata.getName(), "PRIMARY");
 
-			for (int i = 0; i < keyValues.length; i++) {
-				keyValues[i] = mapValues.get(primaryKey.get(i)).getBaseValue().toString();
+				String[] keyValues = new String[primaryKey.size()];
+
+				for (int i = 0; i < keyValues.length; i++) {
+					keyValues[i] = mapValues.get(primaryKey.get(i)).getBaseValue().toString();
+				}
+
+				if (indexData.containsEntry(keyValues)) {
+					throw new SQLException("Primary key violation");
+				}
+
+			} catch (StoreException e) {
+				throw new SQLException(e.getMessage(), e);
 			}
-
-			if (indexData.containsEntry(keyValues)) {
-				throw new SQLException("Primary key violation");
-			}
-
-		} catch (StoreException e) {
-			throw new SQLException(e.getMessage(), e);
 		}
 
 		// já validou tudo, pode gravar no disco
