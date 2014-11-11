@@ -107,7 +107,7 @@ public class SelectCommandTest extends BaseCommandTest {
 
 	}
 
-	private InsertCommand createInsertCommand(int codigo, String nome) {
+	private static InsertCommand createInsertCommand(int codigo, String nome) {
 		Collection<ColumnIdentifier> columns = new ArrayList<ColumnIdentifier>();
 
 		columns.add(new ColumnIdentifier("Codigo"));
@@ -115,7 +115,7 @@ public class SelectCommandTest extends BaseCommandTest {
 
 		Collection<Value<?>> values = new ArrayList<Value<?>>();
 
-		values.add(new NumberValue((long) codigo));
+		values.add(new NumberValue((double) codigo));
 		values.add(new StringValue(nome));
 
 		InsertStatement insertStatement = new InsertStatement(new TableIdentifier(TABLE), columns, values);
@@ -123,7 +123,7 @@ public class SelectCommandTest extends BaseCommandTest {
 		return new InsertCommand(insertStatement);
 	}
 
-	private void createTable() throws SQLException {
+	private static void createTable() throws SQLException {
 		TableDefinition tableDefinition = new TableDefinition(new TableIdentifier(TABLE));
 
 		ColumnDefinition columnCodigo = new ColumnDefinition("Codigo");

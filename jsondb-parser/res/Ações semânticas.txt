@@ -37,6 +37,7 @@
 33		Reconhece literal
 34		Reconhece data
 
+37		Reconhece condição relacional
 38		Inicia reconhecimento de valores no INSERT
 39		Encerra reconhecimento de valores no INSERT
 
@@ -47,6 +48,7 @@
 53		Encerra reconhecimento do tipo
 
 55		Encerra reconhecimento da restricao
+56		Encerra reconhecimento de condições WHERE
 
 --		-----
 

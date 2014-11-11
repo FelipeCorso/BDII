@@ -148,7 +148,7 @@ public class InsertCommandTest extends BaseCommandTest {
 
 	}
 
-	private InsertCommand createInsertCommand(int codigo, String nome) {
+	private static InsertCommand createInsertCommand(int codigo, String nome) {
 		Collection<ColumnIdentifier> columns = new ArrayList<ColumnIdentifier>();
 
 		columns.add(new ColumnIdentifier("codigo"));
@@ -156,7 +156,7 @@ public class InsertCommandTest extends BaseCommandTest {
 
 		Collection<Value<?>> values = new ArrayList<Value<?>>();
 
-		values.add(new NumberValue((long) codigo));
+		values.add(new NumberValue((double) codigo));
 		values.add(new StringValue(nome));
 
 		InsertStatement insertStatement = new InsertStatement(new TableIdentifier(TABLE), columns, values);
@@ -164,7 +164,7 @@ public class InsertCommandTest extends BaseCommandTest {
 		return new InsertCommand(insertStatement);
 	}
 
-	private void createTable() throws SQLParserException, SQLException {
+	private static void createTable() throws SQLParserException, SQLException {
 		JsonDB.getInstance().executeSQL("CREATE TABLE Pessoa(Codigo NUMBER(3) PRIMARY KEY, nome VARCHAR(45));");
 	}
 

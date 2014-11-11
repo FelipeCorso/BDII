@@ -1,6 +1,7 @@
 package br.furb.jsondb.parser.statement;
 
 import java.util.List;
+import java.util.Optional;
 
 import br.furb.jsondb.parser.ColumnIdentifier;
 import br.furb.jsondb.parser.TableIdentifier;
@@ -9,7 +10,7 @@ import br.furb.jsondb.parser.WhereClause;
 public class SelectStatement implements IStatement {
 
 	private List<ColumnIdentifier> columns;
-	private WhereClause whereClause;
+	private Optional<WhereClause> maybeWhere;
 	private List<TableIdentifier> tables;
 
 	public SelectStatement() {
@@ -22,7 +23,7 @@ public class SelectStatement implements IStatement {
 
 	public SelectStatement(List<ColumnIdentifier> columns, WhereClause whereClause) {
 		this.columns = columns;
-		this.whereClause = whereClause;
+		this.maybeWhere = Optional.ofNullable(whereClause);
 	}
 
 	public final List<ColumnIdentifier> getColumns() {
@@ -33,12 +34,12 @@ public class SelectStatement implements IStatement {
 		this.columns = columns;
 	}
 
-	public final WhereClause getWhereClause() {
-		return whereClause;
+	public final Optional<WhereClause> getWhereClause() {
+		return maybeWhere;
 	}
 
 	public final void setWhereClause(WhereClause whereClause) {
-		this.whereClause = whereClause;
+		this.maybeWhere = Optional.ofNullable(whereClause);
 	}
 
 	public void setTables(List<TableIdentifier> tables) {
@@ -47,6 +48,26 @@ public class SelectStatement implements IStatement {
 
 	public List<TableIdentifier> getTables() {
 		return tables;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("SELECT ");
+		columns.forEach(column -> sb.append(column).append(", "));
+		int charCount = sb.length();
+		if (!columns.isEmpty()) {
+			sb.delete(charCount - 2, charCount);
+		}
+		sb.append(" FROM ");
+		tables.forEach(table -> sb.append(table).append(", "));
+		charCount = sb.length();
+		if (!tables.isEmpty()) {
+			sb.delete(charCount - 2, charCount);
+		}
+		if (maybeWhere.isPresent()) {
+			sb.append(" ").append(maybeWhere.get());
+		}
+		return sb.toString();
 	}
 
 }

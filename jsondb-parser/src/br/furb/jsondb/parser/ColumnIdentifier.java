@@ -6,7 +6,14 @@ import br.furb.jsondb.utils.ArgumentValidator;
 
 public class ColumnIdentifier {
 
-	public static final ColumnIdentifier ALL = new ColumnIdentifier("*");
+	public static final ColumnIdentifier ALL = new ColumnIdentifier("*") {
+
+		@Override
+		public String toString() {
+			return getColumnName();
+		};
+
+	};
 
 	private Optional<TableIdentifier> maybeTable;
 	private String columnName;

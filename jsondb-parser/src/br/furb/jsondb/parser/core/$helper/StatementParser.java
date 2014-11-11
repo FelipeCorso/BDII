@@ -1,10 +1,12 @@
 package br.furb.jsondb.parser.core.$helper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +17,7 @@ import br.furb.jsondb.parser.ConstraintDefinition;
 import br.furb.jsondb.parser.ConstraintKind;
 import br.furb.jsondb.parser.DataType;
 import br.furb.jsondb.parser.DatabaseIdentifier;
+import br.furb.jsondb.parser.Date;
 import br.furb.jsondb.parser.ForeignKeyDefinition;
 import br.furb.jsondb.parser.IStructure;
 import br.furb.jsondb.parser.Index;
@@ -25,6 +28,12 @@ import br.furb.jsondb.parser.StringValue;
 import br.furb.jsondb.parser.TableDefinition;
 import br.furb.jsondb.parser.TableIdentifier;
 import br.furb.jsondb.parser.Value;
+import br.furb.jsondb.parser.WhereClause;
+import br.furb.jsondb.parser.conditions.ICondition;
+import br.furb.jsondb.parser.conditions.LogicalCondition;
+import br.furb.jsondb.parser.conditions.LogicalOperator;
+import br.furb.jsondb.parser.conditions.RelationalCondition;
+import br.furb.jsondb.parser.conditions.RelationalOperator;
 import br.furb.jsondb.parser.core.Token;
 import br.furb.jsondb.parser.statement.CreateStatement;
 import br.furb.jsondb.parser.statement.DropStatement;
@@ -44,10 +53,12 @@ public class StatementParser {
 	private Deque<ColumnIdentifier> idStack = new LinkedList<>();
 	private Deque<ColumnDefinition> columnDefStack;
 	private Deque<ConstraintDefinition> constraintStack;
-	private Deque<Value<?>> valuesStack;
+	private Deque<Value<?>> valuesStack = new LinkedList<>();
+	private List<ICondition<?, ?>> conditions = new LinkedList<>();
 	private ColumnType columnType;
-
+	private RelationalOperator operator;
 	private String constraintName;
+
 	private boolean doneRec;
 	private boolean isFinal;
 
@@ -140,6 +151,9 @@ public class StatementParser {
 		case 34:
 			acaoSemantica34(token);
 			break;
+		case 37:
+			acaoSemantica37(token);
+			break;
 		case 38:
 			acaoSemantica38(token);
 			break;
@@ -157,6 +171,9 @@ public class StatementParser {
 			break;
 		case 55:
 			acaoSemantica55(token);
+			break;
+		case 56:
+			acaoSemantica56(token);
 			break;
 		case 61:
 			acaoSemantica61(token);
@@ -378,27 +395,54 @@ public class StatementParser {
 	 *             caso seja encontrado um operador não reconhecido
 	 **/
 	private void acaoSemantica30(Token token) throws SQLParserException {
-		final String operator = token.getLexeme();
-		switch (operator) {
+		final String operatorLexeme = token.getLexeme();
+		RelationalOperator operator;
+		switch (operatorLexeme) {
 		case "=":
+			operator = RelationalOperator.EQUAL;
 			break;
 		case ">":
+			operator = RelationalOperator.GREATER;
 			break;
 		case "<":
+			operator = RelationalOperator.LESSER;
 			break;
 		case ">=":
+			operator = RelationalOperator.GREATER_OR_EQUAL;
 			break;
 		case "<=":
+			operator = RelationalOperator.LESSER_OR_EQUAL;
 			break;
 		case "<>":
+			operator = RelationalOperator.NOT_EQUAL;
 			break;
 		default:
-			throw new SQLParserException("unrecognizable operator: " + operator);
+			throw new SQLParserException("unrecognized operator: " + operatorLexeme);
 		}
+		this.operator = operator;
 	}
 
-	/** Reconhece operador lógico. **/
-	private void acaoSemantica31(Token token) {
+	/**
+	 * Reconhece operador lógico.
+	 * 
+	 * @throws SQLParserException
+	 *             caso seja encontrado um operador não reconhecido
+	 **/
+	private void acaoSemantica31(Token token) throws SQLParserException {
+		String operatorLexeme = token.getLexeme().toUpperCase();
+		LogicalOperator operator;
+		switch (operatorLexeme) {
+		case "AND":
+			operator = LogicalOperator.AND;
+			break;
+		case "OR":
+			operator = LogicalOperator.OR;
+			break;
+		default:
+			throw new SQLParserException("unrecognized operator: " + operatorLexeme);
+		}
+		LogicalCondition condition = new LogicalCondition(operator);
+		this.conditions.add(condition);
 	}
 
 	/** Reconhece número. **/
@@ -422,6 +466,14 @@ public class StatementParser {
 
 	/** Reconhece data. **/
 	private void acaoSemantica34(Token token) {
+		Date date = new Date(token.getLexeme());
+		this.valuesStack.push(date);
+	}
+
+	/** Reconhece condição relacional. */
+	private void acaoSemantica37(Token token) {
+		RelationalCondition condition = new RelationalCondition(operator, this.idStack.pop(), this.valuesStack.pop());
+		this.conditions.add(condition);
 	}
 
 	/** Inicia reconhecimento de valores no INSERT. **/
@@ -477,6 +529,39 @@ public class StatementParser {
 			this.lastColumn.setConstraint(constraint);
 			this.lastColumn = null;
 		}
+	}
+
+	/** Encerra reconhecimento de condições WHERE. */
+	private void acaoSemantica56(Token token) {
+		// Junta operadores lógicos
+		ICondition<?, ?> current;
+
+		// Primeiro AND, depois OR
+		for (LogicalOperator logicalOperator : Arrays.asList(LogicalOperator.AND, LogicalOperator.OR)) {
+			ListIterator<ICondition<?, ?>> it = this.conditions.listIterator();
+			while (it.hasNext()) {
+				current = it.next();
+				if (current.isLogical() && current.getOperator() == logicalOperator) {
+					LogicalCondition logical = (LogicalCondition) current;
+					// Define condição anterior como operando da esquerda
+					it.previous();
+					logical.setLeftOperand(it.previous());
+					// Remove condição adicionada
+					it.remove();
+					it.next();
+					// Define condição seguinte como operando da direita
+					logical.setRightOperand(it.next());
+					// Remove condição adicionada
+					it.previous();
+					it.remove();
+				}
+			}
+		}
+		if (this.conditions.size() > 1) {
+			System.err.println("[StatementParser] more than one condition remained after defining precedence: " + this.conditions.toString());
+		}
+		WhereClause whereClause = new WhereClause(this.conditions.get(0));
+		((SelectStatement) this.statement).setWhereClause(whereClause);
 	}
 
 	/** Nome de tabela a ser removida (DROP). **/

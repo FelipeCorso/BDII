@@ -1,8 +1,10 @@
 package br.furb.jsondb.parser;
 
+import java.util.Objects;
+
 public abstract class Value<BaseType> {
 
-	public static final Value<Object> NULL = new Value<Object>(null) {
+	public static final Value<Object> NULL = new Value<Object>() {
 
 		@Override
 		public String toString() {
@@ -14,7 +16,11 @@ public abstract class Value<BaseType> {
 	private BaseType baseValue;
 
 	public Value(BaseType baseValue) {
-		this.baseValue = baseValue;
+		this.baseValue = Objects.requireNonNull(baseValue, "value cannot be null. Use Value.NULL to represent null values");
+	}
+
+	private Value() {
+		// reservado para Value.NULL
 	}
 
 	public BaseType getBaseValue() {
@@ -33,6 +39,5 @@ public abstract class Value<BaseType> {
 	 */
 	@Override
 	public abstract String toString();
-
 
 }

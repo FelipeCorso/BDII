@@ -1,13 +1,13 @@
 package br.furb.jsondb.parser;
 
-public class NumberValue extends Value<Long> {
+public class NumberValue extends Value<Double> {
 
-	public NumberValue(Long number) {
+	public NumberValue(Double number) {
 		super(number);
 	}
 
 	public static NumberValue parseNumber(String str) {
-		return new NumberValue(Long.parseLong(str));
+		return new NumberValue(Double.parseDouble(str));
 	}
 
 	@Override

@@ -145,8 +145,8 @@ INDEX = id: "INDEX"
 <lista_campos_rec> ::= "," <lista_campos> | î;
 <campo> ::= id #12 <tabela_opt>;
 <tabela_opt> ::= "." id #14 | î;
-<clausula_where> ::= WHERE <lista_condicoes> | î;
-<lista_condicoes> ::= <condicao> <lista_condicoes_rec>;
+<clausula_where> ::= WHERE <lista_condicoes> #56 | î;
+<lista_condicoes> ::= <condicao> #37 <lista_condicoes_rec>;
 <lista_condicoes_rec> ::= <op_logico> #31 <lista_condicoes> | î;
 <condicao> ::= <campo> <op_relacional> #30 <valor>;
 <op_relacional> ::= "=" | ">" | "<" | ">=" | "<=" | "<>";
