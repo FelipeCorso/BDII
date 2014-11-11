@@ -16,11 +16,12 @@ import br.furb.jsondb.core.result.Result;
 import br.furb.jsondb.core.util.JsonDBUtils;
 import br.furb.jsondb.parser.ColumnIdentifier;
 import br.furb.jsondb.parser.DataType;
-import br.furb.jsondb.parser.statement.InsertStatement;
+import br.furb.jsondb.parser.Date;
 import br.furb.jsondb.parser.NumberValue;
 import br.furb.jsondb.parser.StringValue;
 import br.furb.jsondb.parser.TableIdentifier;
 import br.furb.jsondb.parser.Value;
+import br.furb.jsondb.parser.statement.InsertStatement;
 import br.furb.jsondb.sql.SQLException;
 import br.furb.jsondb.store.JsonDBStore;
 import br.furb.jsondb.store.StoreException;
@@ -52,22 +53,22 @@ public class InsertCommand implements ICommand {
 		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(JsonDB.getInstance().getCurrentDatabase());
 
 		if (!databaseMetadata.hasTable(table.getIdentifier())) {
-			throw new SQLException(String.format("Table %s not found", table.getIdentifier()));
+			throw new SQLException(String.format("Table '%s' not found", table.getIdentifier()));
 		}
 
 		// verificar se os campos existem
 
-		List<ColumnIdentifier> columns = statement.getColumns();
-
 		TableMetadata tableMetadata = databaseMetadata.getTable(table.getIdentifier());
 
-		List<String> columnNames = new ArrayList<String>();
+		List<String> columns = validateColumns(table, tableMetadata);
 
-		for (ColumnIdentifier column : columns) {
-			if (!tableMetadata.containsColumn(column.getColumnName())) {
-				throw new SQLException(String.format("Column %s not found on table %s", column.getColumnName(), table.getIdentifier()));
-			}
-			columnNames.add(column.getColumnName());
+		if (columns.isEmpty()) {
+			// adiciona todas as colunas da tabela
+			columns.addAll(tableMetadata.getColumns().keySet());
+		}
+
+		if (columns.size() != statement.getValues().size()) {
+			throw new SQLException("Column count does not match");
 		}
 
 		List<Value<?>> values = statement.getValues();
@@ -76,25 +77,21 @@ public class InsertCommand implements ICommand {
 
 		for (int i = 0; i < columns.size(); i++) {
 
-			String columnName = columns.get(i).getColumnName();
+			String columnName = columns.get(i);
 
 			Value<?> value = values.get(i);
 			mapValues.put(columnName, value);
 
 			ColumnMetadata columnMetadata = tableMetadata.getColumn(columnName);
 
-			// verificar se o valor corresponde ao tipo de dados da coluna
-			Result resultDataTypeValidation = validateDataType(columnMetadata, value);
-			if (resultDataTypeValidation != null) {
-				return resultDataTypeValidation;
+			if (value != Value.NULL) {
+				// verificar se o valor corresponde ao tipo de dados da coluna
+				validateDataType(columnMetadata, value);
+
+				// verificar se o tamanho do valor corresponde aos limites da coluna
+				validateSizeAndPrecision(columnMetadata, value);
 			}
 
-			// verificar se o tamanho do valor corresponde aos limites da coluna
-
-			Result resultSizeValidation = validateSizeAndPrecision(columnMetadata, value);
-			if (resultSizeValidation != null) {
-				return resultSizeValidation;
-			}
 		}
 
 		// verificar se foi informado valores para os campos da pk e campos not
@@ -104,8 +101,8 @@ public class InsertCommand implements ICommand {
 		notNullFields.addAll(TableMetadataUtils.getNotNullFields(tableMetadata, databaseMetadata));
 
 		for (String field : notNullFields) {
-			if (!columnNames.contains(field) || values.get(columnNames.indexOf(field)).getBaseValue() == Value.NULL) {
-				throw new SQLException(String.format("Column %s can't be null.", field));
+			if (!columns.contains(field) || values.get(columns.indexOf(field)).getBaseValue() == Value.NULL) {
+				throw new SQLException(String.format("Column '%s' can't be null.", field));
 			}
 		}
 
@@ -121,17 +118,17 @@ public class InsertCommand implements ICommand {
 			}
 
 			if (indexData.containsEntry(keyValues)) {
-				throw new SQLException("Unique key violation");
+				throw new SQLException("Primary key violation");
 			}
 
 		} catch (StoreException e) {
 			throw new SQLException(e.getMessage(), e);
 		}
 
-		// j� validou tudo, pode gravar no disco
+		// já validou tudo, pode gravar no disco
 		int rowId;
 		try {
-			rowId = JsonDBStore.getInstance().insertData(databaseMetadata.getName(), statement);
+			rowId = JsonDBStore.getInstance().insertData(databaseMetadata.getName(), table.getIdentifier(), mapValues);
 		} catch (StoreException e) {
 			e.printStackTrace();
 			throw new SQLException("Was not possible to insert data", e);
@@ -147,6 +144,18 @@ public class InsertCommand implements ICommand {
 		}
 
 		return new Result("Insert performed with success.");
+	}
+
+	private List<String> validateColumns(TableIdentifier table, TableMetadata tableMetadata) throws SQLException {
+		List<String> columns = new ArrayList<String>();
+
+		for (ColumnIdentifier column : statement.getColumns()) {
+			if (!tableMetadata.containsColumn(column.getColumnName())) {
+				throw new SQLException(String.format("Column '%s' not found on table %s", column.getColumnName(), table.getIdentifier()));
+			}
+			columns.add(column.getColumnName());
+		}
+		return columns;
 	}
 
 	private void updateIndexes(TableMetadata tableMetadata, Map<String, Value<?>> mapValues, int rowId) throws StoreException, IOException {
@@ -182,82 +191,120 @@ public class InsertCommand implements ICommand {
 		}
 	}
 
-	private Result validateSizeAndPrecision(ColumnMetadata columnMetadata, Value<?> value) throws SQLException {
+	private void validateSizeAndPrecision(ColumnMetadata columnMetadata, Value<?> value) throws SQLException {
 
 		DataType type = columnMetadata.getType();
 
 		String columnName = columnMetadata.getName();
-		int columnLenght = columnMetadata.getLenght();
+		int columnLength = columnMetadata.getLength();
+
+		boolean hasError = false;
 
 		switch (type) {
 		case VARCHAR:
 
-			if (columnLenght > 0) {
-
+			if (columnLength > 0) {
 				String v = (String) value.getBaseValue();
-
-				if (v.length() > columnLenght) {
-					throw new SQLException(String.format("Valor '%s' com tamanho inv�lido para a coluna %s", value.getBaseValue(), columnName));
+				if (v.length() > columnLength) {
+					hasError = true;
 				}
-
 			}
 
 			break;
 		case CHAR:
-			// TODO
+			String v = (String) value.getBaseValue();
+			if (v.length() > 1) {
+				hasError = true;
+			}
 
 			break;
 		case DATE:
-			// TODO
+			// TODO precisa validar???
 
 			break;
 		case NUMBER:
-			// TODO
+			NumberValue numberValue = (NumberValue) value;
+			Double baseValue = numberValue.getBaseValue();
+
+			int[] valueLength = getValueLength(baseValue);
+
+			if (columnLength > 0 && valueLength[0] > columnLength) {
+				hasError = true;
+			} else {
+				int precision = columnMetadata.getPrecision();
+
+				if (valueLength[1] > precision) {
+					hasError = true;
+				}
+			}
 
 			break;
 		default:
 			assert false;
 			break;
 		}
-		return null;
+
+		if (hasError) {
+			throw new SQLException(String.format("Invalid value length. Value: '%s'. Column: '%s'", value.stringValue(), columnName));
+		}
+
 	}
 
-	private void invalidValueResult(String columnName, Value<?> value) throws SQLException {
-		throw new SQLException(String.format("Valor '%s' inv�lido para a coluna %s", value.getBaseValue(), columnName));
-	}
-
-
-	private Result validateDataType(ColumnMetadata columnMetadata, Value<?> value) throws SQLException {
+	private void validateDataType(ColumnMetadata columnMetadata, Value<?> value) throws SQLException {
 		DataType type = columnMetadata.getType();
 
 		String columnName = columnMetadata.getName();
 
+		boolean hasError = false;
+
 		switch (type) {
 		case VARCHAR:
+		case CHAR:
 
 			if (!(value instanceof StringValue)) {
-				throw new SQLException(String.format("Valor '%s' inv�lido para a coluna %s", value.getBaseValue(), columnName));
+				hasError = true;
 			}
 
 			break;
-		case CHAR:
-			// TODO
-
-			break;
 		case DATE:
-			// TODO
+			if (!(value instanceof Date)) {
+				hasError = true;
+			}
 
 			break;
 		case NUMBER:
 			if (!(value instanceof NumberValue)) {
-				throw new SQLException(String.format("Valor '%s' inv�lido para a coluna %s", value.getBaseValue(), columnName));
+				hasError = true;
 			}
-
 			break;
 		default:
 			assert false;
 			break;
 		}
-		return null;
+
+		if (hasError) {
+			throw new SQLException(String.format("Invalid value type. Value: '%s'. Column: '%s'", value.stringValue(), columnName));
+		}
 	}
+
+	/**
+	 * Retorna os tamanhos do valor passado (Inteiro e Decimal)<br>
+	 */
+	private static int[] getValueLength(double value) {
+		if (value < 0) {
+			value = -value;
+		}
+		java.text.DecimalFormat df = new java.text.DecimalFormat("0.####################");
+		char decimalSeparator = df.getDecimalFormatSymbols().getDecimalSeparator();
+
+		String formated = df.format(value);
+
+		int separatorIndex = formated.indexOf(decimalSeparator);
+		if (separatorIndex < 0) {
+			return new int[] { formated.length(), 0 };
+		}
+
+		return new int[] { separatorIndex, formated.length() - separatorIndex - 1 };
+	}
+
 }

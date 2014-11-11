@@ -134,7 +134,7 @@ public class InsertCommandTest extends BaseCommandTest {
 		try {
 			JsonDB.getInstance().executeSQL("insert into Pessoa(Codigo, Nome) values (123, \"Batatinha\");");
 		} catch (SQLException e) {
-			assertEquals("Unique key violation", e.getMessage());
+			assertEquals("Primary key violation", e.getMessage());
 		}
 
 		rows = tableData.getRows();
