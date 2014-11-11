@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import br.furb.jsondb.parser.ColumnDefinition;
 import br.furb.jsondb.parser.ColumnIdentifier;
@@ -26,14 +27,14 @@ import br.furb.jsondb.store.utils.LastRowIdUtils;
 public class TableCreator {
 
 	public static void createTable(String database, CreateStatement statement) throws StoreException {
-		// 1� cria uma pasta para a tabela
+		// cria uma pasta para a tabela
 		File tableDir = createDiretory(database, statement);
 
 		TableDefinition tableDefinition = (TableDefinition) statement.getStructure();
 
 		List<String> pk = getPrimaryKeyFields(tableDefinition);
 
-		// 2� cria o arquivo de �ndice da pk da tabela
+		// cria o arquivo de �ndice da pk da tabela
 		IndexMetadata indexMetadata = createPrimaryKeyIndex(tableDir, pk);
 
 		// 3� cria o metadados da tabela
@@ -73,11 +74,28 @@ public class TableCreator {
 		return tableMetadata;
 	}
 
-	private static List<String> getPrimaryKeyFields(TableDefinition tableDefinition) {
+	private static List<String> getPrimaryKeyFields(TableDefinition tableDefinition) throws StoreException {
 		List<String> pk = new ArrayList<String>();
+
+		List<ColumnDefinition> columns = tableDefinition.getColumns();
+
+		for (ColumnDefinition columnDefinition : columns) {
+
+			Optional<ConstraintDefinition> constraint = columnDefinition.getConstraint();
+			if (constraint.isPresent()) {
+				if (constraint.get().getKind() == ConstraintKind.PRIMARY_KEY) {
+					pk.add(columnDefinition.getName());
+				}
+			}
+
+		}
 
 		for (ConstraintDefinition constraintDefinition : tableDefinition.getFinalConstraints()) {
 			if (constraintDefinition.getKind() == ConstraintKind.PRIMARY_KEY) {
+
+				if (pk.size() > 0) {
+					throw new StoreException("Primary Key was defined more than once.");
+				}
 
 				KeyDefinition keyDefinition = (KeyDefinition) constraintDefinition;
 
