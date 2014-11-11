@@ -6,6 +6,7 @@ import br.furb.jsondb.core.command.DropTableCommand;
 import br.furb.jsondb.core.command.InsertCommand;
 import br.furb.jsondb.core.command.SetDatabaseCommand;
 import br.furb.jsondb.core.result.IResult;
+import br.furb.jsondb.parser.Index;
 import br.furb.jsondb.parser.SQLParser;
 import br.furb.jsondb.parser.SQLParserException;
 import br.furb.jsondb.parser.TableDefinition;
@@ -19,7 +20,7 @@ import br.furb.jsondb.sql.SQLException;
 
 public class JsonDB {
 
-	private static JsonDB intance = new JsonDB();
+	private static final JsonDB INSTANCE = new JsonDB();
 
 	private String currentDatabase;
 
@@ -27,7 +28,7 @@ public class JsonDB {
 	}
 
 	public static JsonDB getInstance() {
-		return intance;
+		return INSTANCE;
 	}
 
 	public String getCurrentDatabase() {
@@ -38,6 +39,7 @@ public class JsonDB {
 		this.currentDatabase = currentDatabase;
 	}
 
+	@SuppressWarnings("unchecked")
 	public IResult executeSQL(String sql) throws SQLParserException, SQLException {
 		//		Collection<RawStatement> rawStatements = SQLParser.extractCommands(sql);
 		IStatement statement = SQLParser.parse(sql);
@@ -54,7 +56,11 @@ public class JsonDB {
 		} else if (statement instanceof SetDatabaseStatement) {
 			return setDatabase((SetDatabaseStatement) statement);
 		} else if (statement instanceof DropStatement) {
-			return dropTable((DropStatement<TableIdentifier>) statement);
+			DropStatement<?> dropStatement = (DropStatement<?>) statement;
+			if (dropStatement.getStructure() instanceof TableIdentifier) {
+				return dropTable((DropStatement<TableIdentifier>) statement);
+			}
+			return dropIndex((DropStatement<Index>) statement);
 		}
 
 		// TODO
@@ -103,6 +109,10 @@ public class JsonDB {
 
 	private IResult dropTable(DropStatement<TableIdentifier> statement) throws SQLException {
 		return new DropTableCommand(statement).execute();
+	}
+	
+	private IResult dropIndex(DropStatement<Index> statement) throws SQLException {
+		return null; // TODO
 	}
 
 	private IResult insert(InsertStatement statement) throws SQLException {
