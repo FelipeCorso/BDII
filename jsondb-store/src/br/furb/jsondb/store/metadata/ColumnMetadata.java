@@ -53,7 +53,7 @@ public class ColumnMetadata {
 
 	@Override
 	public String toString() {
-		return "FieldMetadata [name=" + name + ", type=" + type + ", lenght=" + lenght + "]";
+		return "ColumnMetadata [name=" + name + ", type=" + type + ", lenght=" + lenght + "]";
 	}
 
 	public int getPrecision() {
