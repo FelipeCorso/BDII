@@ -2,7 +2,7 @@ package br.furb.jsondb.store;
 
 public enum JsonDBProperty {
 
-	JSON_DB_DIR("br.furb.jsondb.dir", "user.home");
+	JSON_DB_DIR("br.furb.jsondb.dir", System.getProperty("user.home"));
 
 	private String property;
 	private String defaultValue;
