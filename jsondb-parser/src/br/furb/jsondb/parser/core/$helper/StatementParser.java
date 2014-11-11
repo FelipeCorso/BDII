@@ -66,16 +66,16 @@ public class StatementParser {
 	public void executeAction(int action, Token token) throws SQLParserException {
 		switch (action) {
 		case 1:
-			acaoSemantica01(token);
+			acaoSemantica01();
 			break;
 		case 2:
-			acaoSemantica02(token);
+			acaoSemantica02();
 			break;
 		case 3:
-			acaoSemantica03(token);
+			acaoSemantica03();
 			break;
 		case 4:
-			acaoSemantica04(token);
+			acaoSemantica04();
 			break;
 		case 8:
 			acaoSemantica08(token);
@@ -84,10 +84,10 @@ public class StatementParser {
 			acaoSemantica09(token);
 			break;
 		case 10:
-			acaoSemantica10(token);
+			acaoSemantica10();
 			break;
 		case 11:
-			acaoSemantica11(token);
+			acaoSemantica11();
 			break;
 		case 12:
 			acaoSemantica12(token);
@@ -111,22 +111,22 @@ public class StatementParser {
 			acaoSemantica18(token);
 			break;
 		case 19:
-			acaoSemantica19(token);
+			acaoSemantica19();
 			break;
 		case 20:
-			acaoSemantica20(token);
+			acaoSemantica20();
 			break;
 		case 21:
-			acaoSemantica21(token);
+			acaoSemantica21();
 			break;
 		case 22:
-			acaoSemantica22(token);
+			acaoSemantica22();
 			break;
 		case 23:
-			acaoSemantica23(token);
+			acaoSemantica23();
 			break;
 		case 24:
-			acaoSemantica24(token);
+			acaoSemantica24();
 			break;
 		case 26:
 			acaoSemantica26();
@@ -153,13 +153,13 @@ public class StatementParser {
 			acaoSemantica34(token);
 			break;
 		case 37:
-			acaoSemantica37(token);
+			acaoSemantica37();
 			break;
 		case 38:
-			acaoSemantica38(token);
+			acaoSemantica38();
 			break;
 		case 39:
-			acaoSemantica39(token);
+			acaoSemantica39();
 			break;
 		case 51:
 			acaoSemantica51(token);
@@ -168,16 +168,16 @@ public class StatementParser {
 			acaoSemantica52(token);
 			break;
 		case 53:
-			acaoSemantica53(token);
+			acaoSemantica53();
 			break;
 		case 55:
-			acaoSemantica55(token);
+			acaoSemantica55();
 			break;
 		case 56:
-			acaoSemantica56(token);
+			acaoSemantica56();
 			break;
 		case 57:
-			acaoSemantica57(token);
+			acaoSemantica57();
 			break;
 		case 61:
 			acaoSemantica61(token);
@@ -192,7 +192,7 @@ public class StatementParser {
 			acaoSemantica67(token);
 			break;
 		case 99:
-			acaoSemantica99(token);
+			acaoSemantica99();
 			break;
 		default:
 			throw new IllegalArgumentException("unsupported semantic action: " + action);
@@ -200,22 +200,22 @@ public class StatementParser {
 	}
 
 	/** Declaração de NUMBER. **/
-	private void acaoSemantica01(Token token) {
+	private void acaoSemantica01() {
 		this.columnType = new ColumnType(DataType.NUMBER);
 	}
 
 	/** Declaração de VARCHAR. **/
-	private void acaoSemantica02(Token token) {
+	private void acaoSemantica02() {
 		this.columnType = new ColumnType(DataType.VARCHAR);
 	}
 
 	/** Declaração de DATE. **/
-	private void acaoSemantica03(Token token) {
+	private void acaoSemantica03() {
 		this.columnType = new ColumnType(DataType.DATE);
 	}
 
 	/** Declaração de CHAR. **/
-	private void acaoSemantica04(Token token) {
+	private void acaoSemantica04() {
 		this.columnType = new ColumnType(DataType.CHAR);
 	}
 
@@ -230,12 +230,12 @@ public class StatementParser {
 	}
 
 	/** Inicia reconhecimento de colunas no INSERT. **/
-	private void acaoSemantica10(Token token) {
+	private void acaoSemantica10() {
 		this.idStack.clear();
 	}
 
 	/** Encerra reconhecimento de colunas no INSERT. **/
-	private void acaoSemantica11(Token token) {
+	private void acaoSemantica11() {
 		ArrayList<ColumnIdentifier> columns = new ArrayList<ColumnIdentifier>(this.idStack);
 		Collections.reverse(columns);
 		this.statement = new InsertStatement(this.lastTable, columns, null);
@@ -306,7 +306,7 @@ public class StatementParser {
 	 * Encerra reconhecimento de lista de tabelas (SELECT campos from
 	 * «tabelas»).
 	 **/
-	private void acaoSemantica19(Token token) {
+	private void acaoSemantica19() {
 		List<TableIdentifier> tables = new ArrayList<>(idStack.size());
 		idStack.forEach(column -> tables.add(new TableIdentifier(column.getColumnName())));
 		Collections.reverse(tables);
@@ -315,28 +315,28 @@ public class StatementParser {
 	}
 
 	/** Restrição NULL. **/
-	private void acaoSemantica20(Token token) {
+	private void acaoSemantica20() {
 		ConstraintDefinition constraint = new ConstraintDefinition(this.constraintName, ConstraintKind.NULL);
 		this.constraintStack.push(constraint);
 		this.constraintName = null;
 	}
 
 	/** Restrição NOT NULL. **/
-	private void acaoSemantica21(Token token) {
+	private void acaoSemantica21() {
 		ConstraintDefinition constraint = new ConstraintDefinition(this.constraintName, ConstraintKind.NOT_NULL);
 		this.constraintStack.push(constraint);
 		this.constraintName = null;
 	}
 
 	/** Restrição PRIMARY KEY. **/
-	private void acaoSemantica22(Token token) {
+	private void acaoSemantica22() {
 		ConstraintDefinition constraint = new KeyDefinition(this.constraintName, ConstraintKind.PRIMARY_KEY);
 		this.constraintStack.push(constraint);
 		this.constraintName = null;
 	}
 
 	/** Restrição [FOREIGN KEY] REFERENCES. **/
-	private void acaoSemantica23(Token token) {
+	private void acaoSemantica23() {
 		ForeignKeyDefinition constraint = new ForeignKeyDefinition(this.constraintName);
 		constraint.addColumn(this.lastColumn.getIdentifier());
 		this.constraintStack.push(constraint);
@@ -344,7 +344,7 @@ public class StatementParser {
 	}
 
 	/** Restrição FOREIGN KEY. **/
-	private void acaoSemantica24(Token token) {
+	private void acaoSemantica24() {
 		ConstraintDefinition constraint = new ForeignKeyDefinition(this.constraintName);
 		this.constraintStack.push(constraint);
 		this.constraintName = null;
@@ -469,13 +469,13 @@ public class StatementParser {
 	}
 
 	/** Reconhece condição relacional. */
-	private void acaoSemantica37(Token token) {
+	private void acaoSemantica37() {
 		RelationalCondition condition = new RelationalCondition(operator, this.idStack.pop(), this.valuesStack.pop());
 		this.conditions.add(condition);
 	}
 
 	/** Inicia reconhecimento de valores no INSERT. **/
-	private void acaoSemantica38(Token token) {
+	private void acaoSemantica38() {
 		if (this.statement == null) {
 			this.statement = new InsertStatement(this.lastTable, null, null);
 		}
@@ -483,7 +483,7 @@ public class StatementParser {
 	}
 
 	/** Encerra reconhecimento de valores no INSERT. **/
-	private void acaoSemantica39(Token token) {
+	private void acaoSemantica39() {
 		InsertStatement insert = (InsertStatement) this.statement;
 		ArrayList<Value<?>> orderedValues = new ArrayList<>(this.valuesStack);
 		Collections.reverse(orderedValues);
@@ -504,7 +504,7 @@ public class StatementParser {
 	}
 
 	/** Encerra reconhecimento do tipo. **/
-	private void acaoSemantica53(Token token) {
+	private void acaoSemantica53() {
 		ColumnDefinition column = this.columnDefStack.pop();
 		column.setColumnType(this.columnType);
 
@@ -517,7 +517,7 @@ public class StatementParser {
 	 * reconhecida, caso faça parte da declaração da mesma. Do contrário,
 	 * armazena na definição da tabela.
 	 */
-	private void acaoSemantica55(Token token) {
+	private void acaoSemantica55() {
 		TableDefinition table = (TableDefinition) ((CreateStatement) this.statement).getStructure();
 		ConstraintDefinition constraint = this.constraintStack.pop();
 		if (this.isFinal) {
@@ -530,7 +530,7 @@ public class StatementParser {
 	}
 
 	/** Encerra reconhecimento de condições WHERE. */
-	private void acaoSemantica56(Token token) {
+	private void acaoSemantica56() {
 		// Junta operadores lógicos
 		ICondition<?, ?> current;
 
@@ -563,7 +563,7 @@ public class StatementParser {
 	}
 
 	/** Encerra reconhecimento de CREATE INDEX. **/
-	private void acaoSemantica57(Token token) {
+	private void acaoSemantica57() {
 		ColumnIdentifier column = new ColumnIdentifier(this.lastTable, this.idStack.pop().getColumnName());
 		Index index = new Index(this.idStack.pop().getColumnName(), column);
 		this.statement = new CreateStatement(index);
@@ -592,7 +592,7 @@ public class StatementParser {
 	}
 
 	/** Finaliza reconhecimento de sentenca. **/
-	private void acaoSemantica99(Token token) {
+	private void acaoSemantica99() {
 		doneRec = true;
 	}
 

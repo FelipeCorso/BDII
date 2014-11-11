@@ -78,6 +78,6 @@ public class Sintatico implements Constants {
 		currentToken = scanner.nextToken();
 
 		while (!step())
-			;
+			{}
 	}
 }

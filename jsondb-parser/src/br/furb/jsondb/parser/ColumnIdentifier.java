@@ -11,7 +11,7 @@ public class ColumnIdentifier {
 		@Override
 		public String toString() {
 			return getColumnName();
-		};
+		}
 
 	};
 
