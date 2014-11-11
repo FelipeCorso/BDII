@@ -64,7 +64,7 @@ public class InsertCommand implements ICommand {
 		List<String> columnNames = new ArrayList<String>();
 
 		for (ColumnIdentifier column : columns) {
-			if (!tableMetadata.getColumns().containsKey(column.getColumnName())) {
+			if (!tableMetadata.containsColumn(column.getColumnName())) {
 				throw new SQLException(String.format("Column %s not found on table %s", column.getColumnName(), table.getIdentifier()));
 			}
 			columnNames.add(column.getColumnName());
@@ -81,7 +81,7 @@ public class InsertCommand implements ICommand {
 			Value<?> value = values.get(i);
 			mapValues.put(columnName, value);
 
-			ColumnMetadata columnMetadata = tableMetadata.getColumns().get(columnName);
+			ColumnMetadata columnMetadata = tableMetadata.getColumn(columnName);
 
 			// verificar se o valor corresponde ao tipo de dados da coluna
 			Result resultDataTypeValidation = validateDataType(columnMetadata, value);
@@ -109,7 +109,7 @@ public class InsertCommand implements ICommand {
 			}
 		}
 
-		// verificar se ainda n�o existe registro com a chave informada
+		// verificar se ainda não existe registro com a chave informada
 
 		try {
 			IndexData indexData = IndexDataProvider.getInstance(databaseMetadata.getName()).getIndexData(tableMetadata.getName(), "PRIMARY");
