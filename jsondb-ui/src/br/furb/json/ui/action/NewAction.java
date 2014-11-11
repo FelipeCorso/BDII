@@ -3,7 +3,6 @@ package br.furb.json.ui.action;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import br.furb.json.ui.Principal;
@@ -17,28 +16,29 @@ import br.furb.jsondb.store.utils.JsonUtils;
 
 public class NewAction {
 
-	public static void executeAction(Principal principal, JTree jTree, DefaultMutableTreeNode dataBaseNode) {
+	public static void executeAction(Principal principal) {
+		DefaultMutableTreeNode dataBaseNode;
+		DatabaseMetadata database;
 		try {
 			String databaseDir = Dialog.getInstance().createDatabaseDir(principal);
-
-			DatabaseMetadata database = JsonUtils.parseJsonToObject(new File(databaseDir), DatabaseMetadata.class);
-
-			if (!principal.getDatabases().containsKey(database.getName())) {
-				principal.addDataBase(database);
-
-				ManagerTreeMenu.createNodesDatabase(dataBaseNode, database);
-
-				((javax.swing.tree.DefaultTreeModel) jTree.getModel()).reload(ManagerTreeMenu.sort(dataBaseNode));
-
-				principal.getTabbedPanel().getCommandPanel().getTextEditor().setText("");
-				principal.getTabbedPanel().getCommandPanel().getTextMsg().setText("");
-				principal.getTabbedPanel().getCommandPanel().getLbFilePath().setText("");
-				principal.getKeyListener().setTextoEditor("");
-				principal.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.NAO_MODIFICADO.toString());
-			}
+			dataBaseNode = principal.getTreeMenu().getDataBaseNode();
+			database = JsonUtils.parseJsonToObject(new File(databaseDir), DatabaseMetadata.class);
 		} catch (IOException | SQLParserException | SQLException e) {
-			System.err.println("Não foi possível realizar a criação do arquivo: " + e.getMessage());
-			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+
+		if (!principal.getDatabases().containsKey(database.getName())) {
+			principal.addDataBase(database);
+
+			ManagerTreeMenu.createNodesDatabase(dataBaseNode, database);
+
+			((javax.swing.tree.DefaultTreeModel) principal.getTreeMenu().getjTree().getModel()).reload(ManagerTreeMenu.sort(dataBaseNode));
+
+			principal.getTabbedPanel().getCommandPanel().getTextEditor().setText("");
+			principal.getTabbedPanel().getCommandPanel().getTextMsg().setText("");
+			principal.getTabbedPanel().getCommandPanel().getLbFilePath().setText("");
+			principal.getKeyListener().setTextoEditor("");
+			principal.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.NAO_MODIFICADO.toString());
 		}
 	}
 }

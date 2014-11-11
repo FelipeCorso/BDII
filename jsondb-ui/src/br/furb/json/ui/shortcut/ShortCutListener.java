@@ -23,38 +23,39 @@ public class ShortCutListener implements KeyListener {
 		textEditor = "";
 	}
 
+	@SuppressWarnings("incomplete-switch")
 	@Override
 	public void keyPressed(KeyEvent event) {
 		boolean isCtrlDown = event.isControlDown();
 		switch (event.getKeyCode()) {
 		case KeyEvent.VK_N:
 			if (isCtrlDown) {
-				NewAction.executeAction(compUi, compUi.getTreeMenu().getjTree(), compUi.getTreeMenu().getDataBaseNode());
+				compUi.doSafely(NewAction::executeAction);
 			}
 			break;
 		case KeyEvent.VK_A:
 			if (isCtrlDown) {
-				OpenAction.executeAction(compUi, compUi.getTreeMenu().getjTree(), compUi.getTreeMenu().getDataBaseNode());
+				compUi.doSafely(OpenAction::executeAction);
 			}
 			break;
 		case KeyEvent.VK_S:
 			if (isCtrlDown) {
-				SaveAction.executeAction(compUi);
+				compUi.doSafely(SaveAction::executeAction);
 			}
 			break;
 		case KeyEvent.VK_C:
 			if (isCtrlDown) {
-				CopyAction.executeAction(compUi);
+				compUi.doSafely(CopyAction::executeAction);
 			}
 			break;
 		case KeyEvent.VK_V:
 			if (isCtrlDown) {
-				PasteAction.executeAction(compUi);
+				compUi.doSafely(PasteAction::executeAction);
 			}
 			break;
 		case KeyEvent.VK_X:
 			if (isCtrlDown) {
-				CutAction.executeAction(compUi);
+				compUi.doSafely(CutAction::executeAction);
 			}
 			break;
 		// case KeyEvent.VK_F8:

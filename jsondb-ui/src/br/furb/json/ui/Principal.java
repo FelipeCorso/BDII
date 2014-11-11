@@ -7,6 +7,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -14,7 +15,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import br.furb.json.ui.action.CopyAction;
@@ -28,6 +29,7 @@ import br.furb.json.ui.panel.tab.TabbedPanel;
 import br.furb.json.ui.panel.treeMenu.TreeMenuPanel;
 import br.furb.json.ui.shortcut.ShortCutListener;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
+import br.furb.jsondb.utils.ui.UIUtils;
 
 public class Principal extends JFrame {
 
@@ -61,11 +63,16 @@ public class Principal extends JFrame {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		UIUtils.changeLookAndFeelIfPossible(UIUtils.SupportedLookAndFeel.SYSTEM_DEFAULT);
+
 		EventQueue.invokeLater(new Runnable() {
+
+			@Override
 			public void run() {
 				try {
 					Principal frame = new Principal();
 					frame.setVisible(true);
+					UIUtils.centerOnScreen(frame);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -77,7 +84,7 @@ public class Principal extends JFrame {
 	 * Create the frame.
 	 */
 	public Principal() {
-		setTitle("JsOnDb");
+		setTitle("JsonDb");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1024, 660);
 		keyListener = new ShortCutListener(this);
@@ -106,7 +113,7 @@ public class Principal extends JFrame {
 		treeMenu.setSize(170, 591);
 		contentPane.add(treeMenu, BorderLayout.WEST);
 
-		tabbedPanel = new TabbedPanel(this, JTabbedPane.TOP);
+		tabbedPanel = new TabbedPanel(this, SwingConstants.TOP);
 		centerPanel.add(tabbedPanel, BorderLayout.CENTER);
 
 	}
@@ -123,7 +130,7 @@ public class Principal extends JFrame {
 		mntmNew.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				NewAction.executeAction(Principal.this, treeMenu.getjTree(), treeMenu.getDataBaseNode());
+				doSafely(NewAction::executeAction);
 			}
 		});
 		mnFile.add(mntmNew);
@@ -132,7 +139,7 @@ public class Principal extends JFrame {
 		mntmOpen.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				OpenAction.executeAction(Principal.this, treeMenu.getjTree(), treeMenu.getDataBaseNode());
+				doSafely(OpenAction::executeAction);
 			}
 		});
 		mnFile.add(mntmOpen);
@@ -141,7 +148,7 @@ public class Principal extends JFrame {
 		mntmSave.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				SaveAction.executeAction(Principal.this);
+				doSafely(SaveAction::executeAction);
 			}
 		});
 		mnFile.add(mntmSave);
@@ -154,7 +161,7 @@ public class Principal extends JFrame {
 		mntmCopy.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				CopyAction.executeAction(Principal.this);
+				doSafely(CopyAction::executeAction);
 			}
 		});
 		mnEdit.add(mntmCopy);
@@ -163,7 +170,7 @@ public class Principal extends JFrame {
 		mntmCut.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				CutAction.executeAction(Principal.this);
+				doSafely(CutAction::executeAction);
 			}
 		});
 		mnEdit.add(mntmCut);
@@ -172,7 +179,7 @@ public class Principal extends JFrame {
 		mntmPaste.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				PasteAction.executeAction(Principal.this);
+				doSafely(PasteAction::executeAction);
 			}
 		});
 		mnEdit.add(mntmPaste);
@@ -188,7 +195,7 @@ public class Principal extends JFrame {
 		mntmEquipe.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				TeamAction.executeAction(Principal.this);
+				doSafely(TeamAction::executeAction);
 			}
 		});
 		mnSobre.add(mntmEquipe);
@@ -216,6 +223,34 @@ public class Principal extends JFrame {
 
 	public TreeMenuPanel getTreeMenu() {
 		return treeMenu;
+	}
+
+	/**
+	 * Executa a ação de forma preventiva, capturando qualquer exceção que
+	 * ocorra e exibindo-a em um diálogo.
+	 * 
+	 * @param p
+	 *            função a ser executada. Leva como argument a instância atual
+	 *            de {@code Principal}.
+	 */
+	public void doSafely(Consumer<Principal> p) {
+		try {
+			p.accept(this);
+		} catch (Throwable t) {
+			handleUIException(t);
+		}
+	}
+
+	/**
+	 * Trata erros cuja possibilidade de ocorrência é conhecida, imprimindo a
+	 * stack trace e exibindo um diálogo de erro na interface.
+	 * 
+	 * @param t
+	 *            exceção ocorrida.
+	 */
+	private void handleUIException(Throwable t) {
+		t.printStackTrace();
+		UIUtils.showError(contentPane, t);
 	}
 
 }

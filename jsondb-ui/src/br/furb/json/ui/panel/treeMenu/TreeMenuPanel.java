@@ -32,14 +32,14 @@ public class TreeMenuPanel extends JPanel {
 	private static final long serialVersionUID = 8080924607252341731L;
 
 	protected static final String TABLES_STR = "Tabelas";
-	protected static final String INDEX_STR = "Índices";
+	protected static final String INDEX_STR = "ï¿½ndices";
 
 	private DefaultMutableTreeNode dataBaseNode;
 
 	private JTree jTree;
 
 	public TreeMenuPanel(Principal principal) {
-		setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
+		setBorder(new MatteBorder(1, 1, 1, 1, new Color(0, 0, 0)));
 		addKeyListener(principal.getKeyListener());
 
 		defineLookAndFeel();
@@ -67,14 +67,14 @@ public class TreeMenuPanel extends JPanel {
 
 					if (!dmt.getUserObject().toString().equalsIgnoreCase(DATA_BASE_STR)) {
 						if (dmt.getParent().toString().equalsIgnoreCase(DATA_BASE_STR)) {
-							// é uma base, fazer select
+							// ï¿½ uma base, fazer select
 							principal.getTabbedPanel().createTabDataBase(dmt.toString());
 						} else {
 							if (dmt.getParent().toString().equalsIgnoreCase(TABLES_STR)) {
-								// é uma tabela, describe
+								// ï¿½ uma tabela, describe
 							} else {
 								if (dmt.getParent().toString().equalsIgnoreCase(TABLES_STR)) {
-									// é um índice, apresentar nome, colunas
+									// ï¿½ um ï¿½ndice, apresentar nome, colunas
 								}
 							}
 						}
@@ -93,7 +93,7 @@ public class TreeMenuPanel extends JPanel {
 		lblOpenDB.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				OpenAction.executeAction(principal, jTree, dataBaseNode);
+				principal.doSafely(OpenAction::executeAction);
 			}
 		});
 		panelBotoes.setLayout(new FormLayout(new ColumnSpec[] { ColumnSpec.decode("center:50px"), ColumnSpec.decode("center:50px"), ColumnSpec.decode("center:50px"), },
@@ -103,7 +103,7 @@ public class TreeMenuPanel extends JPanel {
 		lblNewDB.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				NewAction.executeAction(principal, jTree, dataBaseNode);
+				principal.doSafely(NewAction::executeAction);
 			}
 		});
 		lblNewDB.setAlignmentX(Component.RIGHT_ALIGNMENT);

@@ -3,7 +3,6 @@ package br.furb.json.ui.action;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import br.furb.json.ui.Principal;
@@ -14,7 +13,7 @@ import br.furb.jsondb.store.utils.JsonUtils;
 
 public class OpenAction {
 
-	public static void executeAction(Principal principal, JTree jTree, DefaultMutableTreeNode dataBaseNode) {
+	public static void executeAction(Principal principal) {
 		try {
 			String databaseDir = Dialog.getInstance().loadDatabaseDir(principal);
 
@@ -23,13 +22,13 @@ public class OpenAction {
 			if (!principal.getDatabases().containsKey(database.getName())) {
 				principal.addDataBase(database);
 
+				DefaultMutableTreeNode dataBaseNode = principal.getTreeMenu().getDataBaseNode();
 				ManagerTreeMenu.createNodesDatabase(dataBaseNode, database);
 
-				((javax.swing.tree.DefaultTreeModel) jTree.getModel()).reload(ManagerTreeMenu.sort(dataBaseNode));
+				((javax.swing.tree.DefaultTreeModel) principal.getTreeMenu().getjTree().getModel()).reload(ManagerTreeMenu.sort(dataBaseNode));
 			}
 		} catch (IOException e) {
-			System.err.println("Não foi possível realizar a leitura do arquivo: " + e.getMessage());
-			e.printStackTrace();
+			throw new RuntimeException("Não foi possível realizar a leitura do arquivo: " + e.getMessage());
 		}
 	}
 
