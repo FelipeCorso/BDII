@@ -44,7 +44,7 @@ public class CreateTableCommand implements ICommand {
 
 		String tableName = statement.getStructure().getIdentifier();
 
-		// valida se a tabela j� existe
+		// valida se a tabela já existe
 		if (databaseMetadata.getTable(tableName) != null) {
 			throw new SQLException(String.format("Table %s already exists in database %s", tableName, database));
 		}
