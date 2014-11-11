@@ -27,7 +27,16 @@ public class TableMetadata {
 	public Map<String, ColumnMetadata> getColumns() {
 		return columns;
 	}
+	
+	public ColumnMetadata getColumn(String columnName) {
+		return columns.get(columnName);
+	}
+	
+	public boolean containsColumn(String columnName) {
+		return columns.containsKey(columnName);
+	}
 
+	
 	public List<String> getPrimaryKey() {
 		return primaryKey;
 	}

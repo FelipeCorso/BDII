@@ -20,10 +20,6 @@ public class IndexMetadata {
 		return columns;
 	}
 
-	public void setColumns(List<String> columns) {
-		this.columns = columns;
-	}
-
 	public void addColumn(String column) {
 		this.columns.add(column);
 	}
