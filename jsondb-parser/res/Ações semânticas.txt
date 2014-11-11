@@ -15,7 +15,7 @@ Acoes semanticas
 13		Nome de tabela
 14		Reconhece nome de coluna, e faz com que o ultimo nome de coluna (#12) seja considerado nome de tabela (#13)
 15		Nome de restricao usada no CREATE
-16		Nome de restrição final usada no CREATE
+16		Nome de restricao final usada no CREATE
 17		Nome de campo/atributo usado no CREATE
 18		Encerra reconhecimento de lista de campos (SELECT <<campos>>)
 19		Encerra reconhecimento de lista de tabelas (SELECT campos from <<tabelas>>)
@@ -37,7 +37,7 @@ Acoes semanticas
 33		Reconhece literal
 34		Reconhece data
 
-37		Reconhece condição relacional
+37		Reconhece condicao relacional
 38		Inicia reconhecimento de valores no INSERT
 39		Encerra reconhecimento de valores no INSERT
 
