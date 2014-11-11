@@ -53,7 +53,7 @@ public class TableDefinition implements IStructure {
 		}
 		structure.append(")");
 
-		return "TABLE ".concat(getIdentifier()).concat(structure.toString());
+		return "TABLE '".concat(getIdentifier()).concat("'").concat(structure.toString());
 	}
 
 }

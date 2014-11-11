@@ -336,7 +336,6 @@ public class StatementParser {
 	}
 
 	/** Restrição [FOREIGN KEY] REFERENCES. **/
-	// TODO: ao final, ver se pode ser substituída pela ação 24
 	private void acaoSemantica23(Token token) {
 		ForeignKeyDefinition constraint = new ForeignKeyDefinition(this.constraintName);
 		constraint.addColumn(this.lastColumn.getIdentifier());
@@ -353,21 +352,19 @@ public class StatementParser {
 
 	/** Encerra reconhecimento de IDs no {@code PRIMARY KEY ( <<ids>>)}. */
 	private void acaoSemantica26() {
-		KeyDefinition key = (KeyDefinition) this.constraintStack.peek();
-		List<ColumnIdentifier> orderedCols = new ArrayList<>(this.idStack);
-		Collections.reverse(orderedCols);
-
-		orderedCols.forEach(column -> key.addColumn(column));
-		this.idStack.clear();
+		endKeysRecognition();
 	}
 
 	/**
 	 * Encerra reconhecimento de IDs no {@code FOREIGN KEY
 	 * <table> (<<ids>>)}.
 	 **/
-	// TODO: ver se pode substituir pela ação 26
 	private void acaoSemantica28() {
-		ForeignKeyDefinition key = (ForeignKeyDefinition) this.constraintStack.peek();
+		endKeysRecognition();
+	}
+
+	private void endKeysRecognition() {
+		KeyDefinition key = (KeyDefinition) this.constraintStack.peek();
 		List<ColumnIdentifier> orderedCols = new ArrayList<>(this.idStack);
 		Collections.reverse(orderedCols);
 
@@ -564,7 +561,7 @@ public class StatementParser {
 		WhereClause whereClause = new WhereClause(this.conditions.get(0));
 		((SelectStatement) this.statement).setWhereClause(whereClause);
 	}
-	
+
 	/** Encerra reconhecimento de CREATE INDEX. **/
 	private void acaoSemantica57(Token token) {
 		ColumnIdentifier column = new ColumnIdentifier(this.lastTable, this.idStack.pop().getColumnName());
