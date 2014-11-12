@@ -1,11 +1,13 @@
 package br.furb.jsondb.core;
 
 import br.furb.jsondb.core.command.CreateDatabaseCommand;
+import br.furb.jsondb.core.command.CreateIndexCommand;
 import br.furb.jsondb.core.command.CreateTableCommand;
 import br.furb.jsondb.core.command.DropTableCommand;
 import br.furb.jsondb.core.command.InsertCommand;
 import br.furb.jsondb.core.command.SetDatabaseCommand;
 import br.furb.jsondb.core.result.IResult;
+import br.furb.jsondb.parser.DatabaseIdentifier;
 import br.furb.jsondb.parser.Index;
 import br.furb.jsondb.parser.SQLParser;
 import br.furb.jsondb.parser.SQLParserException;
@@ -47,16 +49,40 @@ public class JsonDB {
 		if (statement instanceof CreateStatement) {
 
 			CreateStatement createStatement = (CreateStatement) statement;
+
+			/* CREATE TABLE */
 			if (createStatement.getStructure() instanceof TableDefinition) {
 				return createTable(createStatement);
 			}
-			return createDatabase(createStatement);
-		} else if (statement instanceof InsertStatement) {
+
+			/* CREATE DATABASE */
+			if (createStatement.getStructure() instanceof DatabaseIdentifier) {
+				return createDatabase(createStatement);
+			}
+
+			/* CREATE INDEX */
+			if (createStatement.getStructure() instanceof Index) {
+				return createIndex(createStatement);
+			}
+
+			assert false;
+		}
+
+		/* INSERT */
+		if (statement instanceof InsertStatement) {
 			return insert((InsertStatement) statement);
-		} else if (statement instanceof SetDatabaseStatement) {
+		}
+
+		/* SET DATABASE*/
+		if (statement instanceof SetDatabaseStatement) {
 			return setDatabase((SetDatabaseStatement) statement);
-		} else if (statement instanceof DropStatement) {
+		}
+
+		/**/
+		if (statement instanceof DropStatement) {
 			DropStatement<?> dropStatement = (DropStatement<?>) statement;
+
+			/* DROP TABLE */
 			if (dropStatement.getStructure() instanceof TableIdentifier) {
 				return dropTable((DropStatement<TableIdentifier>) statement);
 			}
@@ -65,34 +91,16 @@ public class JsonDB {
 
 		// TODO
 
-		// 04. JsonDb submete c�digo para o SqlParser
-		// 05. SqlParser faz o reconhecimento preliminar das senten�as SQL
-		// (texto at� encontrar ";") e, para cada um, cria um objeto de
-		// RawStatement
-		// 06. SqlParser cria e retorna uma fila das senten�as SQL (sem o
-		// reconhecimento dos tokens)
-		// 07. JsonDb remove a primeira senten�a da fila
-		// 08. JsonDb solicita interpreta��o da senten�a SQL para o SqlParser
-		// 09. SqlParser reconhece a senten�a, cria o objeto de IStatement
-		// correspondente e retorna para o JsonDb
-
-		/* === Os passos abaixo s�o executados pelas classes ICommand === */
-		// 10. JsonDb verifica no metadados da base se a tabela envolvida no
-		// comando existe
-		// 11. JsonDb efetua as valida��es do comando
-		// 12. JsonDb submete altera��es para o Store
-		// 13. Store executa e retorna o resultado das altera��es
-
-		// TODO if para saber qual comando executar
-
-		// 14. JsonDb cria e armazena na sess�o um objeto de resultados com o
-		// comando executado, tempo decorrido desde o passo 07 e tempo absoluto
-		// do SO
-		// 15. Se houver mais um comando, pula para o passo 07
-		// 16. JsonDb retorna os objetos de resultados para a UI
-		// 17. Interface define a melhor forma de exibir os resultados
-
 		return null;
+	}
+
+	private IResult dropIndex(DropStatement<Index> statement) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private IResult createIndex(CreateStatement createStatement) throws SQLException {
+		return new CreateIndexCommand(createStatement).execute();
 	}
 
 	private IResult createDatabase(CreateStatement statement) throws SQLException {
@@ -109,10 +117,6 @@ public class JsonDB {
 
 	private IResult dropTable(DropStatement<TableIdentifier> statement) throws SQLException {
 		return new DropTableCommand(statement).execute();
-	}
-	
-	private IResult dropIndex(DropStatement<Index> statement) throws SQLException {
-		return null; // TODO
 	}
 
 	private IResult insert(InsertStatement statement) throws SQLException {
