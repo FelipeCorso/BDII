@@ -1,4 +1,4 @@
-package br.furb.json.ui.fileFilter;
+package br.furb.json.ui.filefilter;
 
 import java.io.File;
 import java.io.FilenameFilter;

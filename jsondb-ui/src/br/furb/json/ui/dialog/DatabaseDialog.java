@@ -7,28 +7,31 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import br.furb.json.ui.Principal;
-import br.furb.json.ui.fileFilter.MetadataFileFilter;
+import br.furb.json.ui.filefilter.MetadataFileFilter;
 import br.furb.jsondb.core.JsonDB;
 import br.furb.jsondb.parser.SQLParserException;
 import br.furb.jsondb.sql.SQLException;
 import br.furb.jsondb.utils.ui.UIUtils;
 
-public class Dialog extends JFileChooser {
+/**
+ * Diálogo de seleção de database, tanto criação quanto carregamento.
+ */
+public class DatabaseDialog extends JFileChooser {
 
 	private static final long serialVersionUID = -2748601639233642085L;
 	private static final String CREATE_FOLDER_DB = "Crie uma pasta para a nova database";
 	private static final String CREATE_ERROR = "Este diretório já contém um arquivo de metadados!";
 	private static final String CREATE_DATABASE = "CREATE DATABASE %s;";
-	private static Dialog intance = new Dialog();
+	private static DatabaseDialog intance = new DatabaseDialog();
 
-	private Dialog() {
+	private DatabaseDialog() {
 		super("C://"); // FIXME: informar programaticamente o root (existe algum modo simples pelo Java)
 		setFileFilter(MetadataFileFilter.FILE_FILTER); // FIXME: parece não estar sendo invocado oO
 		setAcceptAllFileFilterUsed(false);
 		setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	}
 
-	public static Dialog getInstance() {
+	public static DatabaseDialog getInstance() {
 		return intance;
 	}
 

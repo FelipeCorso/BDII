@@ -3,14 +3,8 @@ package br.furb.json.ui.shortcut;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import br.furb.json.ui.Actions;
 import br.furb.json.ui.Principal;
-import br.furb.json.ui.action.CopyAction;
-import br.furb.json.ui.action.CutAction;
-import br.furb.json.ui.action.NewAction;
-import br.furb.json.ui.action.OpenAction;
-import br.furb.json.ui.action.PasteAction;
-import br.furb.json.ui.action.SaveAction;
-import br.furb.json.ui.action.TeamAction;
 import br.furb.json.ui.status.EStatus;
 
 public class ShortCutListener implements KeyListener {
@@ -30,32 +24,32 @@ public class ShortCutListener implements KeyListener {
 		switch (event.getKeyCode()) {
 		case KeyEvent.VK_N:
 			if (isCtrlDown) {
-				compUi.doSafely(NewAction::executeAction);
+				compUi.doSafely(Actions::newDatabase);
 			}
 			break;
 		case KeyEvent.VK_A:
 			if (isCtrlDown) {
-				compUi.doSafely(OpenAction::executeAction);
+				compUi.doSafely(Actions::openDatabase);
 			}
 			break;
 		case KeyEvent.VK_S:
 			if (isCtrlDown) {
-				compUi.doSafely(SaveAction::executeAction);
+				compUi.doSafely(Actions::saveScript);
 			}
 			break;
 		case KeyEvent.VK_C:
 			if (isCtrlDown) {
-				compUi.doSafely(CopyAction::executeAction);
+				compUi.doSafely(Actions::copy);
 			}
 			break;
 		case KeyEvent.VK_V:
 			if (isCtrlDown) {
-				compUi.doSafely(PasteAction::executeAction);
+				compUi.doSafely(Actions::paste);
 			}
 			break;
 		case KeyEvent.VK_X:
 			if (isCtrlDown) {
-				compUi.doSafely(CutAction::executeAction);
+				compUi.doSafely(Actions::cut);
 			}
 			break;
 		// case KeyEvent.VK_F8:
@@ -65,7 +59,7 @@ public class ShortCutListener implements KeyListener {
 		// new BotaoGerarCodigo().executeAction(compUi);
 		// break;
 		case KeyEvent.VK_F1:
-			TeamAction.executeAction(compUi);
+			Actions.showTeam(compUi);
 			break;
 		}
 	}

@@ -23,8 +23,8 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
+import br.furb.json.ui.Actions;
 import br.furb.json.ui.Principal;
-import br.furb.json.ui.action.ExecuteAction;
 import br.furb.json.ui.shortcut.NumberedBorder;
 import br.furb.json.ui.status.EStatus;
 import br.furb.jsondb.utils.StringUtils;
@@ -84,7 +84,7 @@ public class CommandPanel extends JPanel {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				principal.doSafely(ExecuteAction::executeAction);
+				principal.doSafely(Actions::executeScript);
 			}
 
 		});

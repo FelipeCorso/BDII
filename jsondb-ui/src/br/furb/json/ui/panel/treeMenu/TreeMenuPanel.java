@@ -17,9 +17,8 @@ import javax.swing.border.MatteBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import br.furb.json.ui.Actions;
 import br.furb.json.ui.Principal;
-import br.furb.json.ui.action.NewAction;
-import br.furb.json.ui.action.OpenAction;
 
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
@@ -93,7 +92,7 @@ public class TreeMenuPanel extends JPanel {
 		lblOpenDB.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				principal.doSafely(OpenAction::executeAction);
+				principal.doSafely(Actions::openDatabase);
 			}
 		});
 		panelBotoes.setLayout(new FormLayout(new ColumnSpec[] { ColumnSpec.decode("center:50px"), ColumnSpec.decode("center:50px"), ColumnSpec.decode("center:50px"), },
@@ -103,7 +102,7 @@ public class TreeMenuPanel extends JPanel {
 		lblNewDB.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				principal.doSafely(NewAction::executeAction);
+				principal.doSafely(Actions::newDatabase);
 			}
 		});
 		lblNewDB.setAlignmentX(Component.RIGHT_ALIGNMENT);
