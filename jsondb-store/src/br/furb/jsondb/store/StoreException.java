@@ -1,6 +1,6 @@
 package br.furb.jsondb.store;
 
-public class StoreException extends Exception {
+public class StoreException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
