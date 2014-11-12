@@ -154,7 +154,7 @@ public class InsertCommand implements ICommand {
 
 		for (ColumnIdentifier column : statement.getColumns()) {
 			if (!tableMetadata.containsColumn(column.getColumnName())) {
-				throw new SQLException(String.format("Column '%s' not found on table %s", column.getColumnName(), table.getIdentifier()));
+				throw new SQLException(String.format("Column '%s' not found on table '%s'", column.getColumnName(), table.getIdentifier()));
 			}
 			columns.add(column.getColumnName());
 		}
