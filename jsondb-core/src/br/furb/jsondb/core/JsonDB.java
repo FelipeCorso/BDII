@@ -1,5 +1,7 @@
 package br.furb.jsondb.core;
 
+import java.io.File;
+
 import br.furb.jsondb.core.command.CreateDatabaseCommand;
 import br.furb.jsondb.core.command.CreateIndexCommand;
 import br.furb.jsondb.core.command.CreateTableCommand;
@@ -20,10 +22,21 @@ import br.furb.jsondb.parser.statement.IStatement;
 import br.furb.jsondb.parser.statement.InsertStatement;
 import br.furb.jsondb.parser.statement.SetDatabaseStatement;
 import br.furb.jsondb.sql.SQLException;
+import br.furb.jsondb.store.JsonDBProperty;
+import br.furb.jsondb.store.JsonDBStore;
 
 public class JsonDB {
 
 	private static final JsonDB INSTANCE = new JsonDB();
+
+	/**
+	 * Nome da pasta do JsonDB, que deve estar dentro da pasta de trabalho do
+	 * banco.
+	 * <p>
+	 * Atualmente é {@code ".jsondb"}
+	 * </p>
+	 */
+	public static final String JSONDB_FOLDER_NAME = JsonDBStore.JSONDB_FOLDER_NAME;
 
 	private String currentDatabase;
 
@@ -32,6 +45,12 @@ public class JsonDB {
 
 	public static JsonDB getInstance() {
 		return INSTANCE;
+	}
+
+	public static void setWorkDir(File workDir) {
+		JsonDBStore.reset();
+		JsonDBProperty.JSON_DB_DIR.set(workDir.getAbsolutePath());
+		JsonDBStore.getInstance().getJsonDBDir();
 	}
 
 	public String getCurrentDatabase() {

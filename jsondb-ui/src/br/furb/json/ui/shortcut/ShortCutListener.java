@@ -66,11 +66,13 @@ public class ShortCutListener implements KeyListener {
 
 	@Override
 	public void keyReleased(KeyEvent event) {
-		// FIXME: COMANDO DEVE SER EXECUTADO NA ABA SELECIONADA
-		if (!textEditor.equalsIgnoreCase(compUi.getTabbedPanel().getCommandPanel().getTextEditor().getText())) {
-			compUi.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.MODIFICADO.toString());
-		} else {
-			compUi.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.NAO_MODIFICADO.toString());
+		if (compUi.getTabbedPanel().getCommandPanel() != null) {
+			// FIXME: COMANDO DEVE SER EXECUTADO NA ABA SELECIONADA
+			if (!textEditor.equalsIgnoreCase(compUi.getTabbedPanel().getCommandPanel().getTextEditor().getText())) {
+				compUi.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.MODIFICADO.toString());
+			} else {
+				compUi.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.NAO_MODIFICADO.toString());
+			}
 		}
 
 	}

@@ -84,6 +84,10 @@ public class UIUtils {
 		JOptionPane.showMessageDialog(parent, message, title, dialogType);
 	}
 	
+	public static boolean promptConfirmation(Component parent, String promptMessage, String title) {
+		return JOptionPane.showConfirmDialog(parent, promptMessage, title, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+	}
+	
 	public static void showError(Component parent, Throwable t) {
 		JOptionPane.showMessageDialog(parent, generateMessage(t), "Erro", JOptionPane.ERROR_MESSAGE);
 	}

@@ -3,20 +3,27 @@ package br.furb.json.ui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
@@ -64,6 +71,10 @@ public class Principal extends JFrame {
 	private JMenuItem mntmCreateDatabase;
 	private JMenuItem mntmDropDatabase;
 
+	private Collection<JMenuItem> baseDependantMenus;
+
+	private File workingDir;
+
 	/**
 	 * Launch the application.
 	 */
@@ -89,7 +100,6 @@ public class Principal extends JFrame {
 	 * Create the frame.
 	 */
 	public Principal() {
-		setTitle("JsonDB");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1024, 660);
 		keyListener = new ShortCutListener(this);
@@ -122,6 +132,8 @@ public class Principal extends JFrame {
 
 		menuBar = new JMenuBar();
 		createJMenuBar();
+		
+		setWorkingDir(null);
 	}
 
 	private void createJMenuBar() {
@@ -133,10 +145,9 @@ public class Principal extends JFrame {
 		mnFile.addKeyListener(keyListener);
 		menuBar.add(mnFile);
 
-		mntmNewScript = new JMenuItem("Novo script");
-		mntmNewScript.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
+		mntmNewScript = new JMenuItem(createSafeAction(Actions::newScript, "Novo script sem base"));
 		mntmNewScript.setMnemonic(KeyEvent.VK_N);
-		mntmNewScript.addMouseListener(createSafeMouseListener(Actions::newDatabase));
+		mntmNewScript.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
 		mnFile.add(mntmNewScript);
 
 		mntmOpenScript = new JMenuItem("Abrir script");
@@ -156,7 +167,7 @@ public class Principal extends JFrame {
 		mntmSaveScriptAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
 		mnFile.add(mntmSaveScriptAs);
 
-		mntmChangeWorkDir = new JMenuItem("Alterar pasta de trabalho");
+		mntmChangeWorkDir = new JMenuItem(createSafeAction(Actions::changeWorkingDir, "Alterar pasta de trabalho"));
 		mntmChangeWorkDir.setMnemonic(KeyEvent.VK_T);
 		mntmChangeWorkDir.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK));
 		mnFile.add(mntmChangeWorkDir);
@@ -197,7 +208,8 @@ public class Principal extends JFrame {
 		mnDatabase.setMnemonic(KeyEvent.VK_B);
 		menuBar.add(mnDatabase);
 
-		mntmNewScript_noBase = new JMenuItem("Novo script sem vínculo");
+		// "Novo script sem base"
+		mntmNewScript_noBase = new JMenuItem(mntmNewScript.getAction());
 		mntmNewScript_noBase.setMnemonic(KeyEvent.VK_N);
 		mntmNewScript_noBase.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
 		mnDatabase.add(mntmNewScript_noBase);
@@ -228,6 +240,13 @@ public class Principal extends JFrame {
 		mntmTeam.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
 		mntmTeam.addMouseListener(createSafeMouseListener(Actions::showTeam));
 		mnHelp.add(mntmTeam);
+
+		baseDependantMenus = new ArrayList<JMenuItem>(3);
+		baseDependantMenus.add(mntmNewScript_forBase);
+		baseDependantMenus.add(mntmCreateDatabase);
+		baseDependantMenus.add(mntmDropDatabase);
+
+		baseDependantMenus.forEach((menu) -> menu.setEnabled(false));
 	}
 
 	public Map<String, DatabaseMetadata> getDatabases() {
@@ -263,6 +282,16 @@ public class Principal extends JFrame {
 		};
 	}
 
+	@SuppressWarnings("serial")
+	private Action createSafeAction(Consumer<Principal> action, String actionName) {
+		return new AbstractAction(actionName) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				doSafely(action);
+			}
+		};
+	}
+
 	/**
 	 * Executa a ação de forma preventiva, capturando qualquer exceção que
 	 * ocorra e exibindo-a em um diálogo.
@@ -289,6 +318,35 @@ public class Principal extends JFrame {
 	private void handleUIException(Throwable t) {
 		t.printStackTrace();
 		UIUtils.showError(contentPane, t);
+	}
+
+	/**
+	 * Exibe uma mensagem de erro na tela.
+	 * 
+	 * @param message
+	 *            mensagem do erro.
+	 */
+	private void handleUIException(String message) {
+		UIUtils.showMessage(this, message, "Erro", JOptionPane.ERROR_MESSAGE);
+	}
+
+	/**
+	 * Altera a pasta de trabalho atual, atualizando o caminho no título da
+	 * janela e fechando todos os scripts abertos.
+	 * 
+	 * @param newDir
+	 *            nova pasta de trabalho
+	 */
+	public void setWorkingDir(File newDir) {
+		this.workingDir = newDir;
+		boolean hasDir = newDir != null;
+		setTitle("JsonDB - " + (hasDir ? newDir.getAbsolutePath() : "<sem pasta de trabalho>"));
+		baseDependantMenus.forEach(menu -> menu.setEnabled(hasDir));
+		// TODO
+	}
+
+	public File getWorkingDir() {
+		return workingDir;
 	}
 
 }

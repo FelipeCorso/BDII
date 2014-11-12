@@ -23,6 +23,13 @@ public final class Actions {
 	private Actions() {
 	}
 
+	public static void changeWorkingDir(Principal principal) {
+		File newDir = DatabaseDialog.getInstance().changeWorkingDir(principal, principal.getWorkingDir());
+		if (newDir != null) {
+			principal.setWorkingDir(newDir);
+		}
+	}
+
 	public static void showTeam(Principal principal) {
 		// TODO: mostrar em uma modal
 		principal.getTabbedPanel().getCommandPanel().getTextMsg().setText("Integrantes Equipe: Felipe Loose Corso, Janaína Carraro Mendonça Lima, William Leander Seefeld\n");
@@ -80,6 +87,14 @@ public final class Actions {
 			principal.getKeyListener().setTextoEditor("");
 			principal.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.NAO_MODIFICADO.toString());
 		}
+	}
+	
+	/**
+	 * Cria uma nova aba de código
+	 * @param principal
+	 */
+	public static void newScript(Principal principal) {
+		
 	}
 
 	public static void openDatabase(Principal principal) {

@@ -33,6 +33,15 @@ public class JsonDBStore {
 
 	private File jsonDBDir;
 
+	/**
+	 * Nome da pasta do JsonDB, que deve estar dentro da pasta de trabalho do
+	 * banco.
+	 * <p>
+	 * Atualmente é {@code ".jsondb"}
+	 * </p>
+	 */
+	public static final String JSONDB_FOLDER_NAME = ".jsondb";
+
 	private JsonDBStore() {
 		// esconde o construtor
 	}
@@ -46,7 +55,7 @@ public class JsonDBStore {
 
 	public File getJsonDBDir() {
 		if (jsonDBDir == null) {
-			jsonDBDir = new File(JsonDBProperty.JSON_DB_DIR.get(), ".jsondb");
+			jsonDBDir = new File(JsonDBProperty.JSON_DB_DIR.get(), JSONDB_FOLDER_NAME);
 			if (!jsonDBDir.exists()) {
 				boolean mkdir = jsonDBDir.mkdir();
 				if (!mkdir) {
