@@ -28,8 +28,10 @@ public class InsertTest extends BaseJsonDBTest {
 		/**/"CREATE TABLE livro("
 		/**/+ "titulo VARCHAR(40),"
 		/**/+ "autor VARCHAR(40));");
+
+		executeSQL("CREATE INDEX idx_nome on aluno(nome);");
 	}
-	
+
 	@Override
 	public void after() throws IOException {
 		try {
@@ -40,7 +42,6 @@ public class InsertTest extends BaseJsonDBTest {
 		}
 		super.after();
 	}
-
 
 	/**
 	 * Testa o comando insert com colunas
@@ -65,6 +66,9 @@ public class InsertTest extends BaseJsonDBTest {
 
 		String sql = "INSERT INTO aluno VALUES(1234, \"João\", \"M\", 03/05/2005, 8.5);";
 
+		executeSQL(sql);
+
+		sql = "INSERT INTO aluno VALUES(3456, \"João\", \"M\", 03/05/2005, 8.5);";
 		executeSQL(sql);
 	}
 
@@ -120,9 +124,9 @@ public class InsertTest extends BaseJsonDBTest {
 
 		sql = "INSERT INTO livro VALUES(\"abc\", \"fulano de tal\");";
 		executeSQL(sql);
-		
+
 	}
-	
+
 	/**
 	 * Testa o comando insert com coluna inexistente na tabela
 	 * 
@@ -391,5 +395,4 @@ public class InsertTest extends BaseJsonDBTest {
 		JsonDB.getInstance().executeSQL(sql);
 	}
 
-	
 }
