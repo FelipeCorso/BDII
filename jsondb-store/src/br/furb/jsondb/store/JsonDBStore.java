@@ -9,16 +9,20 @@ import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
 
+import br.furb.jsondb.parser.Index;
 import br.furb.jsondb.parser.Value;
 import br.furb.jsondb.parser.statement.CreateStatement;
 import br.furb.jsondb.sql.SQLException;
 import br.furb.jsondb.store.data.ColumnData;
+import br.furb.jsondb.store.data.IndexData;
 import br.furb.jsondb.store.data.LastRowId;
 import br.furb.jsondb.store.data.RowData;
 import br.furb.jsondb.store.data.TableDataProvider;
 import br.furb.jsondb.store.metadata.ConstraintMetadata;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
 import br.furb.jsondb.store.metadata.DatabaseMetadataProvider;
+import br.furb.jsondb.store.metadata.IndexMetadata;
+import br.furb.jsondb.store.metadata.TableMetadata;
 import br.furb.jsondb.store.utils.JsonUtils;
 import br.furb.jsondb.store.utils.LastRowIdUtils;
 
@@ -142,11 +146,7 @@ public class JsonDBStore {
 
 		}
 
-		try {
-			JsonUtils.write(databaseMetadata, DatabaseMetadata.class, new File(databaseDir, "database.metadata"));
-		} catch (IOException e) {
-			throw new StoreException("Was not possible to write database metadata.", e);
-		}
+		saveDatabaseMetadata(databaseMetadata);
 	}
 
 	public int insertData(String database, String table, Map<String, Value<?>> mapValues) throws StoreException {
@@ -182,7 +182,49 @@ public class JsonDBStore {
 		return rowId;
 	}
 
+	public void saveDatabaseMetadata(DatabaseMetadata databaseMetadata) throws StoreException {
+		try {
+			JsonUtils.write(databaseMetadata, DatabaseMetadata.class, new File(JsonDBStore.getInstance().getDatabaseDir(databaseMetadata.getName()), "database.metadata"));
+		} catch (IOException e) {
+			throw new StoreException("Was not possible to save database metadata.", e);
+		}
+	}
+
 	public static void reset() {
 		instance = null;
+	}
+
+	public void createIndex(String database, Index index) throws StoreException {
+
+		IndexData indexData = new IndexData();
+		indexData.setName(index.getIdentifier());
+		indexData.addColumn(index.getTableColumn().getColumnName());
+
+		IndexMetadata indexMetadata = new IndexMetadata();
+		indexMetadata.addColumn(index.getTableColumn().getColumnName());
+		indexMetadata.setName(index.getIdentifier());
+
+		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(database);
+
+		TableMetadata table = databaseMetadata.getTable(index.getTableColumn().getTable().get().getIdentifier());
+
+		table.addIndexMetadata(indexMetadata);
+
+		File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
+
+		String tableName = table.getName();
+
+		File tableDir = new File(databaseDir, tableName);
+
+		File indexFile = new File(tableDir, index.getIdentifier() + ".index");
+
+		try {
+			indexFile.createNewFile();
+			JsonUtils.write(indexData, IndexData.class, indexFile);
+		} catch (IOException e) {
+			throw new StoreException("Was not possible to create index file", e);
+		}
+
+		saveDatabaseMetadata(databaseMetadata);
 	}
 }
