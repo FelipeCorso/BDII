@@ -152,6 +152,6 @@ INDEX = id: "INDEX"
 <op_relacional> ::= "=" | ">" | "<" | ">=" | "<=" | "<>";
 <op_logico> ::= AND | OR;
 <eliminar> ::= DROP <eliminar_estrutura>;
-<eliminar_estrutura> ::= TABLE id #61 | INDEX id #67;
+<eliminar_estrutura> ::= TABLE id #61 | INDEX id #67 ON id #13;
 <descrever> ::= DESCRIBE id #63;
 <setar_banco> ::= SET DATABASE id #65;

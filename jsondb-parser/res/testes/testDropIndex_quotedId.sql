@@ -1,1 +1,1 @@
-DROP INDEX 'novo_indice';
+DROP INDEX 'novo_indice' ON 'tabela';

@@ -33,7 +33,7 @@ public class DropIndexCommand implements ICommand {
 
 		//validar se a tabela existe
 
-		TableIdentifier tableIdentifier = index.getTableColumn().getTable().get();
+		TableIdentifier tableIdentifier = index.getTable();
 		validateTable(databaseMetadata, tableIdentifier);
 
 		TableMetadata table = databaseMetadata.getTable(tableIdentifier.getIdentifier());

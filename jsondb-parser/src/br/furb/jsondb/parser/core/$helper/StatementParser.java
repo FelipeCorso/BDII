@@ -587,12 +587,16 @@ public class StatementParser {
 
 	/** Nome de índice a ser removido (DROP INDEX). **/
 	private void acaoSemantica67(Token token) {
-		Index index = new Index(cleanId(token.getLexeme()), new ColumnIdentifier(lastTable, cleanId(token.getLexeme())));
+		Index index = new Index(cleanId(token.getLexeme()), null);
 		this.statement = new DropStatement<IStructure>(index);
 	}
 
 	/** Finaliza reconhecimento de sentenca. **/
+	@SuppressWarnings("unchecked")
 	private void acaoSemantica99() {
+		if (statement instanceof DropStatement && ((DropStatement<?>) statement).getStructure() instanceof Index) {
+			((DropStatement<Index>) statement).getStructure().setTable(lastTable);
+		}
 		doneRec = true;
 	}
 

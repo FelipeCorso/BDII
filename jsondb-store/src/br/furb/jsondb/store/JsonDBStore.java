@@ -233,7 +233,7 @@ public class JsonDBStore {
 		// remove do metadata
 		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(database);
 
-		TableMetadata table = databaseMetadata.getTable(index.getTableColumn().getTable().get().getIdentifier());
+		TableMetadata table = databaseMetadata.getTable(index.getTable().getIdentifier());
 		table.removeIndex(index.getIdentifier());
 
 		saveDatabaseMetadata(databaseMetadata);
