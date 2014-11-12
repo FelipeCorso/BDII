@@ -1,6 +1,7 @@
 package br.furb.jsondb.store.metadata;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,16 +28,15 @@ public class TableMetadata {
 	public Map<String, ColumnMetadata> getColumns() {
 		return columns;
 	}
-	
+
 	public ColumnMetadata getColumn(String columnName) {
 		return columns.get(columnName);
 	}
-	
+
 	public boolean containsColumn(String columnName) {
 		return columns.containsKey(columnName);
 	}
 
-	
 	public List<String> getPrimaryKey() {
 		return primaryKey;
 	}
@@ -47,6 +47,20 @@ public class TableMetadata {
 
 	public void addIndexMetadata(IndexMetadata indexMetadata) {
 		this.indexes.add(indexMetadata);
+	}
+
+	public void removeIndex(String index) {
+
+		Iterator<IndexMetadata> iterator = indexes.iterator();
+
+		while (iterator.hasNext()) {
+			IndexMetadata indexMetadata = iterator.next();
+			if (indexMetadata.getName().equals(index)) {
+				iterator.remove();
+				break;
+			}
+		}
+
 	}
 
 	public List<IndexMetadata> getIndexes() {

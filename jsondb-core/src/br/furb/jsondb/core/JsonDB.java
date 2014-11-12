@@ -3,6 +3,7 @@ package br.furb.jsondb.core;
 import br.furb.jsondb.core.command.CreateDatabaseCommand;
 import br.furb.jsondb.core.command.CreateIndexCommand;
 import br.furb.jsondb.core.command.CreateTableCommand;
+import br.furb.jsondb.core.command.DropIndexCommand;
 import br.furb.jsondb.core.command.DropTableCommand;
 import br.furb.jsondb.core.command.InsertCommand;
 import br.furb.jsondb.core.command.SetDatabaseCommand;
@@ -94,9 +95,8 @@ public class JsonDB {
 		return null;
 	}
 
-	private IResult dropIndex(DropStatement<Index> statement) {
-		// TODO Auto-generated method stub
-		return null;
+	private IResult dropIndex(DropStatement<Index> statement) throws SQLException {
+		return new DropIndexCommand(statement).execute();
 	}
 
 	private IResult createIndex(CreateStatement createStatement) throws SQLException {

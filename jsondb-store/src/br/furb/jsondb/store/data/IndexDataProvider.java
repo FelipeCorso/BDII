@@ -30,6 +30,12 @@ public class IndexDataProvider {
 		return INSTANCES.get(database);
 	}
 
+	public void removeIndexData(String table, String index) {
+		if (indexData.containsKey(table)) {
+			indexData.get(table).remove(index);
+		}
+	}
+
 	public IndexData getIndexData(String table, String index) throws StoreException {
 
 		if (!indexData.containsKey(table)) {

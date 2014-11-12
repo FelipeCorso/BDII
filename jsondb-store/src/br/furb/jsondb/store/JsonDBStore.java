@@ -15,6 +15,7 @@ import br.furb.jsondb.parser.statement.CreateStatement;
 import br.furb.jsondb.sql.SQLException;
 import br.furb.jsondb.store.data.ColumnData;
 import br.furb.jsondb.store.data.IndexData;
+import br.furb.jsondb.store.data.IndexDataProvider;
 import br.furb.jsondb.store.data.LastRowId;
 import br.furb.jsondb.store.data.RowData;
 import br.furb.jsondb.store.data.TableDataProvider;
@@ -226,5 +227,32 @@ public class JsonDBStore {
 		}
 
 		saveDatabaseMetadata(databaseMetadata);
+	}
+
+	public void dropIndex(String database, Index index) throws StoreException {
+		// remove do metadata
+		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(database);
+
+		TableMetadata table = databaseMetadata.getTable(index.getTableColumn().getTable().get().getIdentifier());
+		table.removeIndex(index.getIdentifier());
+
+		saveDatabaseMetadata(databaseMetadata);
+
+		//remove da memória
+		IndexDataProvider.getInstance(database).removeIndexData(table.getName(), index.getIdentifier());
+
+		// remove o arquivo do índice
+		File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
+
+		String tableName = table.getName();
+
+		File tableDir = new File(databaseDir, tableName);
+
+		File indexFile = new File(tableDir, index.getIdentifier() + ".index");
+		boolean delete = indexFile.delete();
+
+		if (!delete) {
+			throw new StoreException("Was not possible to delete index file");
+		}
 	}
 }
