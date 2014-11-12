@@ -36,7 +36,7 @@ public class TabbedPanel extends JTabbedPane {
 	}
 
 	public CommandPanel getCommandPanel() {
-		return commandPanel;
+		return (CommandPanel) getSelectedComponent();
 	}
 
 	@Override

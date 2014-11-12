@@ -32,6 +32,7 @@ import javax.swing.border.EmptyBorder;
 import br.furb.json.ui.panel.tab.TabbedPanel;
 import br.furb.json.ui.panel.treeMenu.TreeMenuPanel;
 import br.furb.json.ui.shortcut.ShortCutListener;
+import br.furb.jsondb.store.JsonDBProperty;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
 import br.furb.jsondb.utils.ui.UIUtils;
 
@@ -133,7 +134,7 @@ public class Principal extends JFrame {
 		menuBar = new JMenuBar();
 		createJMenuBar();
 		
-		setWorkingDir(null);
+		setWorkingDir(new File(JsonDBProperty.JSON_DB_DIR.get()));
 	}
 
 	private void createJMenuBar() {

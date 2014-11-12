@@ -6,9 +6,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import javax.swing.JTextArea;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import br.furb.json.ui.dialog.DatabaseDialog;
+import br.furb.json.ui.panel.command.CommandPanel;
 import br.furb.json.ui.panel.treeMenu.ManagerTreeMenu;
 import br.furb.json.ui.status.EStatus;
 import br.furb.jsondb.core.JsonDB;
@@ -17,8 +19,11 @@ import br.furb.jsondb.parser.SQLParserException;
 import br.furb.jsondb.sql.SQLException;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
 import br.furb.jsondb.store.utils.JsonUtils;
+import br.furb.jsondb.utils.StringUtils;
 
 public final class Actions {
+
+	private static int NO_BASE_SCRIPTS;
 
 	private Actions() {
 	}
@@ -47,15 +52,17 @@ public final class Actions {
 	}
 
 	public static void executeScript(Principal principal) {
+		CommandPanel commandPanel = principal.getTabbedPanel().getCommandPanel();
+		JTextArea textMsg = commandPanel.getTextMsg();
+		textMsg.setText(StringUtils.EMPTY_STR);
 		try {
 			IResult result = JsonDB.getInstance().executeSQL(principal.getTabbedPanel().getCommandPanel().getTextEditor().getText());
-			result.getMessages().forEach(message -> principal.getTabbedPanel().getCommandPanel().getTextMsg().append(message));
-
+			result.getMessages().forEach(message -> textMsg.append(message));
 		} catch (SQLParserException e) {
-			System.err.println("Não foi possível executar o comando: " + e.getMessage());
+			textMsg.setText(e.getCause().getMessage());
 			e.printStackTrace();
 		} catch (SQLException e) {
-			System.err.println("Não foi possível executar o comando: " + e.getMessage());
+			textMsg.setText(e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -94,7 +101,7 @@ public final class Actions {
 	 * @param principal
 	 */
 	public static void newScript(Principal principal) {
-		
+		principal.getTabbedPanel().add("Script sem base " + ++NO_BASE_SCRIPTS, new CommandPanel(principal));
 	}
 
 	public static void openDatabase(Principal principal) {
