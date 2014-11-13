@@ -62,6 +62,7 @@ public class DatabaseDialog extends JFileChooser {
 	public String createDatabaseDir(Principal principal) throws IOException, SQLParserException, SQLException {
 		setDialogType(JFileChooser.SAVE_DIALOG);
 		setDialogTitle(CREATE_FOLDER_DB);
+		setCurrentDirectory(principal.getWorkingDir());
 		if (showOpenDialog(principal) == JFileChooser.APPROVE_OPTION) {
 			File selectedFile = getSelectedFile();
 

@@ -16,6 +16,8 @@ import br.furb.json.ui.panel.command.CommandPanel;
 import br.furb.json.ui.panel.treemenu.DatabasesTreeManager;
 import br.furb.jsondb.core.JsonDB;
 import br.furb.jsondb.core.result.IResult;
+import br.furb.jsondb.core.result.IResultSet;
+import br.furb.jsondb.core.result.ResultRow;
 import br.furb.jsondb.parser.SQLParserException;
 import br.furb.jsondb.sql.SQLException;
 import br.furb.jsondb.store.JsonDBProperty;
@@ -92,7 +94,13 @@ public final class Actions {
 				if (result == null) {
 					textMsg.append("Comando não suportado");
 				} else {
-					result.getMessages().forEach(message -> textMsg.append(message));
+					if (result instanceof IResultSet) {
+						for (ResultRow row : ((IResultSet) result).getRows()) {
+							textMsg.append(row.toString());
+						}
+					} else {
+						result.getMessages().forEach(message -> textMsg.append(message));
+					}
 					principal.updateDatabasesTree();
 				}
 				textMsg.append("\n");

@@ -249,13 +249,13 @@ public class Principal extends JFrame {
 
 		mntmOpenDatabase = new JMenuItem(createSafeAction(Actions::openDatabase, "Abrir base"));
 		mntmOpenDatabase.setMnemonic(KeyEvent.VK_A);
+		mntmOpenDatabase.setEnabled(false);
 		mntmOpenDatabase.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
 		mnDatabase.add(mntmOpenDatabase);
 		
 		mntmCreateDatabase = new JMenuItem(createSafeAction(Actions::newDatabase, "Nova base"));
 		mntmCreateDatabase.setMnemonic(KeyEvent.VK_B);
 		mntmCreateDatabase.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_MASK));
-		mntmCreateDatabase.setEnabled(false);
 		mnDatabase.add(mntmCreateDatabase);
 
 		mntmDropDatabase = new JMenuItem(createSafeAction(Actions::dropDatabase, "Eliminar base"));
@@ -272,7 +272,7 @@ public class Principal extends JFrame {
 
 		baseDependantMenus = new ArrayList<JMenuItem>(3);
 		baseDependantMenus.add(mntmNewScript_forBase);
-		baseDependantMenus.add(mntmCreateDatabase);
+//		baseDependantMenus.add(mntmCreateDatabase);
 		baseDependantMenus.add(mntmDropDatabase);
 
 		baseDependantMenus.forEach((menu) -> menu.setEnabled(false));
