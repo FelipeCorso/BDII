@@ -8,6 +8,7 @@ import br.furb.jsondb.core.command.CreateTableCommand;
 import br.furb.jsondb.core.command.DropIndexCommand;
 import br.furb.jsondb.core.command.DropTableCommand;
 import br.furb.jsondb.core.command.InsertCommand;
+import br.furb.jsondb.core.command.SelectCommand;
 import br.furb.jsondb.core.command.SetDatabaseCommand;
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.parser.DatabaseIdentifier;
@@ -20,6 +21,7 @@ import br.furb.jsondb.parser.statement.CreateStatement;
 import br.furb.jsondb.parser.statement.DropStatement;
 import br.furb.jsondb.parser.statement.IStatement;
 import br.furb.jsondb.parser.statement.InsertStatement;
+import br.furb.jsondb.parser.statement.SelectStatement;
 import br.furb.jsondb.parser.statement.SetDatabaseStatement;
 import br.furb.jsondb.sql.SQLException;
 import br.furb.jsondb.store.JsonDBProperty;
@@ -109,9 +111,18 @@ public class JsonDB {
 			return dropIndex((DropStatement<Index>) statement);
 		}
 
+		/* SELECT */
+		if (statement instanceof SelectStatement) {
+			return select((SelectStatement) statement);
+		}
+
 		// TODO
 
 		return null;
+	}
+
+	private IResult select(SelectStatement statement) throws SQLException {
+		return new SelectCommand(statement).execute();
 	}
 
 	private IResult dropIndex(DropStatement<Index> statement) throws SQLException {
