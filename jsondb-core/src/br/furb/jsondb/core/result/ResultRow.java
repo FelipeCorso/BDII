@@ -1,6 +1,7 @@
 package br.furb.jsondb.core.result;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class ResultRow {
 
@@ -20,7 +21,17 @@ public class ResultRow {
 
 	@Override
 	public String toString() {
-		return "ResultRow [columns=" + columns + "]";
+
+		StringBuilder sb = new StringBuilder();
+
+		for (Entry<String, Object> entry : columns.entrySet()) {
+			sb.append(entry.getKey()).append(" = ").append(entry.getValue());
+			sb.append("; ");
+		}
+
+		sb.append("");
+		return sb.toString();
+		//		return "ResultRow [columns=" + columns + "]";
 	}
 
 }
