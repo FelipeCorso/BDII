@@ -76,12 +76,14 @@ public class Principal extends JFrame {
 	private JMenuItem mntmNewScript_forBase;
 	private JMenuItem mntmCreateDatabase;
 	private JMenuItem mntmDropDatabase;
+	private JMenuItem mntmOpenDatabase;
 
 	private Collection<JMenuItem> baseDependantMenus;
 
 	private File workingDir;
 	private JMenuItem mntmFecharScript;
 	private JMenuItem mntmSelectAll;
+
 
 	/**
 	 * Launch the application.
@@ -130,6 +132,7 @@ public class Principal extends JFrame {
 		treeMenu.addKeyListener(keyListener);
 		treeMenu.setMinimumSize(new Dimension(590, 150));
 		treeMenu.setSize(170, 591);
+		treeMenu.setEnabled(false);
 		contentPane.add(treeMenu, BorderLayout.WEST);
 
 		// $hide>>$
@@ -202,20 +205,25 @@ public class Principal extends JFrame {
 		mntmCopy = new JMenuItem(createSafeAction(Actions::copy, "Copiar"));
 		mntmCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
 		mntmCopy.setMnemonic(KeyEvent.VK_C);
+		mntmCopy.setEnabled(false);
 
 		mntmCut = new JMenuItem(createSafeAction(Actions::cut, "Recortar"));
 		mntmCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK));
 		mntmCut.setMnemonic(KeyEvent.VK_T);
+		mntmCut.setEnabled(false);
 		mnEdit.add(mntmCut);
 		mnEdit.add(mntmCopy);
 
 		mntmPaste = new JMenuItem(createSafeAction(Actions::paste, "Colar"));
 		mntmPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK));
 		mntmPaste.setMnemonic(KeyEvent.VK_L);
+		mntmPaste.setEnabled(false);
 		mnEdit.add(mntmPaste);
 
 		mntmSelectAll = new JMenuItem(createSafeAction(Actions::selectAll, "Selecionar tudo"));
 		mntmSelectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK));
+		mntmPaste.setMnemonic(KeyEvent.VK_A);
+		mntmSelectAll.setEnabled(false);
 		mnEdit.add(mntmSelectAll);
 
 		mnHelp = new JMenu("Ajuda");
@@ -229,22 +237,31 @@ public class Principal extends JFrame {
 		// "Novo script sem base"
 		mntmNewScript_noBase = new JMenuItem(mntmNewScript.getAction());
 		mntmNewScript_noBase.setMnemonic(KeyEvent.VK_N);
+		mntmNewScript_noBase.setEnabled(false);
 		mntmNewScript_noBase.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
 		mnDatabase.add(mntmNewScript_noBase);
 
 		mntmNewScript_forBase = new JMenuItem(createSafeAction(Actions::newScriptForBase, "Novo script para a base"));
 		mntmNewScript_forBase.setMnemonic(KeyEvent.VK_P);
 		mntmNewScript_forBase.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
+		mntmNewScript_forBase.setEnabled(false);
 		mnDatabase.add(mntmNewScript_forBase);
 
+		mntmOpenDatabase = new JMenuItem(createSafeAction(Actions::openDatabase, "Abrir base"));
+		mntmOpenDatabase.setMnemonic(KeyEvent.VK_A);
+		mntmOpenDatabase.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
+		mnDatabase.add(mntmOpenDatabase);
+		
 		mntmCreateDatabase = new JMenuItem(createSafeAction(Actions::newDatabase, "Nova base"));
 		mntmCreateDatabase.setMnemonic(KeyEvent.VK_B);
 		mntmCreateDatabase.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_MASK));
+		mntmCreateDatabase.setEnabled(false);
 		mnDatabase.add(mntmCreateDatabase);
 
 		mntmDropDatabase = new JMenuItem(createSafeAction(Actions::dropDatabase, "Eliminar base"));
 		mntmDropDatabase.setMnemonic(KeyEvent.VK_E);
 		mntmDropDatabase.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_MASK));
+		mntmDropDatabase.setEnabled(false);
 		mnDatabase.add(mntmDropDatabase);
 		menuBar.add(mnHelp);
 
@@ -259,6 +276,8 @@ public class Principal extends JFrame {
 		baseDependantMenus.add(mntmDropDatabase);
 
 		baseDependantMenus.forEach((menu) -> menu.setEnabled(false));
+
+		doSafely(Actions::newScript);
 	}
 
 	public Map<String, DatabaseMetadata> getDatabases() {
@@ -349,7 +368,7 @@ public class Principal extends JFrame {
 		this.workingDir = newDir;
 		boolean hasDir = newDir != null;
 		setTitle("JsonDB - " + (hasDir ? newDir.getAbsolutePath() : "<sem pasta de trabalho>"));
-		baseDependantMenus.forEach(menu -> menu.setEnabled(hasDir));
+		//		baseDependantMenus.forEach(menu -> menu.setEnabled(hasDir)); // FIXME: somente quando terminar a interface
 
 		updateDatabasesTree();
 

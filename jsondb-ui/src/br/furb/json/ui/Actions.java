@@ -39,9 +39,8 @@ public final class Actions {
 	}
 
 	public static void showTeam(Principal principal) {
-		// TODO: mostrar em uma modal
-		CommandPanel commandPanel = principal.getActiveCommandPanel();
-		commandPanel.getTextMsg().setText("Integrantes Equipe: Felipe Loose Corso, Janaína Carraro Mendonça Lima, William Leander Seefeld\n");
+		// TODO: mostrar em uma modal organizada
+		UIUtils.showMessage(principal, "Felipe Loose Corso\nJanaína Carraro Mendonça Lima\nWilliam Leander Seefeld\n", "Integrantes da equipe", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	public static void copy(Principal principal) {

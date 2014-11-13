@@ -45,6 +45,7 @@ public class DatabaseDialog extends JFileChooser {
 	}
 
 	public String loadDatabaseDir(Principal principal) {
+		setCurrentDirectory(principal.getWorkingDir());
 		showOpenDialog(principal);
 
 		File selectedFile = getSelectedFile();
