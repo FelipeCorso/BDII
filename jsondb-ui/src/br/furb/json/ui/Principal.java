@@ -76,6 +76,7 @@ public class Principal extends JFrame {
 
 	private File workingDir;
 	private JMenuItem mntmFecharScript;
+	private JMenuItem mntmSelectAll;
 
 	/**
 	 * Launch the application.
@@ -207,6 +208,10 @@ public class Principal extends JFrame {
 		mntmPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK));
 		mntmPaste.setMnemonic(KeyEvent.VK_L);
 		mnEdit.add(mntmPaste);
+		
+		mntmSelectAll = new JMenuItem(createSafeAction(Actions::selectAll, "Selecionar tudo"));
+		mntmSelectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK));
+		mnEdit.add(mntmSelectAll);
 
 		mnHelp = new JMenu("Ajuda");
 		mnHelp.setMnemonic(KeyEvent.VK_J);

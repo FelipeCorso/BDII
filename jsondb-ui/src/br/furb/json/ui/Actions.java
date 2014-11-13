@@ -66,13 +66,33 @@ public final class Actions {
 		}
 	}
 
+	/**
+	 * Seleciona todo o texto do editor, se houver uma aba ativa.
+	 * 
+	 * @param principal
+	 *            janela principal do compilador, na qual são exibidas janelas
+	 *            modais e tratados erros ocorridos na execução das ações.
+	 */
+	public static void selectAll(Principal principal) {
+		CommandPanel commandPanel = principal.getActiveCommandPanel();
+		if (commandPanel != null) {
+			JTextArea textEditor = commandPanel.getTextEditor();
+			textEditor.setSelectionStart(0);
+			textEditor.setSelectionEnd(textEditor.getText().length());
+		}
+	}
+
 	public static void executeScript(Principal principal) {
 		CommandPanel commandPanel = principal.getActiveCommandPanel();
 		JTextArea textMsg = commandPanel.getTextMsg();
 		textMsg.setText(StringUtils.EMPTY_STR);
 		try {
 			IResult result = JsonDB.getInstance().executeSQL(commandPanel.getTextEditor().getText());
-			result.getMessages().forEach(message -> textMsg.append(message));
+			if (result == null) {
+				textMsg.append("Comando não suportado");
+			} else {
+				result.getMessages().forEach(message -> textMsg.append(message));
+			}
 		} catch (SQLParserException e) {
 			textMsg.setText(e.getCause().getMessage());
 			e.printStackTrace();
