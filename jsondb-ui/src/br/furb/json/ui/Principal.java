@@ -28,13 +28,18 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.tree.DefaultMutableTreeNode;
 
+import br.furb.json.ui.filefilter.DatabaseFolderFilter;
 import br.furb.json.ui.panel.command.CommandPanel;
 import br.furb.json.ui.panel.tab.TabbedPanel;
-import br.furb.json.ui.panel.treeMenu.TreeMenuPanel;
+import br.furb.json.ui.panel.treemenu.DatabasesTree;
+import br.furb.json.ui.panel.treemenu.DatabasesTreeManager;
 import br.furb.json.ui.shortcut.ShortCutListener;
 import br.furb.jsondb.store.JsonDBProperty;
+import br.furb.jsondb.store.JsonDBStore;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
+import br.furb.jsondb.store.metadata.DatabaseMetadataProvider;
 import br.furb.jsondb.utils.ui.UIUtils;
 
 public class Principal extends JFrame {
@@ -43,7 +48,7 @@ public class Principal extends JFrame {
 
 	private static final String DIR_IMAGES = "/Images/";
 
-	private TreeMenuPanel treeMenu;
+	private DatabasesTree treeMenu;
 	private Map<String, DatabaseMetadata> databases = new LinkedHashMap<String, DatabaseMetadata>();
 	private JPanel contentPane;
 
@@ -121,7 +126,7 @@ public class Principal extends JFrame {
 		contentPane.add(centerPanel, BorderLayout.CENTER);
 		centerPanel.setLayout(new BorderLayout(0, 0));
 
-		treeMenu = new TreeMenuPanel(this);
+		treeMenu = new DatabasesTree(this);
 		treeMenu.addKeyListener(keyListener);
 		treeMenu.setMinimumSize(new Dimension(590, 150));
 		treeMenu.setSize(170, 591);
@@ -208,7 +213,7 @@ public class Principal extends JFrame {
 		mntmPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK));
 		mntmPaste.setMnemonic(KeyEvent.VK_L);
 		mnEdit.add(mntmPaste);
-		
+
 		mntmSelectAll = new JMenuItem(createSafeAction(Actions::selectAll, "Selecionar tudo"));
 		mntmSelectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_MASK));
 		mnEdit.add(mntmSelectAll);
@@ -281,7 +286,7 @@ public class Principal extends JFrame {
 		return tabbedPanel;
 	}
 
-	public TreeMenuPanel getTreeMenu() {
+	public DatabasesTree getTreeMenu() {
 		return treeMenu;
 	}
 
@@ -345,6 +350,14 @@ public class Principal extends JFrame {
 		boolean hasDir = newDir != null;
 		setTitle("JsonDB - " + (hasDir ? newDir.getAbsolutePath() : "<sem pasta de trabalho>"));
 		baseDependantMenus.forEach(menu -> menu.setEnabled(hasDir));
+
+		File[] databases = JsonDBStore.getInstance().getJsonDBDir().listFiles(DatabaseFolderFilter.INSTANCE);
+		DefaultMutableTreeNode rootNode = treeMenu.getDataBaseNode();
+		for (File databaseFolder : databases) {
+			DatabaseMetadata metadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(databaseFolder.getName());
+			DatabasesTreeManager.createNodesDatabase(rootNode, metadata);
+		}
+
 		// TODO
 	}
 

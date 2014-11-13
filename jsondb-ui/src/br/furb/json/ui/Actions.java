@@ -12,7 +12,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import br.furb.json.ui.dialog.DatabaseDialog;
 import br.furb.json.ui.panel.command.CommandPanel;
-import br.furb.json.ui.panel.treeMenu.ManagerTreeMenu;
+import br.furb.json.ui.panel.treemenu.DatabasesTreeManager;
 import br.furb.jsondb.core.JsonDB;
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.parser.SQLParserException;
@@ -25,7 +25,7 @@ import br.furb.jsondb.utils.ui.UIUtils;
 
 public final class Actions {
 
-	private static int NO_BASE_SCRIPTS;
+	private static int BASELESS_SCRIPTS;
 
 	private Actions() {
 	}
@@ -119,9 +119,9 @@ public final class Actions {
 		if (!principal.getDatabases().containsKey(database.getName())) {
 			principal.addDataBase(database);
 
-			ManagerTreeMenu.createNodesDatabase(dataBaseNode, database);
+			DatabasesTreeManager.createNodesDatabase(dataBaseNode, database);
 
-			((javax.swing.tree.DefaultTreeModel) principal.getTreeMenu().getjTree().getModel()).reload(ManagerTreeMenu.sort(dataBaseNode));
+			((javax.swing.tree.DefaultTreeModel) principal.getTreeMenu().getTree().getModel()).reload(DatabasesTreeManager.sort(dataBaseNode));
 
 			CommandPanel activeCommandPanel = principal.getActiveCommandPanel();
 			activeCommandPanel.getTextEditor().setText("");
@@ -153,7 +153,7 @@ public final class Actions {
 	 *            modais e tratados erros ocorridos na execução das ações.
 	 */
 	public static void newScript(Principal principal) {
-		principal.addCommandPanel(new CommandPanel("Script sem base " + ++NO_BASE_SCRIPTS, principal));
+		principal.addCommandPanel(new CommandPanel("Script sem base " + ++BASELESS_SCRIPTS, principal));
 	}
 
 	/**
@@ -182,9 +182,9 @@ public final class Actions {
 				principal.addDataBase(database);
 
 				DefaultMutableTreeNode dataBaseNode = principal.getTreeMenu().getDataBaseNode();
-				ManagerTreeMenu.createNodesDatabase(dataBaseNode, database);
+				DatabasesTreeManager.createNodesDatabase(dataBaseNode, database);
 
-				((javax.swing.tree.DefaultTreeModel) principal.getTreeMenu().getjTree().getModel()).reload(ManagerTreeMenu.sort(dataBaseNode));
+				((javax.swing.tree.DefaultTreeModel) principal.getTreeMenu().getTree().getModel()).reload(DatabasesTreeManager.sort(dataBaseNode));
 			}
 		} catch (IOException e) {
 			throw new RuntimeException("Não foi possível realizar a leitura do arquivo: " + e.getMessage());

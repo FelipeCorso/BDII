@@ -112,7 +112,7 @@ public class DatabaseDialog extends JFileChooser {
 				UIUtils.showMessage(principal, "Uma pasta existente deve ser escolhida.", "JsonDB", JOptionPane.ERROR_MESSAGE);
 			} else if (UIUtils.promptConfirmation(principal, "A pasta informada não é uma pasta de trabalho do JsonDB. Deseja transformá-la em uma?", "Criar pasta de trabalho")) {
 				try {
-					JsonDB.setWorkDir(chosenFile);
+					JsonDB.setWorkingDir(chosenFile);
 					newWorkDir = chosenFile;
 				} catch (IllegalStateException ex) {
 					UIUtils.showError(principal, ex);

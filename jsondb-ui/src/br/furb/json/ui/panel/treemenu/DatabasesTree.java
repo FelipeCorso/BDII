@@ -1,4 +1,4 @@
-package br.furb.json.ui.panel.treeMenu;
+package br.furb.json.ui.panel.treemenu;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -16,9 +16,9 @@ import javax.swing.tree.TreePath;
 
 import br.furb.json.ui.Principal;
 
-public class TreeMenuPanel extends JPanel {
+public class DatabasesTree extends JPanel {
 
-	private static final String DATA_BASE_STR = "DataBase";
+	private static final String DATA_BASE_STR = "Bases de dados";
 
 	private static final long serialVersionUID = 8080924607252341731L;
 
@@ -27,27 +27,25 @@ public class TreeMenuPanel extends JPanel {
 
 	private DefaultMutableTreeNode dataBaseNode;
 
-	private JTree jTree;
+	private JTree tree;
 
-	public TreeMenuPanel(Principal principal) {
+	public DatabasesTree(Principal principal) {
 		setPreferredSize(new Dimension(150, 0));
 		setBorder(new MatteBorder(1, 1, 1, 1, new Color(0, 0, 0)));
-		//		addKeyListener(principal.getKeyListener());
 
 		setLayout(new BorderLayout(0, 0));
 
 		JScrollPane scrollPaneTree = new JScrollPane();
-		//		scrollPaneTree.addKeyListener(principal.getKeyListener());
 		add(scrollPaneTree, BorderLayout.CENTER);
 
 		dataBaseNode = new DefaultMutableTreeNode(DATA_BASE_STR);
-		jTree = new JTree(new DefaultTreeModel(dataBaseNode));
-		//		jTree.addKeyListener(principal.getKeyListener());
-		jTree.addMouseListener(new MouseAdapter() {
+		tree = new JTree(new DefaultTreeModel(dataBaseNode));
+		// TODO: posso usar esse?
+		//		tree.addTreeSelectionListener(null); 
+		tree.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-
-				TreePath selectionPath = jTree.getSelectionPath();
+				TreePath selectionPath = tree.getSelectionPath();
 
 				if (selectionPath != null) {
 					DefaultMutableTreeNode dmt = (DefaultMutableTreeNode) selectionPath.getLastPathComponent();
@@ -55,14 +53,13 @@ public class TreeMenuPanel extends JPanel {
 					if (!dmt.getUserObject().toString().equalsIgnoreCase(DATA_BASE_STR)) {
 						if (dmt.getParent().toString().equalsIgnoreCase(DATA_BASE_STR)) {
 							// é uma base, fazer select
+							// TODO: que select, o quê... define como base de trabalho
 							principal.getTabbedPanel().createTabDataBase(dmt.toString());
-						} else {
+						} else { // TODO: possível que eu não venha a usar isso
 							if (dmt.getParent().toString().equalsIgnoreCase(TABLES_STR)) {
 								// é uma tabela, describe
-							} else {
-								if (dmt.getParent().toString().equalsIgnoreCase(TABLES_STR)) {
-									// é um índice, apresentar nome, colunas
-								}
+							} else if (dmt.getParent().toString().equalsIgnoreCase(TABLES_STR)) {
+								// é um índice, apresentar nome, colunas
 							}
 						}
 
@@ -71,8 +68,8 @@ public class TreeMenuPanel extends JPanel {
 
 			}
 		});
-		scrollPaneTree.setViewportView(jTree);
-		
+		scrollPaneTree.setViewportView(tree);
+
 		/*JPanel panelBotoes = new JPanel();
 		//		panelBotoes.addKeyListener(principal.getKeyListener());
 		add(panelBotoes, BorderLayout.NORTH);
@@ -128,8 +125,8 @@ public class TreeMenuPanel extends JPanel {
 
 	}
 
-	public JTree getjTree() {
-		return jTree;
+	public JTree getTree() {
+		return tree;
 	}
 
 	public DefaultMutableTreeNode getDataBaseNode() {

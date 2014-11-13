@@ -49,9 +49,9 @@ public class JsonDB {
 		return INSTANCE;
 	}
 
-	public static void setWorkDir(File workDir) {
+	public static void setWorkingDir(File workingDir) {
+		JsonDBProperty.JSON_DB_DIR.set(workingDir.getAbsolutePath());
 		JsonDBStore.reset();
-		JsonDBProperty.JSON_DB_DIR.set(workDir.getAbsolutePath());
 		JsonDBStore.getInstance().getJsonDBDir();
 	}
 

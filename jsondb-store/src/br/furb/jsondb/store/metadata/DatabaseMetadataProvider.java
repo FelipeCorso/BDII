@@ -10,6 +10,8 @@ import br.furb.jsondb.store.utils.JsonUtils;
 
 public class DatabaseMetadataProvider {
 
+	public static final String DATABASE_FILE_NAME = "database.metadata";
+
 	private static DatabaseMetadataProvider INSTANCE;
 
 	private Map<String, DatabaseMetadata> databaseMetadatas = new HashMap<String, DatabaseMetadata>();
@@ -54,8 +56,7 @@ public class DatabaseMetadataProvider {
 		if (!databaseDir.exists()) {
 			throw new IllegalStateException("Database not found: " + database);
 		}
-
-		File metadataFile = new File(databaseDir, "database.metadata");
+		File metadataFile = new File(databaseDir, DATABASE_FILE_NAME);
 		return metadataFile;
 	}
 
