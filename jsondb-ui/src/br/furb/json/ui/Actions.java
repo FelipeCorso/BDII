@@ -3,6 +3,7 @@ package br.furb.json.ui;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Scanner;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -16,6 +17,7 @@ import br.furb.jsondb.core.JsonDB;
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.parser.SQLParserException;
 import br.furb.jsondb.sql.SQLException;
+import br.furb.jsondb.store.JsonDBProperty;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
 import br.furb.jsondb.store.utils.JsonUtils;
 import br.furb.jsondb.utils.StringUtils;
@@ -109,9 +111,11 @@ public final class Actions {
 	}
 
 	/**
-	 * Cria uma nova aba de código
+	 * Cria uma nova aba de código.
 	 * 
 	 * @param principal
+	 *            janela principal do compilador, na qual são exibidas janelas
+	 *            modais e tratados erros ocorridos na execução das ações.
 	 */
 	public static void newScript(Principal principal) {
 		principal.addCommandPanel(new CommandPanel("Script sem base " + ++NO_BASE_SCRIPTS, principal));
@@ -140,29 +144,147 @@ public final class Actions {
 	}
 
 	/**
-	 * Fecha a aba de código informada.
+	 * Fecha a aba de código ativa.
 	 * 
 	 * @param principal
 	 *            janela principal do compilador, na qual são exibidas janelas
 	 *            modais e tratados erros ocorridos na execução das ações.
 	 */
-	public static void closeTab(Principal principal) {
+	public static void closeActiveTab(Principal principal) {
+		CommandPanel commandPanel = principal.getActiveCommandPanel();
+		if (commandPanel != null) {
+			closeTab(principal, commandPanel);
+		}
+	}
+
+	/**
+	 * Fecha a aba de código informada.
+	 * 
+	 * @param principal
+	 *            janela principal do compilador, na qual são exibidas janelas
+	 *            modais e tratados erros ocorridos na execução das ações.
+	 * @param commandPanel
+	 *            documento a ser fechado.
+	 * @return {@code true} se o documento foi fechado. {@code false} se a ação
+	 *         foi cancelada.
+	 */
+	public static boolean closeTab(Principal principal, CommandPanel commandPanel) {
+		if (commandPanel.isModified()) {
+			int confirmation = canSaveDocument(principal, commandPanel);
+			if (confirmation == JOptionPane.YES_OPTION) {
+				try {
+					if (!saveDocument(principal, commandPanel, false)) {
+						return false;
+					}
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			} else if (confirmation != JOptionPane.NO_OPTION) {
+				return false;
+			}
+		}
+		principal.closeCommandPanel(commandPanel);
+		return true;
+	}
+
+	/**
+	 * Solicita um arquivo para o usuário, o qual será aberto em uma nova aba.
+	 * 
+	 * @param principal
+	 *            janela principal do compilador, na qual são exibidas janelas
+	 *            modais e tratados erros ocorridos na execução das ações.
+	 */
+	public static void openScript(Principal principal) {
+		File suggestedFile = principal.getActiveCommandPanel() != null ? principal.getActiveCommandPanel().getCorrespondingFile() : new File(JsonDBProperty.JSON_DB_DIR.get());
+		File file;
+		boolean fileIsValid = false;
+		do {
+			JFileChooser openDialog = new JFileChooser(suggestedFile);
+			if (openDialog.showOpenDialog(principal) != JFileChooser.APPROVE_OPTION) {
+				return;
+			}
+			file = openDialog.getSelectedFile();
+			fileIsValid = file != null && file.isFile();
+			if (!fileIsValid) {
+				principal.handleUIException("Informe um arquivo existente.");
+			}
+		} while (!fileIsValid);
+
+		StringBuilder documentContent = new StringBuilder();
+		try (Scanner scanner = new Scanner(file)) {
+			scanner.useDelimiter("$");
+			scanner.forEachRemaining(line -> documentContent.append(line).append('\n'));
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		CommandPanel document = new CommandPanel(getDocumentTitle(file), principal);
+		document.setCorrespondingFile(file);
+		document.getTextEditor().setText(documentContent.toString());
+		document.setModified(false);
+		principal.addCommandPanel(document);
+	}
+
+	/**
+	 * Salva o documento ativo. Se não ainda tiver sido persistido, solicita ao
+	 * usuário um arquivo para a gravação.
+	 * 
+	 * @param principal
+	 *            janela principal do compilador, na qual são exibidas janelas
+	 *            modais e tratados erros ocorridos na execução das ações.
+	 */
+	public static void saveScript(Principal principal) {
 		CommandPanel commandPanel = principal.getActiveCommandPanel();
 		if (commandPanel != null) {
 			if (commandPanel.isModified()) {
-				int confirmation = canSaveDocument(principal, commandPanel);
-				if (confirmation == JOptionPane.YES_OPTION) {
-					try {
-						saveDocument(principal, commandPanel, false);
-					} catch (IOException e) {
-						throw new RuntimeException(e);
-					}
-				} else if (confirmation == JOptionPane.CANCEL_OPTION) {
-					return;
+				try {
+					saveDocument(principal, commandPanel, false);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
 				}
 			}
-			principal.closeCommandPanel(commandPanel);
 		}
+	}
+
+	/**
+	 * Salva o documento ativo com um novo nome.
+	 * 
+	 * @param principal
+	 *            janela principal do compilador, na qual são exibidas janelas
+	 *            modais e tratados erros ocorridos na execução das ações.
+	 */
+	public static void saveScriptAs(Principal principal) {
+		CommandPanel commandPanel = principal.getActiveCommandPanel();
+		if (commandPanel != null) {
+			try {
+				saveDocument(principal, commandPanel, true);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	/**
+	 * Confirma se o usuário realmente deseja sair, abortando a ação em caso
+	 * negativo.<br>
+	 * Do contrário, verifica se existe algum documento modificado, e para cada
+	 * um encontrado, questiona o usuário se deseja salvar.<br>
+	 * Após ter salvo ou descartado todos os documentos, sai da aplicação.
+	 * 
+	 * @param principal
+	 *            janela principal do compilador, na qual são exibidas janelas
+	 *            modais e tratados erros ocorridos na execução das ações.
+	 */
+	public static void exit(Principal principal) {
+		if (!UIUtils.promptConfirmation(principal, "Tem ceteza de que deseja fechar todos os documentos e sair?", "Sair")) {
+			return;
+		}
+		for (CommandPanel document : principal.getCommandPanels()) {
+			if (!closeTab(principal, document)) {
+				return;
+			}
+		}
+		principal.exit();
 	}
 
 	/**
@@ -186,10 +308,32 @@ public final class Actions {
 	 * 
 	 */
 	public static int canSaveDocument(Principal principal, CommandPanel commandPanel) {
-		String message = String.format("O documento \"%s\" possui alterações não salvas. Deseja salvá-las antes de continuar?", commandPanel.getTitle());
+		String message = String.format("O documento \"%s\" possui alterações não salvas.\nDeseja salvá-las antes de continuar?", commandPanel.getTitle());
 		return UIUtils.promptConfirmationWithAbortion(principal, message, "Confirmação");
 	}
 
+	/**
+	 * Salva o documento no respectivo arquivo, questionando o usuário por um,
+	 * caso ainda não exista.<br>
+	 * É possível informar um novo arquivo mesmo que o documento já possua um
+	 * arquivo associado.
+	 * 
+	 * @param principal
+	 *            janela principal do compilador, na qual são exibidas janelas
+	 *            modais e tratados erros ocorridos na execução das ações.
+	 * @param commandPanel
+	 *            documento a ser salvo.
+	 * @param askNewLocation
+	 *            {@code true} se o usuário pode informar um novo arquivo para
+	 *            salvar o documento, {@code false} se o usuário só deve ser
+	 *            questionado caso o documento ainda não possua um documento
+	 *            associado.
+	 * @return {@code true} se o documento foi salvo e associado a um arquivo,
+	 *         {@code false} se ocorreu algum erro ou o usuário cancelou a
+	 *         operação.
+	 * @throws IOException
+	 *             caso ocorra algum erro ao persistir o documento.
+	 */
 	public static boolean saveDocument(Principal principal, CommandPanel commandPanel, boolean askNewLocation) throws IOException {
 		File file = commandPanel.getCorrespondingFile();
 		if (askNewLocation || file == null) {
@@ -214,26 +358,12 @@ public final class Actions {
 		}
 		commandPanel.setModified(false);
 		commandPanel.setCorrespondingFile(file);
-		commandPanel.setTitle(file.getName().replaceFirst("(?i)\\.sql$", ""));
+		commandPanel.setTitle(getDocumentTitle(file));
 		return true;
 	}
 
-	public static void saveScript(Principal principal) {
-		CommandPanel commandPanel = principal.getActiveCommandPanel();
-		if (commandPanel.isModified()) {
-			try {
-				saveDocument(principal, commandPanel, false);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
-
-	public static void saveFile(String absolutePath, String buffer) throws IOException {
-		try (FileWriter fw = new FileWriter(absolutePath, false)) {
-			fw.write(buffer);
-			fw.flush();
-		}
+	private static String getDocumentTitle(File document) {
+		return document.getName().replaceFirst("(?i)\\.sql$", "");
 	}
 
 }

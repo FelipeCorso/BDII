@@ -2,26 +2,19 @@ package br.furb.json.ui.panel.treeMenu;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.border.MatteBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import br.furb.json.ui.Actions;
 import br.furb.json.ui.Principal;
-
-import com.jgoodies.forms.factories.FormFactory;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.RowSpec;
 
 public class TreeMenuPanel extends JPanel {
 
@@ -37,21 +30,18 @@ public class TreeMenuPanel extends JPanel {
 	private JTree jTree;
 
 	public TreeMenuPanel(Principal principal) {
+		setPreferredSize(new Dimension(150, 0));
 		setBorder(new MatteBorder(1, 1, 1, 1, new Color(0, 0, 0)));
 		//		addKeyListener(principal.getKeyListener());
 
 		setLayout(new BorderLayout(0, 0));
-
-		JPanel panelBotoes = new JPanel();
-		//		panelBotoes.addKeyListener(principal.getKeyListener());
-		add(panelBotoes, BorderLayout.NORTH);
 
 		JScrollPane scrollPaneTree = new JScrollPane();
 		//		scrollPaneTree.addKeyListener(principal.getKeyListener());
 		add(scrollPaneTree, BorderLayout.CENTER);
 
 		dataBaseNode = new DefaultMutableTreeNode(DATA_BASE_STR);
-		jTree = new JTree(new javax.swing.tree.DefaultTreeModel(dataBaseNode));
+		jTree = new JTree(new DefaultTreeModel(dataBaseNode));
 		//		jTree.addKeyListener(principal.getKeyListener());
 		jTree.addMouseListener(new MouseAdapter() {
 			@Override
@@ -60,7 +50,7 @@ public class TreeMenuPanel extends JPanel {
 				TreePath selectionPath = jTree.getSelectionPath();
 
 				if (selectionPath != null) {
-					javax.swing.tree.DefaultMutableTreeNode dmt = (javax.swing.tree.DefaultMutableTreeNode) selectionPath.getLastPathComponent();
+					DefaultMutableTreeNode dmt = (DefaultMutableTreeNode) selectionPath.getLastPathComponent();
 
 					if (!dmt.getUserObject().toString().equalsIgnoreCase(DATA_BASE_STR)) {
 						if (dmt.getParent().toString().equalsIgnoreCase(DATA_BASE_STR)) {
@@ -82,6 +72,10 @@ public class TreeMenuPanel extends JPanel {
 			}
 		});
 		scrollPaneTree.setViewportView(jTree);
+		
+		/*JPanel panelBotoes = new JPanel();
+		//		panelBotoes.addKeyListener(principal.getKeyListener());
+		add(panelBotoes, BorderLayout.NORTH);
 		panelBotoes.setLayout(new FormLayout(new ColumnSpec[] { ColumnSpec.decode("center:50px"), ColumnSpec.decode("center:50px"), FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("max(50px;default)"), }, new RowSpec[] { RowSpec.decode("32px"), }));
 
@@ -130,7 +124,7 @@ public class TreeMenuPanel extends JPanel {
 			}
 		});
 
-		panelBotoes.add(btnDropDB, "2, 1, center, fill");
+		panelBotoes.add(btnDropDB, "2, 1, center, fill");*/
 
 	}
 

@@ -9,6 +9,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,6 +29,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import br.furb.json.ui.panel.command.CommandPanel;
@@ -103,7 +106,6 @@ public class Principal extends JFrame {
 	 * Create the frame.
 	 */
 	public Principal() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1024, 660);
 		keyListener = new ShortCutListener(this);
 		addKeyListener(keyListener);
@@ -137,6 +139,14 @@ public class Principal extends JFrame {
 		createJMenuBar();
 
 		setWorkingDir(new File(JsonDBProperty.JSON_DB_DIR.get()));
+
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				doSafely(Actions::exit);
+			}
+		});
 	}
 
 	private void createJMenuBar() {
@@ -153,10 +163,9 @@ public class Principal extends JFrame {
 		mntmNewScript.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
 		mnFile.add(mntmNewScript);
 
-		mntmOpenScript = new JMenuItem("Abrir script");
+		mntmOpenScript = new JMenuItem(createSafeAction(Actions::openScript, "Abrir script"));
 		mntmOpenScript.setMnemonic(KeyEvent.VK_A);
 		mntmOpenScript.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
-		mntmOpenScript.addMouseListener(createSafeMouseListener(Actions::openDatabase));
 		mnFile.add(mntmOpenScript);
 
 		mntmSave = new JMenuItem(createSafeAction(Actions::saveScript, "Salvar script"));
@@ -164,12 +173,12 @@ public class Principal extends JFrame {
 		mntmSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
 		mnFile.add(mntmSave);
 
-		mntmSaveScriptAs = new JMenuItem("Salvar script como...");
+		mntmSaveScriptAs = new JMenuItem(createSafeAction(Actions::saveScriptAs, "Salvar script como..."));
 		mntmSaveScriptAs.setMnemonic(KeyEvent.VK_C);
 		mntmSaveScriptAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
 		mnFile.add(mntmSaveScriptAs);
-		
-		mntmFecharScript = new JMenuItem(createSafeAction(Actions::closeTab, "Fechar script"));
+
+		mntmFecharScript = new JMenuItem(createSafeAction(Actions::closeActiveTab, "Fechar script"));
 		mntmFecharScript.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_MASK));
 		mnFile.add(mntmFecharScript);
 
@@ -178,7 +187,7 @@ public class Principal extends JFrame {
 		mntmChangeWorkDir.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK));
 		mnFile.add(mntmChangeWorkDir);
 
-		mntmExit = new JMenuItem("Sair");
+		mntmExit = new JMenuItem(createSafeAction(Actions::exit, "Sair"));
 		mntmExit.setMnemonic(KeyEvent.VK_I);
 		mntmExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
 		mnFile.add(mntmExit);
@@ -392,6 +401,24 @@ public class Principal extends JFrame {
 	 */
 	public void closeCommandPanel(CommandPanel commandPanel) {
 		this.tabbedPanel.remove(commandPanel);
+	}
+
+	/**
+	 * Retorna todos os documentos abertos.
+	 * 
+	 * @return todos os documentos abertos
+	 */
+	public Collection<CommandPanel> getCommandPanels() {
+		return this.tabbedPanel.getTabs();
+	}
+
+	/**
+	 * Libera recursos e encerra a aplicação.
+	 */
+	public void exit() {
+		setVisible(false);
+		dispose();
+		System.exit(0);
 	}
 
 }

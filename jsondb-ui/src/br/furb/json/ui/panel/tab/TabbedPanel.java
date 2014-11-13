@@ -1,6 +1,8 @@
 package br.furb.json.ui.panel.tab;
 
 import java.awt.Component;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -62,6 +64,14 @@ public class TabbedPanel extends JTabbedPane {
 		}
 	}
 
+	/**
+	 * Retorna o índice da aba informada.
+	 * 
+	 * @param c
+	 *            aba cujo índice se deseja conhecer.
+	 * @return índice da aba informada, ou {@code -1} caso a aba não esteja
+	 *         associada a este painel.
+	 */
 	public int getTabIndex(Component c) {
 		Component[] components = getComponents();
 		for (int i = 0; i < components.length; i++) {
@@ -70,6 +80,16 @@ public class TabbedPanel extends JTabbedPane {
 			}
 		}
 		return -1;
+	}
+
+	public Collection<CommandPanel> getTabs() {
+		Collection<CommandPanel> documents = new ArrayList<>();
+		for (Component tab : getComponents()) {
+			if (tab instanceof CommandPanel) {
+				documents.add((CommandPanel) tab);
+			}
+		}
+		return documents;
 	}
 
 }
