@@ -14,7 +14,7 @@ import br.furb.jsondb.store.utils.JsonUtils;
 public class DatabaseMetadataJsonParserTest {
 
 	@Test
-	public void testParseToJson() {
+	public void testParseToJson() throws IOException {
 
 		DatabaseMetadata metadata = new DatabaseMetadata();
 

@@ -52,18 +52,18 @@ public class CreateIndexCommand implements ICommand {
 
 		// Criar o índice no disco e gravar metadados
 
-		JsonDBStore.getInstance().createIndex(database, index);
+		JsonDBStore.createIndex(database, index);
 
 		return new Result(String.format("Index '%s' created with success", index.getIdentifier()));
 	}
 
-	private void validateColumn(ColumnIdentifier tableColumn, TableMetadata table) throws SQLException {
+	private static void validateColumn(ColumnIdentifier tableColumn, TableMetadata table) throws SQLException {
 		if (!table.containsColumn(tableColumn.getColumnName())) {
 			throw new SQLException(String.format("Column '%s' not found on table '%s'", tableColumn.getColumnName(), table.getName()));
 		}
 	}
 
-	private void validateTable(DatabaseMetadata databaseMetadata, TableIdentifier tableIdentifier) throws SQLException {
+	private static void validateTable(DatabaseMetadata databaseMetadata, TableIdentifier tableIdentifier) throws SQLException {
 		if (!databaseMetadata.hasTable(tableIdentifier.getIdentifier())) {
 			throw new SQLException(String.format("Table '%s' not found", tableIdentifier.getIdentifier()));
 		}

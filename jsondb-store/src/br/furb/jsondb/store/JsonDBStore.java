@@ -111,12 +111,11 @@ public class JsonDBStore {
 	 * @throws StoreException
 	 * @throws SQLException
 	 */
-	public void createTable(String database, CreateStatement statement, List<String> pk) throws StoreException, SQLException {
-
+	public static void createTable(String database, CreateStatement statement, List<String> pk) throws StoreException, SQLException {
 		TableCreator.createTable(database, statement, pk);
 	}
 
-	public void dropTable(String database, String table) throws StoreException {
+	public static void dropTable(String database, String table) throws StoreException {
 		// remove a tabela do metadados
 		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(database);
 		databaseMetadata.removeTable(table);
@@ -159,7 +158,7 @@ public class JsonDBStore {
 		saveDatabaseMetadata(databaseMetadata);
 	}
 
-	public int insertData(String database, String table, Map<String, Value<?>> mapValues) throws StoreException {
+	public static int insertData(String database, String table, Map<String, Value<?>> mapValues) throws StoreException {
 		RowData rowData = new RowData();
 
 		for (Entry<String, Value<?>> entry : mapValues.entrySet()) {
@@ -192,7 +191,7 @@ public class JsonDBStore {
 		return rowId;
 	}
 
-	public void saveDatabaseMetadata(DatabaseMetadata databaseMetadata) throws StoreException {
+	public static void saveDatabaseMetadata(DatabaseMetadata databaseMetadata) throws StoreException {
 		try {
 			JsonUtils.write(databaseMetadata, DatabaseMetadata.class, new File(JsonDBStore.getInstance().getDatabaseDir(databaseMetadata.getName()), "database.metadata"));
 		} catch (IOException e) {
@@ -204,7 +203,7 @@ public class JsonDBStore {
 		instance = null;
 	}
 
-	public void createIndex(String database, Index index) throws StoreException {
+	public static void createIndex(String database, Index index) throws StoreException {
 
 		IndexData indexData = new IndexData();
 		indexData.setName(index.getIdentifier());
@@ -238,7 +237,7 @@ public class JsonDBStore {
 		saveDatabaseMetadata(databaseMetadata);
 	}
 
-	public void dropIndex(String database, Index index) throws StoreException {
+	public static void dropIndex(String database, Index index) throws StoreException {
 		// remove do metadata
 		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(database);
 

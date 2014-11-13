@@ -32,7 +32,7 @@ public class DropTableCommand implements ICommand {
 		}
 
 		try {
-			JsonDBStore.getInstance().dropTable(JsonDB.getInstance().getCurrentDatabase(), tableName);
+			JsonDBStore.dropTable(JsonDB.getInstance().getCurrentDatabase(), tableName);
 		} catch (StoreException e) {
 			throw new SQLException("Was not possible to drop table");
 		}

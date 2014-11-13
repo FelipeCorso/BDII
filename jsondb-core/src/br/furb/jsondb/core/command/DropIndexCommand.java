@@ -54,12 +54,12 @@ public class DropIndexCommand implements ICommand {
 
 		// apagar o índice
 
-		JsonDBStore.getInstance().dropIndex(database, index);
+		JsonDBStore.dropIndex(database, index);
 
 		return new Result();
 	}
 
-	private void validateTable(DatabaseMetadata databaseMetadata, TableIdentifier tableIdentifier) throws SQLException {
+	private static void validateTable(DatabaseMetadata databaseMetadata, TableIdentifier tableIdentifier) throws SQLException {
 		if (!databaseMetadata.hasTable(tableIdentifier.getIdentifier())) {
 			throw new SQLException(String.format("Table '%s' not found", tableIdentifier.getIdentifier()));
 		}

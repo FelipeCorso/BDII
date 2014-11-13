@@ -113,7 +113,7 @@ public class SelectCommand implements ICommand {
 		return new ResultSet(resultRows);
 	}
 
-	private List<ColumnIdentifier> getAllColumns(List<TableIdentifier> tables) {
+	private static List<ColumnIdentifier> getAllColumns(List<TableIdentifier> tables) {
 
 		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(JsonDB.getInstance().getCurrentDatabase());
 
@@ -196,7 +196,7 @@ public class SelectCommand implements ICommand {
 	}
 
 	@SuppressWarnings("unused")
-	private List<ResultRow> joinResults(Map<String, List<ResultRow>> mapResults) {
+	private static List<ResultRow> joinResults(Map<String, List<ResultRow>> mapResults) {
 
 		/*
 		 * Join não é suportado por enquanto

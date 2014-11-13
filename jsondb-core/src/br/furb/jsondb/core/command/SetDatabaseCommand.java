@@ -23,12 +23,10 @@ public class SetDatabaseCommand implements ICommand {
 		String database = statement.getDatabase().getIdentifier();
 		if (!DatabaseMetadataProvider.getInstance().containsDatabase(database)) {
 			throw new SQLException(String.format("Database %s not found", database));
-		} else {
-
-			JsonDB.getInstance().setCurrentDatabase(database);
-
-			result = new Result("Current database is " + database);
 		}
+		JsonDB.getInstance().setCurrentDatabase(database);
+
+		result = new Result("Current database is " + database);
 
 		return result;
 	}

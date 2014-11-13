@@ -42,12 +42,12 @@ public class TableCreator {
 
 		LastRowIdUtils.createLastRowId(tableDir, new LastRowId());
 
-		// adiciona o metadatos da tabela ao metadados do banco em mem�ria.
+		// adiciona o metadatos da tabela ao metadados do banco em memória.
 		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(database);
 		databaseMetadata.addTable(tableMetadata);
 
 		// grava o metadados da nova tabela no metadados do banco em disco
-		File metadataFile = DatabaseMetadataProvider.getInstance().getMetadataFile(database);
+		File metadataFile = DatabaseMetadataProvider.getMetadataFile(database);
 		try {
 			JsonUtils.write(databaseMetadata, DatabaseMetadata.class, metadataFile);
 		} catch (IOException e) {

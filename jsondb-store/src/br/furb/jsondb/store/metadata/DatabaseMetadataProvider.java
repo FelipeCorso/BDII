@@ -46,7 +46,7 @@ public class DatabaseMetadataProvider {
 		return databaseMetadatas.get(database);
 	}
 
-	public File getMetadataFile(String database) {
+	public static File getMetadataFile(String database) {
 		File jsonDbDir = JsonDBStore.getInstance().getJsonDBDir();
 
 		File databaseDir = new File(jsonDbDir, database);

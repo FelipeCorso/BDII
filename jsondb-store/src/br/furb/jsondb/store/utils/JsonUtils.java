@@ -26,60 +26,62 @@ public final class JsonUtils {
 	/**
 	 * Tamanho padr�o para identa��o de json
 	 */
-//	private static final String DEFAULT_INDENT = "    ";
+	//	private static final String DEFAULT_INDENT = "    ";
 	private static final String DEFAULT_INDENT = "";
 
 	private JsonUtils() {
 	}
 
-	public static JsonElement parseElement(Reader reader)
-			throws JsonIOException, JsonSyntaxException {
-		JsonReader jsonReader = new JsonReader(reader);
-		jsonReader.setLenient(true);
-		JsonElement ret = new JsonParser().parse(jsonReader);
-		return ret;
+	public static JsonElement parseElement(Reader reader) throws JsonIOException, JsonSyntaxException, IOException {
+		try (JsonReader jsonReader = new JsonReader(reader)) {
+			jsonReader.setLenient(true);
+			JsonElement ret = new JsonParser().parse(jsonReader);
+			return ret;
+		}
 	}
 
-	public static <T> T parseJsonToObject(Reader reader, Class<T> type) {
-		JsonReader jsonReader = new JsonReader(reader);
-		jsonReader.setLenient(true);
-		Gson gson = new GsonBuilder().create();
-		return gson.fromJson(jsonReader, type);
+	public static <T> T parseJsonToObject(Reader reader, Class<T> type) throws IOException {
+		try (JsonReader jsonReader = new JsonReader(reader)) {
+			jsonReader.setLenient(true);
+			Gson gson = new GsonBuilder().create();
+			return gson.fromJson(jsonReader, type);
+		}
 	}
 
-	public static <T> T parseJsonToObject(InputStream is, Class<T> type) {
+	public static <T> T parseJsonToObject(InputStream is, Class<T> type) throws IOException {
 		return parseJsonToObject(new InputStreamReader(is), type);
 	}
 
 	public static <T> T parseJsonToObject(File file, Class<T> type) throws IOException {
-		FileReader reader = new FileReader(file);
-		try{
+		try (FileReader reader = new FileReader(file)) {
 			T object = parseJsonToObject(reader, type);
 			return object;
-			
-		}finally{
-			reader.close();
 		}
 	}
 
-	public static <T> void parseObjectToJson(Writer writer, T objectToJson, Class<T> type) {
+	public static <T> void parseObjectToJson(Writer writer, T objectToJson, Class<T> type) throws IOException {
 		parseObjectToJson(writer, objectToJson, type, DEFAULT_INDENT);
 	}
 
-	public static <T> void parseObjectToJson(Writer writer, T objectToJson, Class<T> type, String indent) {
-		JsonWriter jsonWriter = new JsonWriter(writer);
-		jsonWriter.setIndent(indent);
-		GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.enableComplexMapKeySerialization();
-		Gson gson = gsonBuilder.disableHtmlEscaping().create();
-		gson.toJson(objectToJson, type, jsonWriter);
+	public static <T> void parseObjectToJson(Writer writer, T objectToJson, Class<T> type, String indent) throws IOException {
+		try (JsonWriter jsonWriter = new JsonWriter(writer)) {
+			jsonWriter.setIndent(indent);
+			GsonBuilder gsonBuilder = new GsonBuilder();
+			gsonBuilder.enableComplexMapKeySerialization();
+			Gson gson = gsonBuilder.disableHtmlEscaping().create();
+			gson.toJson(objectToJson, type, jsonWriter);
+		}
 	}
 
 	public static JsonElement parseElement(String input) throws JsonIOException, JsonSyntaxException {
-		return parseElement(new StringReader(input));
+		try {
+			return parseElement(new StringReader(input));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public static JsonObject parse(Reader reader) throws JsonIOException, JsonSyntaxException {
+	public static JsonObject parse(Reader reader) throws JsonIOException, JsonSyntaxException, IOException {
 		JsonElement ret = parseElement(reader);
 		if (!ret.isJsonObject()) {
 			throw new JsonSyntaxException("Invalid json object");
@@ -88,37 +90,30 @@ public final class JsonUtils {
 
 	}
 
-	public static JsonObject parse(InputStream stream) throws JsonIOException, JsonSyntaxException {
+	public static JsonObject parse(InputStream stream) throws JsonIOException, JsonSyntaxException, IOException {
 		return parse(new InputStreamReader(stream));
 	}
 
 	public static JsonObject parse(String json) throws JsonIOException, JsonSyntaxException {
-		return parse(new StringReader(json));
+		try {
+			return parse(new StringReader(json));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static JsonObject parse(File file) throws JsonIOException, JsonSyntaxException {
-		try {
-			FileInputStream stream = new FileInputStream(file);
-			try {
-				return parse(stream);
-			} finally {
-				stream.close();
-			}
+		try (FileInputStream stream = new FileInputStream(file)) {
+			return parse(stream);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	public static <T> void write(T object, Class<T> type, File file) throws IOException {
-
-		FileWriter fileWriter = new FileWriter(file);
-		try {
-
+		try (FileWriter fileWriter = new FileWriter(file)) {
 			parseObjectToJson(fileWriter, object, type);
 			fileWriter.flush();
-
-		} finally {
-			fileWriter.close();
 		}
 
 	}

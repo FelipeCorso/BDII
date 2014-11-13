@@ -64,7 +64,7 @@ public class JsonDB {
 	}
 
 	@SuppressWarnings("unchecked")
-	public IResult executeSQL(String sql) throws SQLParserException, SQLException {
+	public static IResult executeSQL(String sql) throws SQLParserException, SQLException {
 		//		Collection<RawStatement> rawStatements = SQLParser.extractCommands(sql);
 		IStatement statement = SQLParser.parse(sql);
 
@@ -108,6 +108,7 @@ public class JsonDB {
 			if (dropStatement.getStructure() instanceof TableIdentifier) {
 				return dropTable((DropStatement<TableIdentifier>) statement);
 			}
+			/* DROP INDEX */
 			return dropIndex((DropStatement<Index>) statement);
 		}
 
@@ -121,35 +122,35 @@ public class JsonDB {
 		return null;
 	}
 
-	private IResult select(SelectStatement statement) throws SQLException {
+	private static IResult select(SelectStatement statement) throws SQLException {
 		return new SelectCommand(statement).execute();
 	}
 
-	private IResult dropIndex(DropStatement<Index> statement) throws SQLException {
+	private static IResult dropIndex(DropStatement<Index> statement) throws SQLException {
 		return new DropIndexCommand(statement).execute();
 	}
 
-	private IResult createIndex(CreateStatement createStatement) throws SQLException {
+	private static IResult createIndex(CreateStatement createStatement) throws SQLException {
 		return new CreateIndexCommand(createStatement).execute();
 	}
 
-	private IResult createDatabase(CreateStatement statement) throws SQLException {
+	private static IResult createDatabase(CreateStatement statement) throws SQLException {
 		return new CreateDatabaseCommand(statement).execute();
 	}
 
-	private IResult setDatabase(SetDatabaseStatement statement) throws SQLException {
+	private static IResult setDatabase(SetDatabaseStatement statement) throws SQLException {
 		return new SetDatabaseCommand(statement).execute();
 	}
 
-	private IResult createTable(CreateStatement statement) throws SQLException {
+	private static IResult createTable(CreateStatement statement) throws SQLException {
 		return new CreateTableCommand(statement).execute();
 	}
 
-	private IResult dropTable(DropStatement<TableIdentifier> statement) throws SQLException {
+	private static IResult dropTable(DropStatement<TableIdentifier> statement) throws SQLException {
 		return new DropTableCommand(statement).execute();
 	}
 
-	private IResult insert(InsertStatement statement) throws SQLException {
+	private static IResult insert(InsertStatement statement) throws SQLException {
 		return new InsertCommand(statement).execute();
 	}
 

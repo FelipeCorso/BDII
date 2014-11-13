@@ -131,7 +131,7 @@ public class InsertCommand implements ICommand {
 		// já validou tudo, pode gravar no disco
 		int rowId;
 		try {
-			rowId = JsonDBStore.getInstance().insertData(databaseMetadata.getName(), table.getIdentifier(), mapValues);
+			rowId = JsonDBStore.insertData(databaseMetadata.getName(), table.getIdentifier(), mapValues);
 		} catch (StoreException e) {
 			e.printStackTrace();
 			throw new SQLException("Was not possible to insert data", e);
@@ -161,7 +161,7 @@ public class InsertCommand implements ICommand {
 		return columns;
 	}
 
-	private void updateIndexes(TableMetadata tableMetadata, Map<String, Value<?>> mapValues, int rowId) throws StoreException, IOException {
+	private static void updateIndexes(TableMetadata tableMetadata, Map<String, Value<?>> mapValues, int rowId) throws StoreException, IOException {
 		List<IndexMetadata> indexes = tableMetadata.getIndexes();
 
 		String database = JsonDB.getInstance().getCurrentDatabase();
@@ -194,7 +194,7 @@ public class InsertCommand implements ICommand {
 		}
 	}
 
-	private void validateSizeAndPrecision(ColumnMetadata columnMetadata, Value<?> value) throws SQLException {
+	private static void validateSizeAndPrecision(ColumnMetadata columnMetadata, Value<?> value) throws SQLException {
 
 		DataType type = columnMetadata.getType();
 
@@ -253,7 +253,7 @@ public class InsertCommand implements ICommand {
 
 	}
 
-	private void validateDataType(ColumnMetadata columnMetadata, Value<?> value) throws SQLException {
+	private static void validateDataType(ColumnMetadata columnMetadata, Value<?> value) throws SQLException {
 		DataType type = columnMetadata.getType();
 
 		String columnName = columnMetadata.getName();

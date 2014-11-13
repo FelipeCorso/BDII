@@ -50,7 +50,7 @@ public class CreateTableCommand implements ICommand {
 		}
 
 		try {
-			JsonDBStore.getInstance().createTable(database, statement, getPrimaryKeyFields((TableDefinition) statement.getStructure()));
+			JsonDBStore.createTable(database, statement, getPrimaryKeyFields((TableDefinition) statement.getStructure()));
 			result = new Result(String.format("Table %s created with success", tableName));
 		} catch (StoreException e) {
 			throw new SQLException("Was not possible to create table.", e);
