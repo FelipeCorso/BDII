@@ -54,7 +54,7 @@ public class CreateIndexCommand implements ICommand {
 
 		JsonDBStore.getInstance().createIndex(database, index);
 
-		return new Result();
+		return new Result(String.format("Index '%s' created with success", index.getIdentifier()));
 	}
 
 	private void validateColumn(ColumnIdentifier tableColumn, TableMetadata table) throws SQLException {
