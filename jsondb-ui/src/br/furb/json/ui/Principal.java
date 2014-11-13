@@ -351,14 +351,18 @@ public class Principal extends JFrame {
 		setTitle("JsonDB - " + (hasDir ? newDir.getAbsolutePath() : "<sem pasta de trabalho>"));
 		baseDependantMenus.forEach(menu -> menu.setEnabled(hasDir));
 
+		updateDatabasesTree();
+
+		// TODO
+	}
+
+	public void updateDatabasesTree() {
 		File[] databases = JsonDBStore.getInstance().getJsonDBDir().listFiles(DatabaseFolderFilter.INSTANCE);
 		DefaultMutableTreeNode rootNode = treeMenu.getDataBaseNode();
 		for (File databaseFolder : databases) {
 			DatabaseMetadata metadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(databaseFolder.getName());
 			DatabasesTreeManager.createNodesDatabase(rootNode, metadata);
 		}
-
-		// TODO
 	}
 
 	public File getWorkingDir() {

@@ -3,6 +3,7 @@ package br.furb.json.ui;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 
 import javax.swing.JFileChooser;
@@ -87,11 +88,15 @@ public final class Actions {
 		JTextArea textMsg = commandPanel.getTextMsg();
 		textMsg.setText(StringUtils.EMPTY_STR);
 		try {
-			IResult result = JsonDB.getInstance().executeSQL(commandPanel.getTextEditor().getText());
-			if (result == null) {
-				textMsg.append("Comando não suportado");
-			} else {
-				result.getMessages().forEach(message -> textMsg.append(message));
+			List<IResult> results = JsonDB.executeSQL(commandPanel.getTextEditor().getText());
+			for (IResult result : results) {
+				if (result == null) {
+					textMsg.append("Comando não suportado");
+				} else {
+					result.getMessages().forEach(message -> textMsg.append(message));
+					principal.updateDatabasesTree();
+				}
+				textMsg.append("\n");
 			}
 		} catch (SQLParserException e) {
 			textMsg.setText(e.getCause().getMessage());

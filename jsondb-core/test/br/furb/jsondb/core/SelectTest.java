@@ -166,12 +166,12 @@ public class SelectTest extends BaseJsonDBTest {
 		super.after();
 	}
 
-	private IResult executeSQL(String sql) throws SQLParserException, SQLException {
-		return JsonDB.getInstance().executeSQL(sql);
+	private static List<IResult> executeSQL(String sql) throws SQLParserException, SQLException {
+		return JsonDB.executeSQL(sql);
 	}
 
-	private IResultSet executeQuery(String sql) throws SQLParserException, SQLException {
-		return (IResultSet) JsonDB.getInstance().executeSQL(sql);
+	private static IResultSet executeQuery(String sql) throws SQLParserException, SQLException {
+		return (IResultSet) JsonDB.executeSQL(sql);
 	}
 
 }

@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -72,7 +73,6 @@ public class SemanticoTest {
 	}
 
 	private static final File TESTS_DIR = new File("res/testes");
-	
 
 	private Sintatico sintatico;
 	private Lexico lexico;
@@ -86,23 +86,25 @@ public class SemanticoTest {
 
 	@Test
 	public void testCreateDatabase() throws Exception {
-		IStatement stm = parse(TestFiles.TEST_CREATE_DATABASE_$QUOTED_ID);
+		List<IStatement> commands = parse(TestFiles.TEST_CREATE_DATABASE_$QUOTED_ID);
+		assertEquals(1, commands.size());
+		IStatement stm = commands.get(0);
 		assertTrue(stm instanceof CreateStatement);
-		
+
 		CreateStatement createStm = (CreateStatement) stm;
 		assertNotNull(createStm.getStructure());
 		assertTrue(createStm.getStructure() instanceof DatabaseIdentifier);
 		assertEquals(createStm.getStructure().getIdentifier(), "database");
 	}
 
-	public IStatement parse(TestFiles testFile) throws LexicalError, SyntaticError, SQLParserException {
+	public List<IStatement> parse(TestFiles testFile) throws LexicalError, SyntaticError, SQLParserException {
 		try {
 			this.lexico = new Lexico(testFile.readFile(TESTS_DIR));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 		sintatico.parse(lexico, semantico);
-		return semantico.getStatement();
+		return semantico.getStatements();
 	}
 
 }

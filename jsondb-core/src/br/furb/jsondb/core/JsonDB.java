@@ -1,6 +1,8 @@
 package br.furb.jsondb.core;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import br.furb.jsondb.core.command.CreateDatabaseCommand;
 import br.furb.jsondb.core.command.CreateIndexCommand;
@@ -63,11 +65,20 @@ public class JsonDB {
 		this.currentDatabase = currentDatabase;
 	}
 
-	@SuppressWarnings("unchecked")
-	public static IResult executeSQL(String sql) throws SQLParserException, SQLException {
+	public static List<IResult> executeSQL(String sql) throws SQLParserException, SQLException {
 		//		Collection<RawStatement> rawStatements = SQLParser.extractCommands(sql);
-		IStatement statement = SQLParser.parse(sql);
+		List<IStatement> statements = SQLParser.parse(sql);
+		List<IResult> results = new ArrayList<>(statements.size());
 
+		for (IStatement statement : statements) {
+			results.add(executeStatement(statement));
+		}
+
+		return results;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static IResult executeStatement(IStatement statement) throws SQLException {
 		if (statement instanceof CreateStatement) {
 
 			CreateStatement createStatement = (CreateStatement) statement;

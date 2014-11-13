@@ -75,6 +75,9 @@ INDEX = id: "INDEX"
 :[\r\s\n\t]
 
 #NonTerminals
+<documento>
+<documento_rec>
+
 <sentenca>
 <acao>
 <criar>
@@ -116,7 +119,10 @@ INDEX = id: "INDEX"
 <eliminar_estrutura>
 
 #Grammar
-<sentenca> ::= <acao> ";" #99;
+<documento> ::= <sentenca> <documento_rec> #99 ;
+<documento_rec> ::= <documento> | î ;
+
+<sentenca> ::= <acao> ";" #98;
 <acao> ::= <criar> | <incluir> | <selecionar> | <eliminar> | <descrever> | <setar_banco>;
 <criar> ::= CREATE <criar_estrutura>;
 <criar_estrutura> ::= DATABASE id #51 | TABLE id #52 "(" <lista_atributos> ")" | INDEX id #12 ON id #13 "(" id #12 ")" #57 ;

@@ -49,13 +49,14 @@ public class StatementParser {
 	private final Matcher escapeCharMatcher = Pattern.compile("\\\\(\\\\|\\\")").matcher(""); // bytecode: \\(\\|\")
 
 	private IStatement statement;
+	private final List<IStatement> statements = new LinkedList<>();
 	private TableIdentifier lastTable;
 	private ColumnDefinition lastColumn;
-	private Deque<ColumnIdentifier> idStack = new LinkedList<>();
+	private final Deque<ColumnIdentifier> idStack = new LinkedList<>();
 	private Deque<ColumnDefinition> columnDefStack;
 	private Deque<ConstraintDefinition> constraintStack;
-	private Deque<Value<?>> valuesStack = new LinkedList<>();
-	private List<ICondition<?, ?>> conditions = new LinkedList<>();
+	private final Deque<Value<?>> valuesStack = new LinkedList<>();
+	private final List<ICondition<?, ?>> conditions = new LinkedList<>();
 	private ColumnType columnType;
 	private RelationalOperator operator;
 	private String constraintName;
@@ -190,6 +191,9 @@ public class StatementParser {
 			break;
 		case 67:
 			acaoSemantica67(token);
+			break;
+		case 98:
+			acaoSemantica98();
 			break;
 		case 99:
 			acaoSemantica99();
@@ -479,7 +483,7 @@ public class StatementParser {
 		if (this.statement == null) {
 			this.statement = new InsertStatement(this.lastTable, null, null);
 		}
-		this.valuesStack = new LinkedList<>();
+		this.valuesStack.clear();
 	}
 
 	/** Encerra reconhecimento de valores no INSERT. **/
@@ -593,10 +597,29 @@ public class StatementParser {
 
 	/** Finaliza reconhecimento de sentenca. **/
 	@SuppressWarnings("unchecked")
-	private void acaoSemantica99() {
+	private void acaoSemantica98() {
 		if (statement instanceof DropStatement && ((DropStatement<?>) statement).getStructure() instanceof Index) {
 			((DropStatement<Index>) statement).getStructure().setTable(lastTable);
 		}
+		this.statements.add(statement);
+		// limpar campos
+		statement = null;
+		lastTable = null;
+		lastColumn = null;
+		idStack.clear();
+		columnDefStack = null;
+		constraintStack = null;
+		valuesStack.clear();
+		conditions.clear();
+		columnType = null;
+		operator = null;
+		constraintName = null;
+		isFinal = false;
+
+	}
+
+	/** Encerra reconhecimento de documento. */
+	private void acaoSemantica99() {
 		doneRec = true;
 	}
 
@@ -605,11 +628,11 @@ public class StatementParser {
 	 * 
 	 * @return sentença reconhecida.
 	 */
-	public IStatement getStatement() {
+	public List<IStatement> getStatements() {
 		if (!doneRec) {
 			return null;
 		}
-		return statement;
+		return statements;
 	}
 
 	// Métodos auxiliares

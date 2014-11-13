@@ -113,8 +113,7 @@ public final class JsonUtils {
 	public static <T> void write(T object, Class<T> type, File file) throws IOException {
 		try (FileWriter fileWriter = new FileWriter(file)) {
 			parseObjectToJson(fileWriter, object, type);
-			fileWriter.flush();
 		}
-
 	}
+
 }

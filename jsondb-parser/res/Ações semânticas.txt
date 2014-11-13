@@ -61,4 +61,5 @@ Acoes semanticas
 
 67		Nome de indice a ser removido (DROP INDEX)
 
-99		Finaliza reconhecimento de sentenca
+98		Finaliza reconhecimento de sentenca
+99		Finaliza reconhecimento do documento
