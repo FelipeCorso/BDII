@@ -19,21 +19,6 @@ public class ShortCutListener extends KeyAdapter {
 	public void keyPressed(KeyEvent event) {
 		boolean isCtrlDown = event.isControlDown();
 		switch (event.getKeyCode()) {
-//		case KeyEvent.VK_N:
-//			if (isCtrlDown) {
-//				compUi.doSafely(Actions::newDatabase);
-//			}
-//			break;
-//		case KeyEvent.VK_A:
-//			if (isCtrlDown) {
-//				compUi.doSafely(Actions::openDatabase);
-//			}
-//			break;
-//		case KeyEvent.VK_S:
-//			if (isCtrlDown) {
-//				compUi.doSafely(Actions::saveScript);
-//			}
-//			break;
 		case KeyEvent.VK_C:
 			if (isCtrlDown) {
 				compUi.doSafely(Actions::copy);

@@ -6,9 +6,6 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -62,7 +59,6 @@ public class Principal extends JFrame {
 	private JMenuItem mntmCut;
 	private JMenuItem mntmPaste;
 	private JMenu mnHelp;
-	private JMenuItem mntmDoc;
 	private JMenuItem mntmTeam;
 
 	private final TabbedPanel tabbedPanel;
@@ -197,22 +193,19 @@ public class Principal extends JFrame {
 		mnEdit.addKeyListener(keyListener);
 		menuBar.add(mnEdit);
 
-		mntmCopy = new JMenuItem("Copiar");
+		mntmCopy = new JMenuItem(createSafeAction(Actions::copy, "Copiar"));
 		mntmCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
 		mntmCopy.setMnemonic(KeyEvent.VK_C);
-		mntmCopy.addMouseListener(createSafeMouseListener(Actions::copy));
 
-		mntmCut = new JMenuItem("Recortar");
+		mntmCut = new JMenuItem(createSafeAction(Actions::cut, "Recortar"));
 		mntmCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_MASK));
 		mntmCut.setMnemonic(KeyEvent.VK_T);
-		mntmCut.addMouseListener(createSafeMouseListener(Actions::cut));
 		mnEdit.add(mntmCut);
 		mnEdit.add(mntmCopy);
 
-		mntmPaste = new JMenuItem("Colar");
+		mntmPaste = new JMenuItem(createSafeAction(Actions::paste, "Colar"));
 		mntmPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_MASK));
 		mntmPaste.setMnemonic(KeyEvent.VK_L);
-		mntmPaste.addMouseListener(createSafeMouseListener(Actions::paste));
 		mnEdit.add(mntmPaste);
 
 		mnHelp = new JMenu("Ajuda");
@@ -229,31 +222,25 @@ public class Principal extends JFrame {
 		mntmNewScript_noBase.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
 		mnDatabase.add(mntmNewScript_noBase);
 
-		mntmNewScript_forBase = new JMenuItem("Novo script para a base");
+		mntmNewScript_forBase = new JMenuItem(createSafeAction(Actions::newScriptForBase, "Novo script para a base"));
 		mntmNewScript_forBase.setMnemonic(KeyEvent.VK_P);
 		mntmNewScript_forBase.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
 		mnDatabase.add(mntmNewScript_forBase);
 
-		mntmCreateDatabase = new JMenuItem("Nova base");
+		mntmCreateDatabase = new JMenuItem(createSafeAction(Actions::newDatabase, "Nova base"));
 		mntmCreateDatabase.setMnemonic(KeyEvent.VK_B);
 		mntmCreateDatabase.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_MASK));
 		mnDatabase.add(mntmCreateDatabase);
 
-		mntmDropDatabase = new JMenuItem("Eliminar base");
+		mntmDropDatabase = new JMenuItem(createSafeAction(Actions::dropDatabase, "Eliminar base"));
 		mntmDropDatabase.setMnemonic(KeyEvent.VK_E);
 		mntmDropDatabase.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_MASK));
 		mnDatabase.add(mntmDropDatabase);
 		menuBar.add(mnHelp);
 
-		mntmDoc = new JMenuItem("Documentação");
-		mntmDoc.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
-		mntmDoc.setMnemonic(KeyEvent.VK_D);
-		mnHelp.add(mntmDoc);
-
-		mntmTeam = new JMenuItem("Equipe");
+		mntmTeam = new JMenuItem(createSafeAction(Actions::showTeam, "Equipe"));
 		mntmTeam.setMnemonic(KeyEvent.VK_E);
 		mntmTeam.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
-		mntmTeam.addMouseListener(createSafeMouseListener(Actions::showTeam));
 		mnHelp.add(mntmTeam);
 
 		baseDependantMenus = new ArrayList<JMenuItem>(3);
@@ -291,15 +278,6 @@ public class Principal extends JFrame {
 
 	public TreeMenuPanel getTreeMenu() {
 		return treeMenu;
-	}
-
-	private MouseListener createSafeMouseListener(Consumer<Principal> action) {
-		return new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				doSafely(action);
-			}
-		};
 	}
 
 	@SuppressWarnings("serial")

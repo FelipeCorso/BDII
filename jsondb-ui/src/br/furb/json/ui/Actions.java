@@ -111,6 +111,21 @@ public final class Actions {
 	}
 
 	/**
+	 * Elimina a base selecionada.<br>
+	 * Uma janela de confirmação é exibida antes de efetuar a eliminação.<br>
+	 * Ao ser eliminada a base, todos os documentos associados serão fechados.
+	 * Para tanto, antes de efetivar o comando, uma mensagem alerta o usuário
+	 * para que salve os documentos associados antes de continuar.
+	 * 
+	 * @param principal
+	 *            janela principal do compilador, na qual são exibidas janelas
+	 *            modais e tratados erros ocorridos na execução das ações.
+	 */
+	public static void dropDatabase(Principal principal) {
+		// TODO
+	}
+
+	/**
 	 * Cria uma nova aba de código.
 	 * 
 	 * @param principal
@@ -119,6 +134,19 @@ public final class Actions {
 	 */
 	public static void newScript(Principal principal) {
 		principal.addCommandPanel(new CommandPanel("Script sem base " + ++NO_BASE_SCRIPTS, principal));
+	}
+
+	/**
+	 * Cria uma nova aba de código e faz com que todos os comandos executados
+	 * por esta aba sejam dirijidos a base selecionada no momento de sua
+	 * criação.
+	 * 
+	 * @param principal
+	 *            janela principal do compilador, na qual são exibidas janelas
+	 *            modais e tratados erros ocorridos na execução das ações.
+	 */
+	public static void newScriptForBase(Principal principal) {
+		// TODO
 	}
 
 	public static void openDatabase(Principal principal) {
