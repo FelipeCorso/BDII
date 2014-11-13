@@ -15,7 +15,6 @@ import br.furb.jsondb.parser.ColumnIdentifier;
 import br.furb.jsondb.parser.TableIdentifier;
 import br.furb.jsondb.parser.statement.SelectStatement;
 import br.furb.jsondb.sql.SQLException;
-import br.furb.jsondb.store.StoreException;
 import br.furb.jsondb.store.data.ColumnData;
 import br.furb.jsondb.store.data.RowData;
 import br.furb.jsondb.store.data.TableData;
@@ -35,11 +34,15 @@ public class SelectCommand implements ICommand {
 
 	@Override
 	public IResult execute() throws SQLException {
-		// validar se h� um banco corrente
+		// validar se há um banco corrente
 		JsonDBUtils.validateHasCurrentDatabase();
 
 		String database = JsonDB.getInstance().getCurrentDatabase();
 		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(database);
+
+		if (selectStatement.getTables().size() > 1) {
+			throw new SQLException("Join is not supported yet");
+		}
 
 		// validar se as tabelas existem
 
@@ -47,64 +50,82 @@ public class SelectCommand implements ICommand {
 
 		// validar se os campos existem
 
-		validateColumns(databaseMetadata);
+		List<ColumnIdentifier> columns = selectStatement.getColumns();
 
-		// validar a clausula where
-		//TODO
+		if (columns.size() == 1 && columns.get(0) == ColumnIdentifier.ALL) {
+			columns = getAllColumns(selectStatement.getTables());
+		} else if (!columns.isEmpty()) {
+			validateColumns(databaseMetadata);
+		}
 
-		// Obter os dados
+		//TODO validar a clausula where
 
 		List<ResultRow> resultRows = new ArrayList<ResultRow>();
 
-		if (selectStatement.getWhereClause() == null) {
+		for (TableIdentifier tableIdentifier : selectStatement.getTables()) {
 
-			List<ColumnIdentifier> columns = selectStatement.getColumns();
+			TableData tableData = TableDataProvider.getInstance().getTableData(database, tableIdentifier.getIdentifier());
 
-			for (TableIdentifier tableIdentifier : selectStatement.getTables()) {
+			Map<Integer, RowData> rows = tableData.getRows();
 
-				try {
-					TableData tableData = TableDataProvider.getInstance().getTableData(database, tableIdentifier.getIdentifier());
+			for (RowData rowData : rows.values()) {
 
-					Map<Integer, RowData> rows = tableData.getRows();
+				Map<String, Object> columnsValues = new LinkedHashMap<String, Object>();
 
-					for (RowData rowData : rows.values()) {
+				for (ColumnIdentifier columnIdentifier : columns) {
 
-						Map<String, Object> columnsValues = new LinkedHashMap<String, Object>();
-						if (columns.isEmpty()) {
-							//seleciona todas as colunas
-							rowData.getColumns().values().forEach(columnData -> columnsValues.put(columnData.getName(), columnData.getValue()));
+					ColumnData columnData = null;
 
-						} else {
+					if (/**/!columnIdentifier.getTable().isPresent()
+					/**/|| (columnIdentifier.getTable().isPresent() && columnIdentifier.getTable().get().getIdentifier().equals(tableIdentifier.getIdentifier())))
+					/**/{
+						columnData = rowData.getColumn(columnIdentifier.getColumnName());
+						if (columnData != null) {
 
-							for (ColumnIdentifier columnIdentifier : columns) {
+							boolean filterResult = true;
 
-								ColumnData columnData = null;
+							if (selectStatement.getWhereClause().isPresent()) {
 
-								if (/**/!columnIdentifier.getTable().isPresent()
-								/**/|| (columnIdentifier.getTable().isPresent() && columnIdentifier.getTable().get().equals(tableIdentifier.getIdentifier())))
-								/**/{
-									columnData = rowData.getColumn(columnIdentifier.getColumnName());
-									if (columnData != null) {
-										columnsValues.put(columnData.getName(), columnData.getValue());
-									}
-								}
+								//TODO filtro where
 
+								//	filterResult = //resultado do where;
 							}
-						}
 
-						ResultRow resultRow = new ResultRow(columnsValues);
-						resultRows.add(resultRow);
+							if (filterResult) {
+								columnsValues.put(columnData.getName(), columnData.getValue());
+							}
+
+						}
 					}
 
-				} catch (StoreException e) {
-					e.printStackTrace();
-					throw new SQLException(e.getMessage(), e);
+					//						}
 				}
+
+				ResultRow resultRow = new ResultRow(columnsValues);
+				resultRows.add(resultRow);
 			}
 
 		}
 
 		return new ResultSet(resultRows);
+	}
+
+	private List<ColumnIdentifier> getAllColumns(List<TableIdentifier> tables) {
+
+		DatabaseMetadata databaseMetadata = DatabaseMetadataProvider.getInstance().getDatabaseMetadata(JsonDB.getInstance().getCurrentDatabase());
+
+		List<ColumnIdentifier> columns = new ArrayList<ColumnIdentifier>();
+
+		for (TableIdentifier tableIdentifier : tables) {
+			TableMetadata tableMetadata = databaseMetadata.getTable(tableIdentifier.getIdentifier());
+
+			for (String col : tableMetadata.getColumns().keySet()) {
+				columns.add(new ColumnIdentifier(tableIdentifier, col));
+			}
+
+		}
+
+		return columns;
 	}
 
 	private void validateColumns(DatabaseMetadata databaseMetadata) throws SQLException {
@@ -118,7 +139,7 @@ public class SelectCommand implements ICommand {
 			if (!table.isPresent()) {
 
 				if (selectStatement.getTables().size() > 1) {
-					// verificar se o campo � amb�guo
+					// verificar se o campo  é ambíguo
 
 					boolean containsField = false;
 
@@ -153,7 +174,7 @@ public class SelectCommand implements ICommand {
 
 				TableMetadata tableMetadata = databaseMetadata.getTable(tableIdentifier.getIdentifier());
 
-				if (tableMetadata.getColumns().containsKey(columnName)) {
+				if (!tableMetadata.getColumns().containsKey(columnName)) {
 					throw new SQLException(String.format("Unknown column '%s.%s' in 'field list'", tableIdentifier.getIdentifier(), columnName));
 				}
 			}
@@ -171,4 +192,40 @@ public class SelectCommand implements ICommand {
 		}
 	}
 
+	@SuppressWarnings("unused")
+	private List<ResultRow> joinResults(Map<String, List<ResultRow>> mapResults) {
+
+		/*
+		 * Join não é suportado por enquanto
+		 * Aqui está o inicio da implementação :( 
+		 */
+
+		List<ResultRow> joinedResults = new ArrayList<ResultRow>();
+
+		int qtdRows = 0;
+
+		for (List<ResultRow> resultRow : mapResults.values()) {
+			qtdRows = qtdRows * resultRow.size();
+		}
+
+		for (int i = 0; i < qtdRows; i++) {
+
+			Map<String, Object> columns = new LinkedHashMap<String, Object>();
+
+			joinedResults.add(new ResultRow(columns));
+
+		}
+
+		for (List<ResultRow> resultRows : mapResults.values()) {
+			for (ResultRow resultRow : resultRows) {
+
+				for (int i = 0; i < qtdRows; i++) {
+					joinedResults.get(i).getColumns().putAll(resultRow.getColumns());
+
+				}
+			}
+		}
+
+		return joinedResults;
+	}
 }
