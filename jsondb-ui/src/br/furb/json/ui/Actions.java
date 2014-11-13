@@ -97,6 +97,7 @@ public final class Actions {
 					if (result instanceof IResultSet) {
 						for (ResultRow row : ((IResultSet) result).getRows()) {
 							textMsg.append(row.toString());
+							textMsg.append("\n");
 						}
 					} else {
 						result.getMessages().forEach(message -> textMsg.append(message));

@@ -26,8 +26,9 @@ public final class JsonUtils {
 	/**
 	 * Tamanho padr�o para identa��o de json
 	 */
-	//	private static final String DEFAULT_INDENT = "    ";
-	private static final String DEFAULT_INDENT = "";
+	private static final String DEFAULT_INDENT = "    ";
+
+	//	private static final String DEFAULT_INDENT = "";
 
 	private JsonUtils() {
 	}
