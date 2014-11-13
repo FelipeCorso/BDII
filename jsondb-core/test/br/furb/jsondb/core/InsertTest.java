@@ -141,7 +141,7 @@ public class InsertTest extends BaseJsonDBTest {
 			executeSQL(sql);
 			fail();
 		} catch (SQLException e) {
-			assertEquals("Column 'inexistente' not found on table aluno", e.getMessage());
+			assertEquals("Column 'inexistente' not found on table 'aluno'", e.getMessage());
 		}
 	}
 

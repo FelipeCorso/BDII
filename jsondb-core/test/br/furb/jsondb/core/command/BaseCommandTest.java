@@ -36,7 +36,18 @@ public abstract class BaseCommandTest {
 	@After
 	public void after() throws IOException {
 		JsonDBProperty.JSON_DB_DIR.set(bkpProperty);
-		FileUtils.deleteDirectory(tempDir);
+		try {
+			FileUtils.deleteDirectory(tempDir);
+
+		} catch (Exception e) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e1) {
+			}
+			FileUtils.deleteDirectory(tempDir);
+
+		}
+
 		DatabaseMetadataProvider.reset();
 		TableDataProvider.reset();
 		IndexDataProvider.reset();
@@ -48,15 +59,15 @@ public abstract class BaseCommandTest {
 		CreateDatabaseCommand command = new CreateDatabaseCommand(createStatement);
 
 		System.out.println(JsonDBStore.getInstance().getDatabaseDir(database));
-		try{
+		try {
 			command.execute();
-		}catch(SQLException e){
+		} catch (SQLException e) {
 			try {
 				after();
 			} catch (IOException e1) {
 			}
 			command.execute();
 		}
-		
+
 	}
 }

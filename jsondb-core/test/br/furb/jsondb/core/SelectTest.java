@@ -171,7 +171,7 @@ public class SelectTest extends BaseJsonDBTest {
 	}
 
 	private static IResultSet executeQuery(String sql) throws SQLParserException, SQLException {
-		return (IResultSet) JsonDB.executeSQL(sql);
+		return (IResultSet) JsonDB.executeSQL(sql).get(0);
 	}
 
 }
