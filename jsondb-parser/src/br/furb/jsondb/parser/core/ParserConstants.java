@@ -181,10 +181,9 @@ public interface ParserConstants
         
         // <--- NÃO-TERMINAIS ---
         // "<sentenca> inválido",
-        // TODO: remover as tags das duas strings
-        "<sentenca> esperado [ CREATE | INSERT INTO | SELECT | DROP | DESCRIBE | SET ]",
+        "esperado [ CREATE | INSERT INTO | SELECT | DROP | DESCRIBE | SET ]",
         // "<acao> inválido",
-        "<acao> esperado [ CREATE | INSERT INTO | SELECT | DROP | DESCRIBE | SET ]",
+        "esperado [ CREATE | INSERT INTO | SELECT | DROP | DESCRIBE | SET ]",
         // "<criar> inválido",
         "esperado [ CREATE ]",
         // "<criar_estrutura> inválido",
