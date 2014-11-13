@@ -9,13 +9,16 @@ import br.furb.jsondb.parser.statement.IStatement;
 public class Semantico implements Constants {
 
 	private StatementParser stmParser;
+	public boolean showActions = false;
 
 	public Semantico() {
 		stmParser = new StatementParser();
 	}
 
 	public void executeAction(int action, Token token) throws SQLParserException {
-		System.out.println("Ação #" + action + ", Token: " + token);
+		if (showActions) {
+			System.out.println("Ação #" + action + ", Token: " + token);
+		}
 		stmParser.executeAction(action, token);
 	}
 
