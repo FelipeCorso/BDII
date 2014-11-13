@@ -9,6 +9,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -17,27 +18,35 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import br.furb.json.ui.Actions;
 import br.furb.json.ui.Principal;
+import br.furb.json.ui.panel.tab.TabbedPanel;
 import br.furb.json.ui.shortcut.NumberedBorder;
-import br.furb.json.ui.status.EStatus;
+import br.furb.json.ui.status.ModificationStatus;
 import br.furb.jsondb.utils.StringUtils;
 
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
+/**
+ * Painel para inserção e execução de comandos SQL.<br>
+ * É composto por um editor, painel de mensagens, rótulo indicando o caminho do
+ * arquivo e botões para apagar o conteúdo ou executar o script.<br>
+ * É possível verificar e alterar o estado de modificação de um documento por
+ * esta classe.
+ */
 public class CommandPanel extends JPanel {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -3187283892481573406L;
 	private final JTextArea textEditor;
 	private final JTextArea textMsg;
@@ -52,10 +61,19 @@ public class CommandPanel extends JPanel {
 	private JLabel lbStatus;
 	private JLabel lbFilePath;
 
+	private ModificationStatus modificationStatus = ModificationStatus.UNMODIFIED;
+	private File correspondingFile;
+	private String title;
+	private TabbedPanel owner;
+
 	/**
 	 * Create the frame.
+	 * 
+	 * @param title
+	 *            título do documento
 	 */
-	public CommandPanel(final Principal principal) {
+	public CommandPanel(String title, final Principal principal) {
+		this.setTitle(title);
 		addKeyListener(principal.getKeyListener());
 
 		setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -120,6 +138,31 @@ public class CommandPanel extends JPanel {
 		textEditor.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK), "none");
 		textEditor.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK), "none");
 		textEditor.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK), "none");
+
+		textEditor.getDocument().addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				documentChanged();
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				documentChanged();
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				documentChanged();
+			}
+
+			private void documentChanged() {
+				if (!isModified()) {
+					setModified(true);
+				}
+			}
+		});
+
 		panelEditor.setLayout(new BoxLayout(panelEditor, BoxLayout.X_AXIS));
 
 		panelEditor.add(textEditor);
@@ -145,14 +188,21 @@ public class CommandPanel extends JPanel {
 		textMsg.setFont(new Font("Console", Font.PLAIN, 11));
 
 		setBorder(new EmptyBorder(5, 5, 5, 5));
+		
+		setModified(false);
+	}
+	
+	@Override
+	public void setVisible(boolean aFlag) {
+		super.setVisible(aFlag);
+		this.textEditor.requestFocus();
 	}
 
 	private void createStatusPathBar(Principal principal) {
-
 		panelFooter.setLayout(new GridLayout(1, 2, 0, 0));
 		panelFooter.addKeyListener(principal.getKeyListener());
 
-		lbStatus = new JLabel(EStatus.NAO_MODIFICADO.toString());
+		lbStatus = new JLabel();
 		lbStatus.addKeyListener(principal.getKeyListener());
 		panelFooter.add(lbStatus);
 
@@ -169,12 +219,57 @@ public class CommandPanel extends JPanel {
 		return textMsg;
 	}
 
-	public JLabel getLbStatus() {
-		return lbStatus;
+	/**
+	 * Retorna o arquivo correspondente a este script.
+	 * 
+	 * @return arquivo correspondente a este script.
+	 */
+	public File getCorrespondingFile() {
+		return correspondingFile;
 	}
 
-	public JLabel getLbFilePath() {
-		return lbFilePath;
+	/**
+	 * Define o arquivo correspondente a este script.
+	 * 
+	 * @param correspondingFile
+	 *            arquivo correspondente a este script
+	 */
+	public void setCorrespondingFile(File correspondingFile) {
+		this.correspondingFile = correspondingFile;
+	}
+
+	/**
+	 * Método de conveniência para verificar se a enumeração do estado de
+	 * modificação do documento é {@link ModificationStatus#MODIFIED}.
+	 * 
+	 * @return {@code true} se o documento tiver sido modificado. {@code false}
+	 *         do contrário.
+	 */
+	public boolean isModified() {
+		return getModificationStatus() == ModificationStatus.MODIFIED;
+	}
+
+	/**
+	 * Método de conveniência para definir a enumeração correspondente ao estado
+	 * de modificação do documento.
+	 * 
+	 * @param modified
+	 *            {@code true} se o documento está
+	 *            {@link ModificationStatus#MODIFIED MODIFIED}, {@code false} se
+	 *            está {@link ModificationStatus#UNMODIFIED UNMODIFIED}.
+	 */
+	public void setModified(boolean modified) {
+		this.modificationStatus = modified ? ModificationStatus.MODIFIED : ModificationStatus.UNMODIFIED;
+		this.lbStatus.setText(this.modificationStatus.toString());
+	}
+
+	/**
+	 * Retorna o estado de modificação correspondente do documento atual.
+	 * 
+	 * @return estado de modificação correspondente do documento atual.
+	 */
+	public ModificationStatus getModificationStatus() {
+		return modificationStatus;
 	}
 
 	/**
@@ -185,11 +280,47 @@ public class CommandPanel extends JPanel {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// Add content to the window.
-		frame.getContentPane().add(new CommandPanel(new Principal()));
+		frame.getContentPane().add(new CommandPanel("Sem título", new Principal()));
 		frame.setMinimumSize(new Dimension(600, 400));
 
 		// Display the window.
 		frame.pack();
 		frame.setVisible(true);
 	}
+
+	/**
+	 * Retorna o título do documento.
+	 * 
+	 * @return título do documento.
+	 */
+	public String getTitle() {
+		return title;
+	}
+
+	/**
+	 * Altera o título do documento.
+	 * 
+	 * @param title
+	 *            título do documento.
+	 */
+	public void setTitle(String title) {
+		this.title = title;
+		if (owner != null) {
+			int index = owner.getTabIndex(this);
+			if (index >= 0) {
+				owner.setTitleAt(index, title);
+			}
+		}
+	}
+
+	/**
+	 * Define o {@link JTabbedPane} ao qual este painel foi vinculado.
+	 * 
+	 * @param owner
+	 *            {@code JTabbedPane} ao qual este painel foi vinculado.
+	 */
+	public void setOwner(TabbedPanel owner) {
+		this.owner = owner;
+	}
+
 }

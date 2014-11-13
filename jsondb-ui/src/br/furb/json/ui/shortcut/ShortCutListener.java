@@ -1,20 +1,17 @@
 package br.furb.json.ui.shortcut;
 
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import br.furb.json.ui.Actions;
 import br.furb.json.ui.Principal;
-import br.furb.json.ui.status.EStatus;
 
-public class ShortCutListener implements KeyListener {
+public class ShortCutListener extends KeyAdapter {
 
 	private Principal compUi;
-	private String textEditor;
 
 	public ShortCutListener(Principal compUi) {
 		this.compUi = compUi;
-		textEditor = "";
 	}
 
 	@SuppressWarnings("incomplete-switch")
@@ -52,6 +49,11 @@ public class ShortCutListener implements KeyListener {
 				compUi.doSafely(Actions::cut);
 			}
 			break;
+		case KeyEvent.VK_W:
+			if (isCtrlDown) {
+				compUi.doSafely(Actions::closeTab);
+			}
+			break;
 		// case KeyEvent.VK_F8:
 		// new BotaoCompilar().executeAction(compUi);
 		// break;
@@ -59,36 +61,9 @@ public class ShortCutListener implements KeyListener {
 		// new BotaoGerarCodigo().executeAction(compUi);
 		// break;
 		case KeyEvent.VK_F1:
-			Actions.showTeam(compUi);
+			compUi.doSafely(Actions::showTeam);
 			break;
 		}
-	}
-
-	@Override
-	public void keyReleased(KeyEvent event) {
-		if (compUi.getTabbedPanel().getCommandPanel() != null) {
-			// FIXME: COMANDO DEVE SER EXECUTADO NA ABA SELECIONADA
-			if (!textEditor.equalsIgnoreCase(compUi.getTabbedPanel().getCommandPanel().getTextEditor().getText())) {
-				compUi.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.MODIFICADO.toString());
-			} else {
-				compUi.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.NAO_MODIFICADO.toString());
-			}
-		}
-
-	}
-
-	@Override
-	public void keyTyped(KeyEvent event) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public String getTextoEditor() {
-		return textEditor;
-	}
-
-	public void setTextoEditor(String textEditor) {
-		this.textEditor = textEditor;
 	}
 
 }

@@ -29,6 +29,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+import br.furb.json.ui.panel.command.CommandPanel;
 import br.furb.json.ui.panel.tab.TabbedPanel;
 import br.furb.json.ui.panel.treeMenu.TreeMenuPanel;
 import br.furb.json.ui.shortcut.ShortCutListener;
@@ -75,6 +76,7 @@ public class Principal extends JFrame {
 	private Collection<JMenuItem> baseDependantMenus;
 
 	private File workingDir;
+	private JMenuItem mntmFecharScript;
 
 	/**
 	 * Launch the application.
@@ -133,7 +135,7 @@ public class Principal extends JFrame {
 
 		menuBar = new JMenuBar();
 		createJMenuBar();
-		
+
 		setWorkingDir(new File(JsonDBProperty.JSON_DB_DIR.get()));
 	}
 
@@ -157,16 +159,19 @@ public class Principal extends JFrame {
 		mntmOpenScript.addMouseListener(createSafeMouseListener(Actions::openDatabase));
 		mnFile.add(mntmOpenScript);
 
-		mntmSave = new JMenuItem("Salvar script");
+		mntmSave = new JMenuItem(createSafeAction(Actions::saveScript, "Salvar script"));
 		mntmSave.setMnemonic(KeyEvent.VK_S);
 		mntmSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
-		mntmSave.addMouseListener(createSafeMouseListener(Actions::saveScript));
 		mnFile.add(mntmSave);
 
 		mntmSaveScriptAs = new JMenuItem("Salvar script como...");
 		mntmSaveScriptAs.setMnemonic(KeyEvent.VK_C);
 		mntmSaveScriptAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
 		mnFile.add(mntmSaveScriptAs);
+		
+		mntmFecharScript = new JMenuItem(createSafeAction(Actions::closeTab, "Fechar script"));
+		mntmFecharScript.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_MASK));
+		mnFile.add(mntmFecharScript);
 
 		mntmChangeWorkDir = new JMenuItem(createSafeAction(Actions::changeWorkingDir, "Alterar pasta de trabalho"));
 		mntmChangeWorkDir.setMnemonic(KeyEvent.VK_T);
@@ -266,6 +271,11 @@ public class Principal extends JFrame {
 		return keyListener;
 	}
 
+	/**
+	 * @deprecated você não deveria estar usando isso... use
+	 *             {@link #getActiveCommandPanel()}
+	 */
+	@Deprecated
 	public TabbedPanel getTabbedPanel() {
 		return tabbedPanel;
 	}
@@ -327,7 +337,7 @@ public class Principal extends JFrame {
 	 * @param message
 	 *            mensagem do erro.
 	 */
-	private void handleUIException(String message) {
+	public void handleUIException(String message) {
 		UIUtils.showMessage(this, message, "Erro", JOptionPane.ERROR_MESSAGE);
 	}
 
@@ -348,6 +358,40 @@ public class Principal extends JFrame {
 
 	public File getWorkingDir() {
 		return workingDir;
+	}
+
+	/**
+	 * Retorna a {@link CommandPanel aba de script} ativa.
+	 * 
+	 * @return aba de script ativa, ou {@code null} caso não haja uma.
+	 */
+	public CommandPanel getActiveCommandPanel() {
+		return this.tabbedPanel.getCommandPanel();
+	}
+
+	/**
+	 * Adiciona uma nova aba de código.
+	 * 
+	 * @param commandPanel
+	 *            painel do documento.
+	 */
+	public void addCommandPanel(CommandPanel commandPanel) {
+		if (commandPanel == null) {
+			return;
+		}
+		this.tabbedPanel.add(commandPanel.getTitle(), commandPanel);
+		this.tabbedPanel.setSelectedComponent(commandPanel);
+		commandPanel.setOwner(this.tabbedPanel);
+	}
+
+	/**
+	 * Remove a aba do painel de comando informado.
+	 * 
+	 * @param commandPanel
+	 *            painel de comando a ser removido.
+	 */
+	public void closeCommandPanel(CommandPanel commandPanel) {
+		this.tabbedPanel.remove(commandPanel);
 	}
 
 }

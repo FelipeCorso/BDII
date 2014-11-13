@@ -1,18 +1,17 @@
 package br.furb.json.ui;
 
-import java.awt.FileDialog;
-import java.awt.Frame;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import br.furb.json.ui.dialog.DatabaseDialog;
 import br.furb.json.ui.panel.command.CommandPanel;
 import br.furb.json.ui.panel.treeMenu.ManagerTreeMenu;
-import br.furb.json.ui.status.EStatus;
 import br.furb.jsondb.core.JsonDB;
 import br.furb.jsondb.core.result.IResult;
 import br.furb.jsondb.parser.SQLParserException;
@@ -20,6 +19,7 @@ import br.furb.jsondb.sql.SQLException;
 import br.furb.jsondb.store.metadata.DatabaseMetadata;
 import br.furb.jsondb.store.utils.JsonUtils;
 import br.furb.jsondb.utils.StringUtils;
+import br.furb.jsondb.utils.ui.UIUtils;
 
 public final class Actions {
 
@@ -37,26 +37,39 @@ public final class Actions {
 
 	public static void showTeam(Principal principal) {
 		// TODO: mostrar em uma modal
-		principal.getTabbedPanel().getCommandPanel().getTextMsg().setText("Integrantes Equipe: Felipe Loose Corso, Janaína Carraro Mendonça Lima, William Leander Seefeld\n");
+		CommandPanel commandPanel = principal.getActiveCommandPanel();
+		commandPanel.getTextMsg().setText("Integrantes Equipe: Felipe Loose Corso, Janaína Carraro Mendonça Lima, William Leander Seefeld\n");
 	}
 
 	public static void copy(Principal principal) {
-		// FIXME: copiar só a seleção
-		principal.getTabbedPanel().getCommandPanel().getTextEditor().copy();
+		CommandPanel commandPanel = principal.getActiveCommandPanel();
+		if (commandPanel != null) {
+			commandPanel.getTextEditor().copy();
+		}
 	}
 
 	public static void cut(Principal principal) {
-		// FIXME: recortar só a seleção
-		principal.getTabbedPanel().getCommandPanel().getTextEditor().cut();
-		principal.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.MODIFICADO.toString());
+		CommandPanel commandPanel = principal.getActiveCommandPanel();
+		if (commandPanel != null) {
+			commandPanel.getTextEditor().cut();
+			commandPanel.setModified(true);
+		}
+	}
+
+	public static void paste(Principal principal) {
+		CommandPanel commandPanel = principal.getActiveCommandPanel();
+		if (commandPanel != null) {
+			commandPanel.getTextEditor().paste();
+			commandPanel.setModified(true);
+		}
 	}
 
 	public static void executeScript(Principal principal) {
-		CommandPanel commandPanel = principal.getTabbedPanel().getCommandPanel();
+		CommandPanel commandPanel = principal.getActiveCommandPanel();
 		JTextArea textMsg = commandPanel.getTextMsg();
 		textMsg.setText(StringUtils.EMPTY_STR);
 		try {
-			IResult result = JsonDB.getInstance().executeSQL(principal.getTabbedPanel().getCommandPanel().getTextEditor().getText());
+			IResult result = JsonDB.getInstance().executeSQL(commandPanel.getTextEditor().getText());
 			result.getMessages().forEach(message -> textMsg.append(message));
 		} catch (SQLParserException e) {
 			textMsg.setText(e.getCause().getMessage());
@@ -88,20 +101,20 @@ public final class Actions {
 
 			((javax.swing.tree.DefaultTreeModel) principal.getTreeMenu().getjTree().getModel()).reload(ManagerTreeMenu.sort(dataBaseNode));
 
-			principal.getTabbedPanel().getCommandPanel().getTextEditor().setText("");
-			principal.getTabbedPanel().getCommandPanel().getTextMsg().setText("");
-			principal.getTabbedPanel().getCommandPanel().getLbFilePath().setText("");
-			principal.getKeyListener().setTextoEditor("");
-			principal.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.NAO_MODIFICADO.toString());
+			CommandPanel activeCommandPanel = principal.getActiveCommandPanel();
+			activeCommandPanel.getTextEditor().setText("");
+			activeCommandPanel.getTextMsg().setText("");
+			activeCommandPanel.setModified(false);
 		}
 	}
-	
+
 	/**
 	 * Cria uma nova aba de código
+	 * 
 	 * @param principal
 	 */
 	public static void newScript(Principal principal) {
-		principal.getTabbedPanel().add("Script sem base " + ++NO_BASE_SCRIPTS, new CommandPanel(principal));
+		principal.addCommandPanel(new CommandPanel("Script sem base " + ++NO_BASE_SCRIPTS, principal));
 	}
 
 	public static void openDatabase(Principal principal) {
@@ -126,32 +139,92 @@ public final class Actions {
 		}
 	}
 
-	public static void paste(Principal principal) {
-		principal.getTabbedPanel().getCommandPanel().getTextEditor().paste();
-		principal.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.MODIFICADO.toString());
+	/**
+	 * Fecha a aba de código informada.
+	 * 
+	 * @param principal
+	 *            janela principal do compilador, na qual são exibidas janelas
+	 *            modais e tratados erros ocorridos na execução das ações.
+	 */
+	public static void closeTab(Principal principal) {
+		CommandPanel commandPanel = principal.getActiveCommandPanel();
+		if (commandPanel != null) {
+			if (commandPanel.isModified()) {
+				int confirmation = canSaveDocument(principal, commandPanel);
+				if (confirmation == JOptionPane.YES_OPTION) {
+					try {
+						saveDocument(principal, commandPanel, false);
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				} else if (confirmation == JOptionPane.CANCEL_OPTION) {
+					return;
+				}
+			}
+			principal.closeCommandPanel(commandPanel);
+		}
+	}
+
+	/**
+	 * Pergunta ao usuário se o documento informado pode ser salvo
+	 * automaticamente.<br>
+	 * Esta confirmação geralmente é necessária quando o usuário solicitou uma
+	 * ação que exige que o documento esteja salvo, mas o mesmo se encontra
+	 * modificado.
+	 * 
+	 * @param principal
+	 *            janela principal do compilador, na qual será exibida a janela
+	 *            de confirmação.
+	 * @param commandPanel
+	 *            documento a ser salvo.
+	 * @return {@link JOptionPane#YES_OPTION} caso o usuário deseje salvar o
+	 *         documento;<br>
+	 *         {@link JOptionPane#NO_OPTION} caso o usuário deseje continuar sem
+	 *         salvar o documento;<br>
+	 *         {@link JOptionPane#CANCEL_OPTION} caso o usuário deseje abortar a
+	 *         ação.
+	 * 
+	 */
+	public static int canSaveDocument(Principal principal, CommandPanel commandPanel) {
+		String message = String.format("O documento \"%s\" possui alterações não salvas. Deseja salvá-las antes de continuar?", commandPanel.getTitle());
+		return UIUtils.promptConfirmationWithAbortion(principal, message, "Confirmação");
+	}
+
+	public static boolean saveDocument(Principal principal, CommandPanel commandPanel, boolean askNewLocation) throws IOException {
+		File file = commandPanel.getCorrespondingFile();
+		if (askNewLocation || file == null) {
+			File suggestedFile = file != null ? file : new File(commandPanel.getTitle() + ".sql");
+			boolean fileIsValid = false;
+			do {
+				JFileChooser saveDialog = new JFileChooser(suggestedFile);
+				if (saveDialog.showSaveDialog(principal) != JFileChooser.APPROVE_OPTION) {
+					return false;
+				}
+				file = saveDialog.getSelectedFile();
+				fileIsValid = file != null && !file.isDirectory();
+				if (!fileIsValid) {
+					principal.handleUIException("Informe um arquivo.");
+				}
+			} while (!fileIsValid);
+		}
+		file = file.getAbsoluteFile();
+		try (FileWriter fw = new FileWriter(file, false)) {
+			fw.write(commandPanel.getTextEditor().getText());
+			fw.flush();
+		}
+		commandPanel.setModified(false);
+		commandPanel.setCorrespondingFile(file);
+		commandPanel.setTitle(file.getName().replaceFirst("(?i)\\.sql$", ""));
+		return true;
 	}
 
 	public static void saveScript(Principal principal) {
-		if (principal.getTabbedPanel().getCommandPanel().getLbStatus().getText().equalsIgnoreCase(EStatus.MODIFICADO.toString())) {
-			String absolutePath = principal.getTabbedPanel().getCommandPanel().getLbFilePath().getText();
-
-			if (absolutePath.isEmpty()) {
-				// FIXME AJUSTAR
-				//				Dialog dialog = new Dialog(principal, "Informe o diretório e o nome do arquivo", FileDialog.SAVE);
-				//
-				//				dialog.abrirFrame();
-				//				absolutePath = dialog.getAbsolutePath();
-			}
-
+		CommandPanel commandPanel = principal.getActiveCommandPanel();
+		if (commandPanel.isModified()) {
 			try {
-				if (!absolutePath.equalsIgnoreCase("C:\\null")) {
-					Actions.saveFile(absolutePath, principal.getTabbedPanel().getCommandPanel().getTextEditor().getText());
-					principal.getTabbedPanel().getCommandPanel().getLbFilePath().setText(absolutePath);
-					principal.getTabbedPanel().getCommandPanel().getTextMsg().setText("");
-					principal.getTabbedPanel().getCommandPanel().getLbStatus().setText(EStatus.NAO_MODIFICADO.toString());
-				}
+				saveDocument(principal, commandPanel, false);
 			} catch (IOException e) {
-				throw new RuntimeException("Não foi possível salvar o arquivo: \n\t" + e.getMessage());
+				throw new RuntimeException(e);
 			}
 		}
 	}
@@ -160,27 +233,6 @@ public final class Actions {
 		try (FileWriter fw = new FileWriter(absolutePath, false)) {
 			fw.write(buffer);
 			fw.flush();
-		}
-	}
-
-	private class Dialog extends FileDialog {
-
-		public Dialog(Frame parent, String title, int mode) {
-			super(parent, title, mode);
-		}
-
-		private static final long serialVersionUID = 1L;
-		private String absolutePath;
-
-		public void abrirFrame() {
-			this.setDirectory("C:\\");
-			this.setVisible(true);
-
-			absolutePath = this.getDirectory() + this.getFile();
-		}
-
-		public String getAbsolutePath() {
-			return absolutePath;
 		}
 	}
 

@@ -13,7 +13,8 @@ public class TabbedPanel extends JTabbedPane {
 
 	private static final long serialVersionUID = 4227160448630150355L;
 	private Principal principal;
-	private Map<String, Component> tabMap = new LinkedHashMap<String, Component>();
+	@Deprecated
+	private Map<String, Component> tabMap = new LinkedHashMap<String, Component>(); // FIXME: pra quê?
 	private CommandPanel commandPanel;
 
 	/**
@@ -28,10 +29,14 @@ public class TabbedPanel extends JTabbedPane {
 	}
 
 	/**
-	 * Caso o usuário tenha selecionado uma base é criada uma aba, para executar os comandos.
+	 * Caso o usuário tenha selecionado uma base é criada uma aba, para executar
+	 * os comandos.
+	 * 
+	 * @deprecated em revisão
 	 */
+	@Deprecated
 	public void createTabDataBase(String dataBaseName) {
-		commandPanel = new CommandPanel(principal);
+		commandPanel = new CommandPanel(dataBaseName, principal);
 		add(dataBaseName, commandPanel);
 	}
 
@@ -39,14 +44,15 @@ public class TabbedPanel extends JTabbedPane {
 		return (CommandPanel) getSelectedComponent();
 	}
 
-	@Override
+	// TODO
+	/*@Override
 	public Component add(String title, Component component) {
 		if (!tabMap.containsKey(title)) {
 			tabMap.put(title, component);
 			return super.add(title, component);
 		}
 		return component;
-	}
+	}*/
 
 	public void remove(String dataBaseName) {
 		Component component = tabMap.get(dataBaseName);
@@ -55,4 +61,15 @@ public class TabbedPanel extends JTabbedPane {
 			super.remove(component);
 		}
 	}
+
+	public int getTabIndex(Component c) {
+		Component[] components = getComponents();
+		for (int i = 0; i < components.length; i++) {
+			if (components[i] == c) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
 }

@@ -84,7 +84,7 @@ public class CreateTableCommand implements ICommand {
 			if (constraintDefinition.getKind() == ConstraintKind.PRIMARY_KEY) {
 
 				if (pk.size() > 0) {
-					throw new SQLException("Multiple primary key defined");
+					throw new SQLException("Multiple primary keys defined");
 				}
 
 				KeyDefinition keyDefinition = (KeyDefinition) constraintDefinition;

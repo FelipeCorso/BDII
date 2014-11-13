@@ -3,16 +3,14 @@ package br.furb.json.ui.panel.treeMenu;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.UIManager;
 import javax.swing.border.MatteBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -20,6 +18,7 @@ import javax.swing.tree.TreePath;
 import br.furb.json.ui.Actions;
 import br.furb.json.ui.Principal;
 
+import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
@@ -31,7 +30,7 @@ public class TreeMenuPanel extends JPanel {
 	private static final long serialVersionUID = 8080924607252341731L;
 
 	protected static final String TABLES_STR = "Tabelas";
-	protected static final String INDEX_STR = "�ndices";
+	protected static final String INDEX_STR = "Índices";
 
 	private DefaultMutableTreeNode dataBaseNode;
 
@@ -39,22 +38,21 @@ public class TreeMenuPanel extends JPanel {
 
 	public TreeMenuPanel(Principal principal) {
 		setBorder(new MatteBorder(1, 1, 1, 1, new Color(0, 0, 0)));
-		addKeyListener(principal.getKeyListener());
+		//		addKeyListener(principal.getKeyListener());
 
-		defineLookAndFeel();
 		setLayout(new BorderLayout(0, 0));
 
 		JPanel panelBotoes = new JPanel();
-		panelBotoes.addKeyListener(principal.getKeyListener());
+		//		panelBotoes.addKeyListener(principal.getKeyListener());
 		add(panelBotoes, BorderLayout.NORTH);
 
 		JScrollPane scrollPaneTree = new JScrollPane();
-		scrollPaneTree.addKeyListener(principal.getKeyListener());
+		//		scrollPaneTree.addKeyListener(principal.getKeyListener());
 		add(scrollPaneTree, BorderLayout.CENTER);
 
 		dataBaseNode = new DefaultMutableTreeNode(DATA_BASE_STR);
 		jTree = new JTree(new javax.swing.tree.DefaultTreeModel(dataBaseNode));
-		jTree.addKeyListener(principal.getKeyListener());
+		//		jTree.addKeyListener(principal.getKeyListener());
 		jTree.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -66,14 +64,14 @@ public class TreeMenuPanel extends JPanel {
 
 					if (!dmt.getUserObject().toString().equalsIgnoreCase(DATA_BASE_STR)) {
 						if (dmt.getParent().toString().equalsIgnoreCase(DATA_BASE_STR)) {
-							// � uma base, fazer select
+							// é uma base, fazer select
 							principal.getTabbedPanel().createTabDataBase(dmt.toString());
 						} else {
 							if (dmt.getParent().toString().equalsIgnoreCase(TABLES_STR)) {
-								// � uma tabela, describe
+								// é uma tabela, describe
 							} else {
 								if (dmt.getParent().toString().equalsIgnoreCase(TABLES_STR)) {
-									// � um �ndice, apresentar nome, colunas
+									// é um índice, apresentar nome, colunas
 								}
 							}
 						}
@@ -84,46 +82,30 @@ public class TreeMenuPanel extends JPanel {
 			}
 		});
 		scrollPaneTree.setViewportView(jTree);
+		panelBotoes.setLayout(new FormLayout(new ColumnSpec[] { ColumnSpec.decode("center:50px"), ColumnSpec.decode("center:50px"), FormFactory.RELATED_GAP_COLSPEC,
+				ColumnSpec.decode("max(50px;default)"), }, new RowSpec[] { RowSpec.decode("32px"), }));
 
-		JLabel lblOpenDB = new JLabel("");
-		lblOpenDB.setAlignmentX(Component.CENTER_ALIGNMENT);
-		lblOpenDB.setToolTipText("Abrir Database [Ctrl+A]");
-		lblOpenDB.addKeyListener(principal.getKeyListener());
-		lblOpenDB.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				principal.doSafely(Actions::openDatabase);
-			}
-		});
-		panelBotoes.setLayout(new FormLayout(new ColumnSpec[] { ColumnSpec.decode("center:50px"), ColumnSpec.decode("center:50px"), ColumnSpec.decode("center:50px"), },
-				new RowSpec[] { RowSpec.decode("32px"), }));
-
-		JLabel lblNewDB = new JLabel("");
-		lblNewDB.addMouseListener(new MouseAdapter() {
+		JButton btnNewDB = new JButton(new ImageIcon(TreeMenuPanel.class.getResource("/Images/Add folder.png")));
+		btnNewDB.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				principal.doSafely(Actions::newDatabase);
 			}
 		});
-		lblNewDB.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		lblNewDB.setToolTipText("Nova Database [Ctrl+N]");
-		lblNewDB.setIcon(new ImageIcon(TreeMenuPanel.class.getResource("/Images/Add folder.png")));
-		lblNewDB.addKeyListener(principal.getKeyListener());
-		panelBotoes.add(lblNewDB, "1, 1, center, fill");
+		btnNewDB.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		btnNewDB.setToolTipText("Nova Database [Ctrl+N]");
+		//		lblNewDB.addKeyListener(principal.getKeyListener());
+		panelBotoes.add(btnNewDB, "1, 1, center, fill");
 
-		lblOpenDB.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		lblOpenDB.setIcon(new ImageIcon(TreeMenuPanel.class.getResource("/Images/openFile.png")));
-		panelBotoes.add(lblOpenDB, "2, 1, center, fill");
+		JButton btnDropDB = new JButton(new ImageIcon(TreeMenuPanel.class.getResource("/Images/Remove Folder.png")));
+		btnDropDB.setAlignmentX(Component.CENTER_ALIGNMENT);
+		btnDropDB.setToolTipText("Remover Database [Del]");
+		//		btnDropDB.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		//		lblDropDB.addKeyListener(principal.getKeyListener());
+		btnDropDB.addMouseListener(new MouseAdapter() {
 
-		JLabel lblRemoveDB = new JLabel("");
-		lblRemoveDB.setAlignmentX(Component.CENTER_ALIGNMENT);
-		lblRemoveDB.setToolTipText("Remover Database [Del]");
-		lblRemoveDB.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		lblRemoveDB.setIcon(new ImageIcon(TreeMenuPanel.class.getResource("/Images/Remove Folder.png")));
-		lblRemoveDB.addKeyListener(principal.getKeyListener());
-		lblRemoveDB.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
+			public void mouseClicked(MouseEvent e) {
 				TreePath selectionPath = jTree.getSelectionPath();
 
 				if (selectionPath != null) {
@@ -148,20 +130,8 @@ public class TreeMenuPanel extends JPanel {
 			}
 		});
 
-		panelBotoes.add(lblRemoveDB, "3, 1, center, fill");
+		panelBotoes.add(btnDropDB, "2, 1, center, fill");
 
-	}
-
-	private static boolean useSystemLookAndFeel = true;
-
-	private static void defineLookAndFeel() {
-		if (useSystemLookAndFeel) {
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (Exception e) {
-				System.err.println("Couldn't use system look and feel.");
-			}
-		}
 	}
 
 	public JTree getjTree() {
