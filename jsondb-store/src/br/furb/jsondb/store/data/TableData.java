@@ -26,8 +26,7 @@ public class TableData {
 		if (!rows.containsKey(id)) {
 			// Lê o registro e joga para a memória.
 
-			File databaseDir = JsonDBStore.getInstance().getDatabaseDir(
-					database);
+			File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
 			File tableDir = new File(databaseDir, tableMetadata.getName());
 
 			addRowData(tableDir, id);
@@ -46,9 +45,9 @@ public class TableData {
 		File databaseDir = JsonDBStore.getInstance().getDatabaseDir(database);
 		File tableDir = new File(databaseDir, tableMetadata.getName());
 
-		LastRowId lastRowId = LastRowIdUtils.getLastRowId(tableDir);
+		int lastRowId = LastRowIdUtils.getLastRowId(tableDir).getLastRowId();
 
-		for (int i = -1; i < lastRowId.getLastRowId(); i++) {
+		for (int i = -1; i < lastRowId; i++) {
 
 			if (!rows.containsKey(i + 1)) {
 

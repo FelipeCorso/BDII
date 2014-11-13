@@ -42,6 +42,10 @@ public class IndexData {
 		return mapEntries.get(Arrays.asList(values));
 	}
 
+	public Map<List<String>, List<Integer>> getMapEntries() {
+		return mapEntries;
+	}
+
 	public String getName() {
 		return name;
 	}
