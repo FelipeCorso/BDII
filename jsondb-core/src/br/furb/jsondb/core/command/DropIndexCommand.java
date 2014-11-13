@@ -56,7 +56,7 @@ public class DropIndexCommand implements ICommand {
 
 		JsonDBStore.dropIndex(database, index);
 
-		return new Result();
+		return new Result("Index deleted with success");
 	}
 
 	private static void validateTable(DatabaseMetadata databaseMetadata, TableIdentifier tableIdentifier) throws SQLException {
