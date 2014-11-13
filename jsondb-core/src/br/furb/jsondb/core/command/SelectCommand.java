@@ -66,6 +66,9 @@ public class SelectCommand implements ICommand {
 
 			TableData tableData = TableDataProvider.getInstance().getTableData(database, tableIdentifier.getIdentifier());
 
+			//TODO se o where tiver campo que possui indice, buscar os registros direto do indice, não todos os registros da tabela
+			//if (selectStatement.getWhereClause().isPresent()) {
+
 			Map<Integer, RowData> rows = tableData.getRows();
 
 			for (RowData rowData : rows.values()) {
